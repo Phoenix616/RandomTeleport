@@ -1,0 +1,38 @@
+name: RandomTeleport
+main: de.themoep.bukkit.plugin.RandomTeleport.RandomTeleport
+softdepend: [WorldGuard,Factions]
+version: 1.4.9 de git
+description: provides a command to teleport the player to a random save location
+author: Phoenix616
+website: http://dev.bukkit.org/bukkit-plugins/randomteleport/
+commands:
+   randomteleport:
+      aliases: [randomtp, rtp]
+      description: RandomTeleport command.
+      usage: |
+             /<command> <minRange> <maxRange> [-p, -w, -x, -z, -c, -f]             
+             minRange - minimum distance to the center point (square shaped)
+             maxRange - maximum distance to the center point (square shaped)
+             Options:
+             > -p,-player <playername> - teleports other players
+             > -w,-world <worldname> - teleports the player in a specific world
+             > -x,-xPos <x value> - x axis of the center point, if not set the player's x axis is used
+             > -z,-zPos <z value> - z axis of the center point, if not set the player's z axis is used
+             > -c, -cooldown <seconds> - cooldown in seconds after which the player can use this teleporter again
+             > -f,-force - teleport even if there is no dirt/grass/sand/gravel, only checks for lava/water/cactus, ignores WorldGuard/Faction regions
+             /<command> stat - shows a statistic of the teleports since the last restart
+      permission: randomteleport.use
+      permission-message: You don't have the permission <permission>
+permissions:
+   randomteleport.use:
+      description: Gives permission to the command
+      default: op
+   randomteleport.tpothers:
+      description: Gives permission to teleport other players
+      default: op
+   randomteleport.cooldownexempt:
+      description: Teleportcooldown does not effect these players
+      default: op
+   randomteleport.stat:
+      description: Permission for showing the teleport statistic
+      default: op
