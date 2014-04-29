@@ -42,19 +42,19 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 	public static File folder = new File("plugins/RandomTeleport/");
 	
 	//English:
-	/*
+	
 	public static String textsearch = ChatColor.GRAY + "RandomTeleport searches for a safe place in world {worldname}. . .";
 	public static String textteleport = ChatColor.GRAY + "RandomTeleport teleported you to"; //  + " X: " + xTp + " Y: " + yTp + " Z: " + zTp + "!"
 	public static String textlocationerror = ChatColor.DARK_RED + "Error:" + ChatColor.RED + " RandomTeleport could not find a save location!";
 	public static String textcooldownerror = ChatColor.RED + "You have to wait {cooldown_text}before using this RandomTeleport again!";
-	*/
 	
-	//Deutsch:
-	public static String textsearch = ChatColor.GRAY + "Der Zufallsteleporter sucht nach einem sicheren Ort in Welt {worldname} . . .";
+	
+	//German:
+	/*public static String textsearch = ChatColor.GRAY + "Der Zufallsteleporter sucht nach einem sicheren Ort in Welt {worldname} . . .";
 	public static String textteleport = ChatColor.GRAY + "Der Zufallsteleporter teleportierte dich nach"; //  + " X: " + xTp + " Y: " + yTp + " Z: " + zTp + "!"
 	public static String textlocationerror = ChatColor.DARK_RED + "Fehler:" + ChatColor.RED + " der Zufallsteleporter konnte keinen sicheren Ort finden!";
 	public static String textcooldownerror = ChatColor.RED + "Du musst noch {cooldown_text}warten bevor du den Zufallsteleporter wieder nutzen kannst!";
-	
+	*/
 	
 	public void writeMap(Object object, String outputFile) {
 		try
