@@ -151,10 +151,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
     				} 
     			}
     			return true; 
-    		} else if (args.length == 1 && args[0].equalsIgnoreCase("write")) {
-				writeMap(cooldown, "cooldown.map");
-				return true;
-			}
+    		}
     		
     		if(args.length < 2) {
     			sender.sendMessage(ChatColor.DARK_RED + "Syntax error:" + ChatColor.RED + " Not enough arguments!");
@@ -210,7 +207,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
     			    	
 				       	// if -x/-z option is selected set x/z it to its values
     					} else if(args[i].equalsIgnoreCase("-x") || args[i].equalsIgnoreCase("-xPos")) {
-    						if(i+1 >= args.length || args[i+1].startsWith("-")) {
+    						if(i+1 >= args.length || (args[i+1].startsWith("-") && !isNumeric(args[i+1].substring(1)))) {
     			    			sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " The " + args[i] + " option needs an argument (" + args[i] + " value)!");
     			    			return true;
     						}
@@ -223,7 +220,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
     			    			return true;
     			    		}
     					} else if(args[i].equalsIgnoreCase("-z") || args[i].equalsIgnoreCase("-zPos")) {
-    						if(i+1 >= args.length || args[i+1].startsWith("-")) {
+    						if(i+1 >= args.length || (args[i+1].startsWith("-") && !isNumeric(args[i+1].substring(1)))) {
     			    			sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " The " + args[i] + " option needs an argument (" + args[i] + " value)!");
     			    			return true;
     						}
@@ -477,6 +474,16 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 			if(faction != wilderness) return false;
 		}
 		return true;
+	}
+	
+	// check if string is mumeric
+	public static boolean isNumeric(String str)
+	{
+	    for (char c : str.toCharArray())
+	    {
+	        if (!Character.isDigit(c)) return false;
+	    }
+	    return true;
 	}
     
 }
