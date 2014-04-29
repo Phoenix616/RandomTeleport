@@ -1,0 +1,13 @@
+/RandomTeleport v1.0/
+bin
+*.class
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+# Eclipse stuff
+.classpath
+.project
+.settings/
