@@ -35,7 +35,6 @@ import java.util.UUID;
 
 public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 	
-	///<command> <Playername> <minRange> <maxRange>
 	public static HashMap<String,Long> cooldown = new HashMap<String,Long> ();
 	public static HashSet<UUID> playerlock = new HashSet<UUID> ();
 	public static int[] checkstat = new int[100];
