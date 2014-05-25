@@ -38,7 +38,6 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 	public static HashMap<String,Long> cooldown = new HashMap<String,Long> ();
 	public static HashSet<UUID> playerlock = new HashSet<UUID> ();
 	public static int[] checkstat = new int[100];
-	public static File folder = new File("plugins/RandomTeleport/");
 	
 	//English:
 	
@@ -58,7 +57,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 	public void writeMap(Object object, String outputFile) {
 		try
 	      {
-			File file = new File(folder + "/" + outputFile);
+			File file = new File(getDataFolder().getPath() + "/" + outputFile);
 			if (!file.isFile()) {
 				if(!file.createNewFile()){			
 					throw new IOException("Error creating new file: " + file.getPath());
@@ -77,9 +76,9 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public HashMap<String, Long> readMap(String inputFile) {
-		HashMap<String,Long> map = cooldown;
-		File file = new File(folder + "/" + inputFile);
+	public Object readMap(String inputFile) {
+		HashMap<Object, Object> map = new HashMap<Object,Object>();
+		File file = new File(getDataFolder().getPath() + "/" + inputFile);
 		if (!file.isFile()) {
 			getLogger().fine("No file found in " + file.getPath());
 			try {
@@ -99,7 +98,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 	      {
 	         FileInputStream fileIn = new FileInputStream(file.getPath());
 	         ObjectInputStream in = new ObjectInputStream(fileIn);
-	         map = (HashMap<String,Long>) in.readObject();
+	         map = (HashMap<Object, Object>) in.readObject();
 	         in.close();
 	         fileIn.close();
 	      }catch(IOException i)
@@ -112,12 +111,10 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 		return map;
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void onEnable() {
-		if(!folder.isDirectory()) {
-			folder.mkdirs();
-		}
-		cooldown = readMap("cooldown.map");
+		cooldown = (HashMap<String, Long>) readMap("cooldown.map");
 	}
 	
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) throws NumberFormatException {
