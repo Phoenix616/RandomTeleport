@@ -124,7 +124,6 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
     	if((cmd.getName().equalsIgnoreCase("randomteleport") || cmd.getName().equalsIgnoreCase("randomtp") || cmd.getName().equalsIgnoreCase("rtp")) && sender.hasPermission("randomteleport.use")) { 
     		boolean force = false;
     		//boolean tppoints = false;
-    		boolean woption = false;
     		boolean xoption = false;
     		boolean zoption = false;
     		boolean coption = false;
@@ -196,12 +195,11 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
     			    			return true;
     						}
 						
-				    		world = Bukkit.getWorld(args[i+1]);
+				    		world = Bukkit.getServer().getWorld(args[i+1]);
 				    		if(world == null) {
 				    			sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " The world \"" + args[i+1] + "\" given in the " + args[i] + " option does not exist!");
     			    			return true;    						
 				    		}
-				    		woption = true;
 				    		i++;
     			    	
 				       	// if -x/-z option is selected set x/z it to its values
@@ -261,7 +259,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
     			return true;
     		}
     		
-    		if(!woption) {
+    		if(world == null) {
         		if(sender instanceof Player) world = ((Player) sender).getWorld();
         		else if(sender instanceof BlockCommandSender) world = ((BlockCommandSender) sender).getBlock().getWorld();
         		else if(sender instanceof ConsoleCommandSender) world = player.getWorld();
@@ -399,7 +397,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 			z = zold;
 			
 			// attempts to teleport player, sends message if it fails
-			if(!teleportPlayer(playername,x,z)) 
+			if(!teleportPlayer(playername,x,z,world)) 
 				sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " Player '" + playername + "' is not online anymore!");
 			else 
 				getLogger().fine("Used teleport location X: " + x + " Z: " + z + " for player '" + playername + "' RandomTeleportID: " + cooldownid);
@@ -415,12 +413,11 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
     }
 
     // teleports player with the name playername at the highest block at x/z
-	private boolean teleportPlayer(String playername, int x ,int z) {
+	private boolean teleportPlayer(String playername, int x ,int z, World world) {
 		final Player player = Bukkit.getServer().getPlayer(playername);
-		if(player == null) {    			
+		if(player == null||world == null) {    			
 			return false;
 		}
-		World world = player.getWorld();
 		final int xTp = x;
 		final int yTp = world.getHighestBlockYAt(x, z);
 		final int zTp = z;
