@@ -27,6 +27,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.text.BreakIterator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
@@ -114,6 +115,12 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void onEnable() {
+		saveDefaultConfig();
+		RandomTeleport.textsearch = this.getConfig().getString("msg.search");
+		RandomTeleport.textteleport = this.getConfig().getString("msg.teleport");
+		RandomTeleport.textlocationerror = this.getConfig().getString("msg.error.location");
+		RandomTeleport.textcooldownerror = this.getConfig().getString("msg.error.cooldown");
+		
 		cooldown = (HashMap<String, Long>) readMap("cooldown.map");
 	}
 	
@@ -133,7 +140,28 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
     		int cooldowntime = 0;
     		World world = null;
     		    		
+    		if(args.length == 0 && sender.hasPermission("randomteleport.presets.default")) {
+    			if(this.getConfig().getString("presets.default") != null) {
+    				String defaultcmd = this.getConfig().getString("presets.default").replace("/", "");
+    				defaultcmd = defaultcmd + " -p " + sender.getName();
+    				this.getServer().dispatchCommand(this.getServer().getConsoleSender(),defaultcmd);
+    				return true;
+    			}
+    		}
     		
+    		if(args.length == 1) {
+    			if(sender.hasPermission("randomteleport.presets." + args[0].toLowerCase())) {
+	    			if(this.getConfig().getString("presets." + args[0].toLowerCase()) == null) {
+	    				sender.sendMessage(ChatColor.RED + "The Random Teleport " + args[0].toLowerCase() + " does not exist!");
+	    				return true;
+	    			}
+	    			String defaultcmd = this.getConfig().getString("presets." + args[0].toLowerCase()).replace("/", "");
+					defaultcmd = defaultcmd + " -p " + sender.getName();
+					this.getServer().dispatchCommand(this.getServer().getConsoleSender(),defaultcmd);
+					return true;
+    			}
+    			
+    		}
 			
     		// analyze the args & get parameter
     		if(args.length == 1 && args[0].equalsIgnoreCase("stat") && sender.hasPermission("randomteleport.stat")) {    			

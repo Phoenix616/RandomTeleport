@@ -1,7 +1,7 @@
 name: RandomTeleport
 main: de.themoep.bukkit.plugin.RandomTeleport.RandomTeleport
 softdepend: [WorldGuard,Factions]
-version: 1.4.11
+version: 1.5.0 dev
 description: provides a command to teleport the player to a random save location
 author: Phoenix616
 website: http://dev.bukkit.org/bukkit-plugins/randomteleport/
@@ -35,4 +35,7 @@ permissions:
       default: op
    randomteleport.stat:
       description: Permission for showing the teleport statistic
+      default: op
+   randomteleport.presets.default:
+      description: Gives permission to use the default random teleport
       default: op
