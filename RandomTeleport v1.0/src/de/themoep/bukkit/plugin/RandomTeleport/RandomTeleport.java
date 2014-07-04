@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.UUID;
+import java.util.logging.Level;
 
 
 public class RandomTeleport extends JavaPlugin implements CommandExecutor {
@@ -55,77 +56,22 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 	public static String textcooldownerror = ChatColor.RED + "Du musst noch {cooldown_text}warten bevor du den Zufallsteleporter wieder nutzen kannst!";
 	*/
 	
-	public void writeMap(Object object, String outputFile) {
-		try
-	      {
-			File file = new File(getDataFolder().getPath() + "/" + outputFile);
-			if (!file.isFile()) {
-				if(!file.createNewFile()){			
-					throw new IOException("Error creating new file: " + file.getPath());
-				}
-			}
-			FileOutputStream fileOut = new FileOutputStream(file.getPath());
-			ObjectOutputStream out = new ObjectOutputStream(fileOut);
-			out.writeObject(object);
-			out.close();
-			fileOut.close();
-			getLogger().fine("Serialized data is saved in " + file.getPath());
-	      }catch(IOException i)
-	      {
-	    	  i.printStackTrace();
-	      }
-	}
-	
-	@SuppressWarnings("unchecked")
-	public Object readMap(String inputFile) {
-		HashMap<Object, Object> map = new HashMap<Object,Object>();
-		File file = new File(getDataFolder().getPath() + "/" + inputFile);
-		if (!file.isFile()) {
-			getLogger().fine("No file found in " + file.getPath());
-			try {
-				if(!file.createNewFile())
-				{
-					throw new IOException("Error while creating new file: " + file.getPath());
-				} else {
-					writeMap(map, inputFile);
-					getLogger().fine("New file created in " + file.getPath());
-				}
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		try
-	      {
-	         FileInputStream fileIn = new FileInputStream(file.getPath());
-	         ObjectInputStream in = new ObjectInputStream(fileIn);
-	         map = (HashMap<Object, Object>) in.readObject();
-	         in.close();
-	         fileIn.close();
-	      }catch(IOException i)
-	      {
-		     getLogger().warning("No saved Map found in " + inputFile);
-	      } catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		};
-		return map;
-	}
-	
 	@SuppressWarnings("unchecked")
 	@Override
 	public void onEnable() {
 		saveDefaultConfig();
-		RandomTeleport.textsearch = this.getConfig().getString("msg.search");
-		RandomTeleport.textteleport = this.getConfig().getString("msg.teleport");
-		RandomTeleport.textlocationerror = this.getConfig().getString("msg.error.location");
-		RandomTeleport.textcooldownerror = this.getConfig().getString("msg.error.cooldown");
+		this.getLogger().log(Level.INFO, "Loading messages from config.");
+		RandomTeleport.textsearch = ChatColor.translateAlternateColorCodes("&".charAt(0), this.getConfig().getString("msg.search"));
+		RandomTeleport.textteleport = ChatColor.translateAlternateColorCodes("&".charAt(0), this.getConfig().getString("msg.teleport"));
+		RandomTeleport.textlocationerror = ChatColor.translateAlternateColorCodes("&".charAt(0), this.getConfig().getString("msg.error.location"));
+		RandomTeleport.textcooldownerror = ChatColor.translateAlternateColorCodes("&".charAt(0), this.getConfig().getString("msg.error.cooldown"));
 		
+		this.getLogger().log(Level.INFO, "Attempting to load cooldown.map...");
 		cooldown = (HashMap<String, Long>) readMap("cooldown.map");
 	}
 	
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) throws NumberFormatException {
-    	if((cmd.getName().equalsIgnoreCase("randomteleport") || cmd.getName().equalsIgnoreCase("randomtp") || cmd.getName().equalsIgnoreCase("rtp")) && sender.hasPermission("randomteleport.use")) { 
+    	if(cmd.getName().equalsIgnoreCase("randomteleport") || cmd.getName().equalsIgnoreCase("randomtp") || cmd.getName().equalsIgnoreCase("rtp")) {
     		boolean force = false;
     		//boolean tppoints = false;
     		boolean xoption = false;
@@ -174,6 +120,11 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
     				} 
     			}
     			return true; 
+    		}
+
+    		if(!sender.hasPermission("randomteleport.use") && sender instanceof Player) {
+    			sender.sendMessage("You don't have the permission randomteleport.use");
+    			return true;
     		}
     		
     		if(args.length < 2) {
@@ -396,7 +347,8 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 						for(int j = -4; j <= 4; j++) {
 							int xcheck = x + i * 16;
 							int zcheck = z + j * 16;
-							if(checkforRegion(player,world,xcheck,zcheck)) chunksum++;
+							Location location = new Location(world, xcheck, world.getHighestBlockYAt(xcheck, zcheck), zcheck);
+							if(checkforRegion(player,location)) chunksum++;
 							
 						}
 					}
@@ -470,7 +422,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 	    			if(highest.getType() != Material.SAND && highest.getType() != Material.GRAVEL && highest.getType() != Material.DIRT && highest.getType() != Material.GRASS && true)
 	    				return false;
 			}		
-			if(!checkforRegion(player, world, x, z)) return false;
+			if(!checkforRegion(player, highest.getLocation())) return false;
 			
 			
 		} else {
@@ -483,21 +435,99 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 		
 	}
 
-	// function for checking if the player can build in the region/if region is protected 
-	private boolean checkforRegion(Player player, World world, int x, int z) {
-		Block highest = world.getBlockAt(x, world.getHighestBlockYAt(x, z) - 1, z);
+	/**
+	 * Checks if the player can build at the highest block of the location
+	 * @param player The Player to check with
+	 * @param location the black at the location to check
+	 * @return true or false
+	 */
+	// 
+	private boolean checkforRegion(Player player, Location location) {
+		Block highest = location.getWorld().getBlockAt(location);
 		if(Bukkit.getPluginManager().getPlugin("WorldGuard") != null && !WGBukkit.getPlugin().canBuild(player, highest)) {
 			return false;
 		}
 		if(Bukkit.getPluginManager().getPlugin("Factions") != null){
-			Faction wilderness = FactionColls.get().getForWorld(world.getName()).getNone();
+			Faction wilderness = FactionColls.get().getForWorld(location.getWorld().getName()).getNone();
 			Faction faction = BoardColls.get().getFactionAt(PS.valueOf(highest));
 			if(faction != wilderness) return false;
 		}
 		return true;
 	}
 	
-	// check if string is mumeric
+	/**
+	 * Writes a Hashmap to a file
+	 * @param object The Hashmap to write
+	 * @param outputFile The file to write to
+	 */
+	public void writeMap(Object object, String outputFile) {
+		try
+	      {
+			File file = new File(getDataFolder().getPath() + "/" + outputFile);
+			if (!file.isFile()) {
+				if(!file.createNewFile()){			
+					throw new IOException("Error creating new file: " + file.getPath());
+				}
+			}
+			FileOutputStream fileOut = new FileOutputStream(file.getPath());
+			ObjectOutputStream out = new ObjectOutputStream(fileOut);
+			out.writeObject(object);
+			out.close();
+			fileOut.close();
+			getLogger().fine("Serialized data is saved in " + file.getPath());
+	      }catch(IOException i)
+	      {
+	    	  i.printStackTrace();
+	      }
+	}
+	
+	/**
+	 * Reads a Hashmap from a file
+	 * @param inputFile The file to read from
+	 * @return An Object which is a HashMap<Object,Object>
+	 */
+	@SuppressWarnings("unchecked")
+	public Object readMap(String inputFile) {
+		HashMap<Object, Object> map = new HashMap<Object,Object>();
+		File file = new File(getDataFolder().getPath() + "/" + inputFile);
+		if (!file.isFile()) {
+			getLogger().log(Level.INFO, "No file found in " + file.getPath());
+			try {
+				if(!file.createNewFile())
+				{
+					throw new IOException("Error while creating new file: " + file.getPath());
+				} else {
+					writeMap(map, inputFile);
+					getLogger().log(Level.INFO, "New file created in " + file.getPath());
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		try
+	      {
+	         FileInputStream fileIn = new FileInputStream(file.getPath());
+	         ObjectInputStream in = new ObjectInputStream(fileIn);
+	         map = (HashMap<Object, Object>) in.readObject();
+	         in.close();
+	         fileIn.close();
+	         getLogger().log(Level.INFO, "Sucessfully loaded cooldown.map.");
+	      }catch(IOException i)
+	      {
+		     getLogger().log(Level.WARNING, "No saved Map found in " + inputFile);
+	      } catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		};
+		return map;
+	}
+	
+	/**
+	 * Checks if a string is mumeric
+	 * @param str to test
+	 * @return True if input string is numeric
+	 */
 	public static boolean isNumeric(String str)
 	{
 	    for (char c : str.toCharArray())
