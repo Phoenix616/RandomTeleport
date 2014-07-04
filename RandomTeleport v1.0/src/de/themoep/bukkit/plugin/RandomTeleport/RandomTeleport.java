@@ -40,21 +40,11 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 	public static HashMap<String,Long> cooldown = new HashMap<String,Long> ();
 	public static HashSet<UUID> playerlock = new HashSet<UUID> ();
 	public static int[] checkstat = new int[100];
-	
-	//English:
-	
+		
 	public static String textsearch = ChatColor.GRAY + "RandomTeleport searches for a safe place in world {worldname}. . .";
 	public static String textteleport = ChatColor.GRAY + "RandomTeleport teleported you to"; //  + " X: " + xTp + " Y: " + yTp + " Z: " + zTp + "!"
 	public static String textlocationerror = ChatColor.DARK_RED + "Error:" + ChatColor.RED + " RandomTeleport could not find a save location!";
 	public static String textcooldownerror = ChatColor.RED + "You have to wait {cooldown_text}before using this RandomTeleport again!";
-	
-	
-	//German:
-	/*public static String textsearch = ChatColor.GRAY + "Der Zufallsteleporter sucht nach einem sicheren Ort in Welt {worldname} . . .";
-	public static String textteleport = ChatColor.GRAY + "Der Zufallsteleporter teleportierte dich nach"; //  + " X: " + xTp + " Y: " + yTp + " Z: " + zTp + "!"
-	public static String textlocationerror = ChatColor.DARK_RED + "Fehler:" + ChatColor.RED + " der Zufallsteleporter konnte keinen sicheren Ort finden!";
-	public static String textcooldownerror = ChatColor.RED + "Du musst noch {cooldown_text}warten bevor du den Zufallsteleporter wieder nutzen kannst!";
-	*/
 	
 	@SuppressWarnings("unchecked")
 	@Override
@@ -388,8 +378,15 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
     	} 
     	return false; 
     }
+    /**
+     * Teleports player with the name playername at the highest block at x/z
+     * @param playername
+     * @param x
+     * @param z
+     * @param world
+     * @return true if player got teleported
+     */
 
-    // teleports player with the name playername at the highest block at x/z
 	private boolean teleportPlayer(String playername, int x ,int z, World world) {
 		final Player player = Bukkit.getServer().getPlayer(playername);
 		if(player == null||world == null) {    			
@@ -404,7 +401,17 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 		return true;
 	}
 
-	// function for checking if block is valid to teleport to (no lava, fire, water, ...), also if it is protected by WG or Factions
+	/**
+	 * Checks if block is valid to teleport to (no lava, fire, water, ...), also if it is protected by WG or Factions
+	 * @param player
+	 * @param world
+	 * @param x coordinate of the block as int
+	 * @param z coordinate of the block as int
+	 * @param force true if should only check if the player wont die, 
+	 *              false for region check and block restrictions
+	 * @return true if the block is a valid teleport block
+	 */
+	
 	private boolean teleportCheck(Player player, World world, int x, int z, boolean force) {
 		int y = world.getHighestBlockYAt(x, z);
 		Block highest = world.getBlockAt(x, y - 1, z);
