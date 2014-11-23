@@ -87,19 +87,30 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
     			}
     		}
     		
-    		if(args.length == 1) {
-    			if(sender.hasPermission("randomteleport.presets." + args[0].toLowerCase())) {
-	    			if(this.getConfig().getString("presets." + args[0].toLowerCase()) == null) {
-	    				sender.sendMessage(ChatColor.RED + "The Random Teleport " + args[0].toLowerCase() + " does not exist!");
-	    				return true;
-	    			}
-	    			String defaultcmd = this.getConfig().getString("presets." + args[0].toLowerCase()).replace("/", "");
-					defaultcmd = defaultcmd + " -p " + sender.getName();
-					this.getServer().dispatchCommand(this.getServer().getConsoleSender(),defaultcmd);
+    		if(args.length == 1 && sender.hasPermission("randomteleport.presets." + args[0].toLowerCase())) {
+				if(this.getConfig().getString("presets." + args[0].toLowerCase()) == null) {
+					sender.sendMessage(ChatColor.RED + "The Random Teleport " + args[0].toLowerCase() + " does not exist!");
 					return true;
-    			}
-    			
+				}
+
+				String defaultcmd = this.getConfig().getString("presets." + args[0].toLowerCase()).replace("/", "");
+				defaultcmd = defaultcmd + " -p " + sender.getName();
+				this.getServer().dispatchCommand(this.getServer().getConsoleSender(),defaultcmd);
+				return true;
     		}
+
+			if(args.length == 2 && sender.hasPermission("randomteleport.tpothers") && this.getConfig().getString("presets." + args[0].toLowerCase()) != null) {
+				Player toTp = Bukkit.getServer().getPlayer(args[1]);
+				if(toTp == null) {
+					sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " Player '" + args[1] + "' was not found online!");
+					return true;
+				}
+				String defaultcmd = this.getConfig().getString("presets." + args[0].toLowerCase()).replace("/", "");
+				defaultcmd = defaultcmd + " -p " + toTp.getName();
+				this.getServer().dispatchCommand(sender,defaultcmd);
+				return true;
+
+			}
 			
     		// analyze the args & get parameter
     		if(args.length == 1 && args[0].equalsIgnoreCase("stat") && sender.hasPermission("randomteleport.stat")) {    			
@@ -154,9 +165,9 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
     			    		player = Bukkit.getServer().getPlayer(playername);	
     			    		i++;
     			    		if(player == null) {
-    			    			sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " Player '" + playername + "' is not found online!");
-    			    			return true;
-    			    		}
+								sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " Player '" + playername + "' was not found online!");
+								return true;
+							}
     					} else if(args[i].equalsIgnoreCase("-w") || args[i].equalsIgnoreCase("-world")) {
     						if(i+1 >= args.length || args[i+1].startsWith("-")) {
     			    			sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " The " + args[i] + " option needs an argument (" + args[i] + " value)!");
