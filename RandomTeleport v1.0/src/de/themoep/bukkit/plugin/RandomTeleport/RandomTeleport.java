@@ -6,6 +6,7 @@ import com.massivecraft.factions.entity.FactionColl;
 import com.massivecraft.massivecore.ps.PS;
 import com.sk89q.worldguard.bukkit.WGBukkit;
 
+import de.themoep.bukkit.plugin.RandomTeleport.Listeners.SignListener;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -36,7 +37,9 @@ import java.util.logging.Level;
 
 
 public class RandomTeleport extends JavaPlugin implements CommandExecutor {
-	
+
+	public static RandomTeleport plugin;
+
 	public static HashMap<String,Long> cooldown = new HashMap<String,Long> ();
 	public static HashSet<UUID> playerlock = new HashSet<UUID> ();
 	public static int[] checkstat = new int[100];
@@ -49,6 +52,8 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void onEnable() {
+		this.plugin = this;
+
 		saveDefaultConfig();
 		this.getLogger().log(Level.INFO, "Loading messages from config.");
 		RandomTeleport.textsearch = ChatColor.translateAlternateColorCodes("&".charAt(0), this.getConfig().getString("msg.search"));
@@ -58,6 +63,8 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 		
 		this.getLogger().log(Level.INFO, "Attempting to load cooldown.map...");
 		cooldown = (HashMap<String, Long>) readMap("cooldown.map");
+
+		this.getServer().getPluginManager().registerEvents(new SignListener(), this);
 	}
 	
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) throws NumberFormatException {
@@ -109,7 +116,6 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 				defaultcmd = defaultcmd + " -p " + toTp.getName();
 				this.getServer().dispatchCommand(sender,defaultcmd);
 				return true;
-
 			}
 			
     		// analyze the args & get parameter
@@ -562,6 +568,10 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 	        if (!Character.isDigit(c)) return false;
 	    }
 	    return true;
+	}
+
+	public static RandomTeleport getPlugin() {
+		return plugin;
 	}
     
 }
