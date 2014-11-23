@@ -1,9 +1,9 @@
 package de.themoep.bukkit.plugin.RandomTeleport;
 
-import com.massivecraft.factions.entity.BoardColls;
+import com.massivecraft.factions.entity.BoardColl;
 import com.massivecraft.factions.entity.Faction;
-import com.massivecraft.factions.entity.FactionColls;
-import com.massivecraft.mcore.ps.PS;
+import com.massivecraft.factions.entity.FactionColl;
+import com.massivecraft.massivecore.ps.PS;
 import com.sk89q.worldguard.bukkit.WGBukkit;
 
 import org.bukkit.Bukkit;
@@ -455,9 +455,8 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 			return false;
 		}
 		if(Bukkit.getPluginManager().getPlugin("Factions") != null){
-			Faction wilderness = FactionColls.get().getForWorld(location.getWorld().getName()).getNone();
-			Faction faction = BoardColls.get().getFactionAt(PS.valueOf(highest));
-			if(faction != wilderness) return false;
+			Faction faction = BoardColl.get().getFactionAt(PS.valueOf(highest));
+			if(faction != FactionColl.get().getNone()) return false;
 		}
 		return true;
 	}
