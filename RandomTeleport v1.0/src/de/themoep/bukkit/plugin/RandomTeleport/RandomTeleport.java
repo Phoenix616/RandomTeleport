@@ -62,8 +62,10 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 	
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) throws NumberFormatException {
     	if(cmd.getName().equalsIgnoreCase("randomteleport") || cmd.getName().equalsIgnoreCase("randomtp") || cmd.getName().equalsIgnoreCase("rtp")) {
-    		boolean force = false;
-    		//boolean tppoints = false;
+    		boolean forceBlocks = false;
+			boolean forceRegions = false;
+
+			//boolean tppoints = false;
     		boolean xoption = false;
     		boolean zoption = false;
     		boolean coption = false;
@@ -209,7 +211,16 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
     			    			return true;
     			    		}
     					} else if(args[i].equalsIgnoreCase("-f") || args[i].equalsIgnoreCase("-force")) {
-    						force = true;
+							if(i+1 >= args.length || args[i+1].startsWith("-")) {
+								forceBlocks = true;
+								forceRegions = true;
+							} else {
+								i++;
+								if(args[i+1].equalsIgnoreCase("blocks"))
+									forceBlocks = true;
+								else if(args[i+1].equalsIgnoreCase("regions"))
+									forceRegions = true;
+							}
     					} else {
     						sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " Your input contains a invalid option (" + args[i] + ")!");
 			    			return false;
@@ -232,7 +243,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
         		else world = player.getWorld();
     		}
     		
-    		if(world.getEnvironment() == Environment.NETHER && !force) {
+    		if(world.getEnvironment() == Environment.NETHER && !forceBlocks) {
     			sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " RandomTeleport currently does not work in the nether!");
     			return true;
     		}
@@ -246,7 +257,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 
     		//getLogger().info("Starting to read cooldown hashmap");
     		
-    		String cooldownid = player.getUniqueId().toString() + minRange + maxRange + xCenter + zCenter + cooldowntime + force;
+    		String cooldownid = player.getUniqueId().toString() + minRange + maxRange + xCenter + zCenter + cooldowntime + forceBlocks + forceRegions;
     		if(cooldown.containsKey(cooldownid) && cooldown.get(cooldownid) + cooldowntime * 1000 >  System.currentTimeMillis()) {
     			
     			// convert seconds in dhms format
@@ -283,7 +294,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 	    		zCenter = (int) player.getLocation().getZ();
     		}
 
-    		getLogger().fine("RandomTeleport for player '" + playername + "' with minRange " + minRange + " maxRange " + maxRange + " xCenter " + xCenter + " zCenter " + zCenter + " force=" + force);
+    		getLogger().fine("RandomTeleport for player '" + playername + "' with minRange " + minRange + " maxRange " + maxRange + " xCenter " + xCenter + " zCenter " + zCenter + " forceBlocks=" + forceBlocks + " forceRegions=" + forceRegions);
 
     		int z;
 			int x;
@@ -310,12 +321,12 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 		    		if(count == 100) {
 		    			sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " RandomTeleport could not find a save location!");
 		    			if(!sender.getName().equalsIgnoreCase(player.getName())) player.sendMessage(textlocationerror);
-		    			getLogger().info("Error: RandomTeleport could not find a save location after " + count + " tries for the player '" + playername + "' (minRange " + minRange + " maxRange " + maxRange + " xCenter " + xCenter + " zCenter " + zCenter + " force=" + force + ")");
+		    			getLogger().info("Error: RandomTeleport could not find a save location after " + count + " tries for the player '" + playername + "' (minRange " + minRange + " maxRange " + maxRange + " xCenter " + xCenter + " zCenter " + zCenter + " forceBlocks=" + forceBlocks + " forceRegions=" + forceRegions + ")");
 		    			checkstat[count-1] = checkstat[count-1]++;
 		    			playerlock.remove(player.getUniqueId());
 		    			return true;
 		    		};
-	    		} while(!teleportCheck(player,world,x,z,force)); 
+	    		} while(!teleportCheck(player,world,x,z,forceBlocks, forceRegions));
 				
 				checkstat[count-1] = checkstat[count-1] + 1;
     			
@@ -326,7 +337,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 					zold = z;
 				}
 				
-				if(force) break;
+				if(forceRegions) break;
 				
 				//(re)set sum of valid chunks to zero
 				chunksum = 0;
@@ -338,7 +349,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 							int xcheck = x + i * 16;
 							int zcheck = z + j * 16;
 							Location location = new Location(world, xcheck, world.getHighestBlockYAt(xcheck, zcheck), zcheck);
-							if(checkforRegion(player,location)) chunksum++;
+							if(checkforRegion(player,location, false)) chunksum++;
 							
 						}
 					}
@@ -402,54 +413,53 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 	}
 
 	/**
-	 * Checks if block is valid to teleport to (no lava, fire, water, ...), also if it is protected by WG or Factions
+	 * Checks if block is valid to teleport to (no lava, fire, water, ...)
 	 * @param player
 	 * @param world
 	 * @param x coordinate of the block as int
 	 * @param z coordinate of the block as int
-	 * @param force true if should only check if the player wont die, 
-	 *              false for region check and block restrictions
+	 * @param forceBlocks true if should only check if the player wont die,
+	 *              	  false for block restrictions check
+	 * @param forceRegions true if should not check if location is in region,
+	 *              	   false for region restriction
 	 * @return true if the block is a valid teleport block
 	 */
 	
-	private boolean teleportCheck(Player player, World world, int x, int z, boolean force) {
+	private boolean teleportCheck(Player player, World world, int x, int z, boolean forceBlocks, boolean forceRegions) {
 		int y = world.getHighestBlockYAt(x, z);
 		Block highest = world.getBlockAt(x, y - 1, z);
 		getLogger().finer("Checked teleport location for player '" + player.getName() + "' X: " + x + " Y: " + (y - 1) + "  Z: " + z + " is " + highest.getType() + " + " + world.getBlockAt(x, y + 1, z).getType());
 		
-		if(!force) {			
+		if(!forceBlocks) {
 			switch (world.getEnvironment()) {
-	    		case NETHER:	
-	    			return false;
-	    		case THE_END:
-	    			if(highest.getType() == Material.AIR || highest.getType() == Material.WATER || highest.getType() == Material.STATIONARY_WATER || highest.getType() == Material.STATIONARY_LAVA || highest.getType() == Material.WEB || highest.getType() == Material.LAVA || highest.getType() == Material.CACTUS || highest.getType() == Material.ENDER_PORTAL || highest.getType() == Material.PORTAL) 
-	    				return false;
-	    		case NORMAL:
-	    		default:
-	    			if(highest.getType() != Material.SAND && highest.getType() != Material.GRAVEL && highest.getType() != Material.DIRT && highest.getType() != Material.GRASS && true)
-	    				return false;
-			}		
-			if(!checkforRegion(player, highest.getLocation())) return false;
-			
-			
+				case NETHER:
+					return false;
+				case THE_END:
+					if (highest.getType() == Material.AIR || highest.getType() == Material.WATER || highest.getType() == Material.STATIONARY_WATER || highest.getType() == Material.STATIONARY_LAVA || highest.getType() == Material.WEB || highest.getType() == Material.LAVA || highest.getType() == Material.CACTUS || highest.getType() == Material.ENDER_PORTAL || highest.getType() == Material.PORTAL)
+						return false;
+				case NORMAL:
+				default:
+					if (highest.getType() != Material.SAND && highest.getType() != Material.GRAVEL && highest.getType() != Material.DIRT && highest.getType() != Material.GRASS && true)
+						return false;
+			}
 		} else {
 			if(highest.getType() == Material.AIR || highest.getType() == Material.WATER || highest.getType() == Material.STATIONARY_WATER || highest.getType() == Material.STATIONARY_LAVA || highest.getType() == Material.WEB || highest.getType() == Material.LAVA || highest.getType() == Material.CACTUS || highest.getType() == Material.ENDER_PORTAL || highest.getType() == Material.PORTAL) 
 				return false;
 		}
-		
-		
-		return true;
-		
+		return checkforRegion(player, highest.getLocation(), forceRegions);
 	}
 
 	/**
 	 * Checks if the player can build at the highest block of the location
 	 * @param player The Player to check with
 	 * @param location the black at the location to check
+	 * @param forceRegions true if should not check if location is in region,
+	 *              	   false for region restriction
 	 * @return true or false
 	 */
 	// 
-	private boolean checkforRegion(Player player, Location location) {
+	private boolean checkforRegion(Player player, Location location, Boolean forceRegions) {
+		if(forceRegions) return true;
 		Block highest = location.getWorld().getBlockAt(location);
 		if(Bukkit.getPluginManager().getPlugin("WorldGuard") != null && !WGBukkit.getPlugin().canBuild(player, highest)) {
 			return false;
