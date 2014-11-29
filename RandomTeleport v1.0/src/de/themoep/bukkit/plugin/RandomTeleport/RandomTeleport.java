@@ -1,9 +1,16 @@
 package de.themoep.bukkit.plugin.RandomTeleport;
 
+import com.massivecraft.factions.Board;
+import com.massivecraft.factions.FLocation;
+import com.massivecraft.factions.Factions;
+
+import com.massivecraft.factions.entity.BoardColls;
+import com.massivecraft.factions.entity.FactionColls;
+
 import com.massivecraft.factions.entity.BoardColl;
-import com.massivecraft.factions.entity.Faction;
 import com.massivecraft.factions.entity.FactionColl;
 import com.massivecraft.massivecore.ps.PS;
+
 import com.sk89q.worldguard.bukkit.WGBukkit;
 
 import de.themoep.bukkit.plugin.RandomTeleport.Listeners.SignListener;
@@ -28,7 +35,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.text.BreakIterator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
@@ -48,7 +54,11 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 	public static String textteleport = ChatColor.GRAY + "RandomTeleport teleported you to"; //  + " X: " + xTp + " Y: " + yTp + " Z: " + zTp + "!"
 	public static String textlocationerror = ChatColor.DARK_RED + "Error:" + ChatColor.RED + " RandomTeleport could not find a save location!";
 	public static String textcooldownerror = ChatColor.RED + "You have to wait {cooldown_text}before using this RandomTeleport again!";
-	
+
+	public static int factionsApiVersion = 0;
+	public static boolean worldguard = false;
+
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public void onEnable() {
@@ -65,6 +75,24 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 		cooldown = (HashMap<String, Long>) readMap("cooldown.map");
 
 		this.getServer().getPluginManager().registerEvents(new SignListener(), this);
+
+		if(Bukkit.getPluginManager().getPlugin("WorldGuard") != null){
+			this.getLogger().log(Level.INFO, "Detected WorldGuard.");
+			this.worldguard = true;
+		}
+
+		if(Bukkit.getPluginManager().getPlugin("Factions") != null){
+			String version = Bukkit.getPluginManager().getPlugin("Factions").getDescription().getVersion();
+			if(version.startsWith("2.7") || version.startsWith("2.8") || version.startsWith("2.9") || version.startsWith("2.10")) {
+				this.factionsApiVersion = 27;
+			} else if(version.startsWith("1.6")){
+				this.factionsApiVersion = 16;
+			} else {
+				this.factionsApiVersion = 26;
+			}
+			this.getLogger().log(Level.INFO, "Detected Factions " + version + ".");
+		}
+
 	}
 	
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) throws NumberFormatException {
@@ -477,14 +505,22 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 	// 
 	private boolean checkforRegion(Player player, Location location, Boolean forceRegions) {
 		if(forceRegions) return true;
-		Block highest = location.getWorld().getBlockAt(location);
-		if(Bukkit.getPluginManager().getPlugin("WorldGuard") != null && !WGBukkit.getPlugin().canBuild(player, highest)) {
+		Block block = location.getWorld().getBlockAt(location);
+		if(worldguard && !WGBukkit.getPlugin().canBuild(player, block)) {
 			return false;
 		}
-		if(Bukkit.getPluginManager().getPlugin("Factions") != null){
-			Faction faction = BoardColl.get().getFactionAt(PS.valueOf(highest));
+		if(this.factionsApiVersion == 27){
+			com.massivecraft.factions.entity.Faction faction = BoardColl.get().getFactionAt(PS.valueOf(block));
 			if(faction != FactionColl.get().getNone()) return false;
 		}
+		if(this.factionsApiVersion == 26){
+			com.massivecraft.factions.entity.Faction faction = BoardColls.get().getFactionAt(PS.valueOf(block));
+			if(faction != FactionColls.get().getForWorld(location.getWorld().getName()).getNone()) return false;
+		}
+		/*if(this.factionsApiVersion == 16){
+			com.massivecraft.factions.Faction faction = Board.getInstance().getFactionAt(new FLocation(location));
+			if(faction != Factions.getNone()) return false;
+		}*/
 		return true;
 	}
 	
