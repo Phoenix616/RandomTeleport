@@ -1,8 +1,8 @@
 package de.themoep.bukkit.plugin.RandomTeleport;
 
-import com.massivecraft.factions.Board;
+/*import com.massivecraft.factions.Board;
 import com.massivecraft.factions.FLocation;
-import com.massivecraft.factions.Factions;
+import com.massivecraft.factions.Factions;*/
 
 import com.massivecraft.factions.entity.BoardColls;
 import com.massivecraft.factions.entity.FactionColls;
@@ -62,7 +62,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void onEnable() {
-		this.plugin = this;
+		RandomTeleport.plugin = this;
 
 		saveDefaultConfig();
 		this.getLogger().log(Level.INFO, "Loading messages from config.");
@@ -78,17 +78,17 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 
 		if(Bukkit.getPluginManager().getPlugin("WorldGuard") != null){
 			this.getLogger().log(Level.INFO, "Detected WorldGuard.");
-			this.worldguard = true;
+			RandomTeleport.worldguard = true;
 		}
 
 		if(Bukkit.getPluginManager().getPlugin("Factions") != null){
 			String version = Bukkit.getPluginManager().getPlugin("Factions").getDescription().getVersion();
 			if(version.startsWith("2.7") || version.startsWith("2.8") || version.startsWith("2.9") || version.startsWith("2.10")) {
-				this.factionsApiVersion = 27;
+				RandomTeleport.factionsApiVersion = 27;
 			} else if(version.startsWith("1.6")){
-				this.factionsApiVersion = 16;
+				RandomTeleport.factionsApiVersion = 16;
 			} else {
-				this.factionsApiVersion = 26;
+				RandomTeleport.factionsApiVersion = 26;
 			}
 			this.getLogger().log(Level.INFO, "Detected Factions " + version + ".");
 		}
@@ -277,7 +277,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 
 			//getLogger().info("Success: Parsed options");
     		
-    		if(playername == "CONSOLE") {
+    		if(playername.equalsIgnoreCase("CONSOLE")) {
     			sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " Silly filly! The console can not teleport! Did you forgot to add the -player <playername> option?");
     			return true;
     		}
@@ -321,7 +321,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
     			if(cooldown_seconds > 0) cooldown_text = cooldown_text + cooldown_seconds + "s ";
     			
     			// display cooldown
-    			if(playername != "CONSOLE") sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " This teleport is on cooldown for player " + playername + "!");
+    			if(playername.equalsIgnoreCase("CONSOLE")) sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " This teleport is on cooldown for player " + player.getName() + "!");
     			player.sendMessage(textcooldownerror.replaceAll("\\{cooldown_text\\}", cooldown_text));
     			playerlock.remove(player.getUniqueId());
     			return true;
@@ -371,7 +371,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 		    			checkstat[count-1] = checkstat[count-1]++;
 		    			playerlock.remove(player.getUniqueId());
 		    			return true;
-		    		};
+		    		}
 	    		} while(!teleportCheck(player,world,x,z,forceBlocks, forceRegions));
 				
 				checkstat[count-1] = checkstat[count-1] + 1;
@@ -416,7 +416,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 			// if there is no location after 10 tries found which has no protected regions in a 15x15 square around the location 
 			// or
 			// aborts if all 225 around the location are not protected
-			};
+			}
 			x = xold;
 			z = zold;
 			
@@ -437,33 +437,29 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
     }
     /**
      * Teleports player with the name playername at the highest block at x/z
-     * @param playername
-     * @param x
-     * @param z
-     * @param world
+     * @param playername The name of the player
+	 * @param x Coordinate of the block as int
+	 * @param z Coordinate of the block as int
+     * @param world The world we should teleport the player to
      * @return true if player got teleported
      */
 
 	private boolean teleportPlayer(String playername, int x ,int z, World world) {
 		final Player player = Bukkit.getServer().getPlayer(playername);
-		if(player == null||world == null) {    			
-			return false;
-		}
-		final int xTp = x;
+		if(player == null||world == null) return false;
 		final int yTp = world.getHighestBlockYAt(x, z);
-		final int zTp = z;
 		
-		player.teleport(new Location(world, xTp + 0.5, yTp + 0.5, zTp + 0.5));
-	    player.sendMessage(textteleport + " X: " + xTp + " Y: " + yTp + " Z: " + zTp + "!");	    		
+		player.teleport(new Location(world, x + 0.5, yTp + 0.5, z + 0.5));
+	    player.sendMessage(textteleport + " X: " + x + " Y: " + yTp + " Z: " + z + "!");
 		return true;
 	}
 
 	/**
 	 * Checks if block is valid to teleport to (no lava, fire, water, ...)
-	 * @param player
-	 * @param world
-	 * @param x coordinate of the block as int
-	 * @param z coordinate of the block as int
+	 * @param player The player we should check
+	 * @param world The world the coordinate is in
+	 * @param x Coordinate of the block as int
+	 * @param z Coordinate of the block as int
 	 * @param forceBlocks true if should only check if the player wont die,
 	 *              	  false for block restrictions check
 	 * @param forceRegions true if should not check if location is in region,
@@ -485,7 +481,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 						return false;
 				case NORMAL:
 				default:
-					if (highest.getType() != Material.SAND && highest.getType() != Material.GRAVEL && highest.getType() != Material.DIRT && highest.getType() != Material.GRASS && true)
+					if (highest.getType() != Material.SAND && highest.getType() != Material.GRAVEL && highest.getType() != Material.DIRT && highest.getType() != Material.GRASS)
 						return false;
 			}
 		} else {
@@ -507,14 +503,14 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 	private boolean checkforRegion(Player player, Location location, Boolean forceRegions) {
 		if(forceRegions) return true;
 		Block block = location.getWorld().getBlockAt(location);
-		if(worldguard && !WGBukkit.getPlugin().canBuild(player, block)) {
+		if(RandomTeleport.worldguard && !WGBukkit.getPlugin().canBuild(player, block)) {
 			return false;
 		}
-		if(this.factionsApiVersion == 27){
+		if(RandomTeleport.factionsApiVersion == 27){
 			com.massivecraft.factions.entity.Faction faction = BoardColl.get().getFactionAt(PS.valueOf(block));
 			if(faction != FactionColl.get().getNone()) return false;
 		}
-		if(this.factionsApiVersion == 26){
+		if(RandomTeleport.factionsApiVersion == 26){
 			com.massivecraft.factions.entity.Faction faction = BoardColls.get().getFactionAt(PS.valueOf(block));
 			if(faction != FactionColls.get().getForWorld(location.getWorld().getName()).getNone()) return false;
 		}
@@ -589,7 +585,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 	      } catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		};
+		}
 		return map;
 	}
 	
