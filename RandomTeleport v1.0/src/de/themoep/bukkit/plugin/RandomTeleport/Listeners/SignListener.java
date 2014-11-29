@@ -23,31 +23,39 @@ public class SignListener implements Listener {
             if(!event.getPlayer().hasPermission("randomteleport.sign.create")){
                 event.getBlock().breakNaturally();
                 event.getPlayer().sendMessage(ChatColor.RED + "You don't have permission to create RandomTeleport preset signs! " + ChatColor.ITALIC + " (randomteleport.sign.create)");
+            } else {
+                event.getPlayer().sendMessage(ChatColor.GREEN + "RandomTeleport preset sign created!");
+                if (RandomTeleport.getPlugin().getConfig().getString("presets." + event.getLine(2).toLowerCase()) == null) {
+                    event.getPlayer().sendMessage(ChatColor.DARK_RED + "Warning: " + ChatColor.RED + "The RandomTeleport preset " + ChatColor.GOLD + event.getLine(2).toLowerCase() + ChatColor.RED + " does not exist!");
+                }
             }
         }
     }
 
     @EventHandler
     public void onSignDestroy(BlockBreakEvent event){
-        if(event.getBlock().getType() == Material.SIGN) {
-            Sign sign = (Sign) event.getBlock();
-            if((sign.getLine(1).equalsIgnoreCase("[rtp]") || sign.getLine(1).equalsIgnoreCase("[RandomTP]")) && !event.getPlayer().hasPermission("randomteleport.sign.create")) {
-                event.setCancelled(true);
-                event.getPlayer().sendMessage(ChatColor.RED + "You don't have permission to break RandomTeleport preset signs! " + ChatColor.ITALIC + " (randomteleport.sign.create)");
+        if(event.getBlock().getType() == Material.WALL_SIGN || event.getBlock().getType() == Material.SIGN_POST) {
+            Sign sign = (Sign) event.getBlock().getState();
+            if(sign.getLine(1).equalsIgnoreCase("[rtp]") || sign.getLine(1).equalsIgnoreCase("[RandomTP]")){
+                if (!event.getPlayer().hasPermission("randomteleport.sign.create")){
+                    event.setCancelled(true);
+                    event.getPlayer().sendMessage(ChatColor.RED + "You don't have permission to break RandomTeleport signs! " + ChatColor.ITALIC + " (randomteleport.sign.create)");
+                } else {
+                    event.getPlayer().sendMessage(ChatColor.RED + "RandomTeleport sign destroyed!");
+                }
             }
         }
     }
 
     @EventHandler
     public void onSignClick(PlayerInteractEvent event) {
-        if(event.getAction() == Action.LEFT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            if (event.getClickedBlock().getType() != Material.SIGN) return;
+        if(event.getAction() == Action.RIGHT_CLICK_BLOCK && !event.isCancelled() && (event.getClickedBlock().getType() == Material.WALL_SIGN || event.getClickedBlock().getType() == Material.SIGN_POST)) {
             Sign sign = (Sign) event.getClickedBlock().getState();
             if(!(sign.getLine(1).equalsIgnoreCase("[rtp]") || sign.getLine(1).equalsIgnoreCase("[RandomTP]"))) return;
-            String preset = sign.getLine(2);
+            String preset = sign.getLine(2).toLowerCase();
             if (event.getPlayer().hasPermission("randomteleport.sign.preset." + preset)) {
                 if (RandomTeleport.getPlugin().getConfig().getString("presets." + preset) == null) {
-                    event.getPlayer().sendMessage(ChatColor.RED + "The Random Teleport " + preset + " does not exist!");
+                    event.getPlayer().sendMessage(ChatColor.RED + "The RandomTeleport preset " + ChatColor.GOLD +  preset + ChatColor.RED + " does not exist!");
                 } else {
                     String cmd = "rtp " + preset + " " + event.getPlayer().getName();
                     RandomTeleport.getPlugin().getServer().dispatchCommand(RandomTeleport.getPlugin().getServer().getConsoleSender(), cmd);
