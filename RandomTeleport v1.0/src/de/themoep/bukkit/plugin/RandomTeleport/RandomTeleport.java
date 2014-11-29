@@ -121,7 +121,19 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
     				return true;
     			}
     		}
-    		
+
+			if(args.length == 1 && args[0].equalsIgnoreCase("stat") && sender.hasPermission("randomteleport.stat")) {
+				sender.sendMessage("--RandomTeleport statistics--");
+				sender.sendMessage("Checks - Times occured");
+				for(int i = 0; i < 100; i++) {
+					if(checkstat[i] != 0) {
+						if(i == 99) sender.sendMessage(ChatColor.RED + "Canceled - " + checkstat[i] + "x");
+						else sender.sendMessage(i + 1 + " - " + checkstat[i] + "x");
+					}
+				}
+				return true;
+			}
+
     		if(args.length == 1 && sender.hasPermission("randomteleport.presets." + args[0].toLowerCase())) {
 				if(this.getConfig().getString("presets." + args[0].toLowerCase()) == null) {
 					sender.sendMessage(ChatColor.RED + "The Random Teleport " + args[0].toLowerCase() + " does not exist!");
@@ -147,17 +159,6 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 			}
 			
     		// analyze the args & get parameter
-    		if(args.length == 1 && args[0].equalsIgnoreCase("stat") && sender.hasPermission("randomteleport.stat")) {    			
-				sender.sendMessage("--RandomTeleport statistics--");
-				sender.sendMessage("Checks - Times occured");
-    			for(int i = 0; i < 100; i++) {
-    				if(checkstat[i] != 0) {
-    					if(i == 99) sender.sendMessage(ChatColor.RED + "Canceled - " + checkstat[i] + "x");
-        				else sender.sendMessage(i + 1 + " - " + checkstat[i] + "x");
-    				} 
-    			}
-    			return true; 
-    		}
 
     		if(!sender.hasPermission("randomteleport.use") && sender instanceof Player) {
     			sender.sendMessage("You don't have the permission randomteleport.use");
