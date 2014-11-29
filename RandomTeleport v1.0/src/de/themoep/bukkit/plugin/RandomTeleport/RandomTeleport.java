@@ -65,11 +65,8 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 		RandomTeleport.plugin = this;
 
 		saveDefaultConfig();
-		this.getLogger().log(Level.INFO, "Loading messages from config.");
-		RandomTeleport.textsearch = ChatColor.translateAlternateColorCodes("&".charAt(0), this.getConfig().getString("msg.search"));
-		RandomTeleport.textteleport = ChatColor.translateAlternateColorCodes("&".charAt(0), this.getConfig().getString("msg.teleport"));
-		RandomTeleport.textlocationerror = ChatColor.translateAlternateColorCodes("&".charAt(0), this.getConfig().getString("msg.error.location"));
-		RandomTeleport.textcooldownerror = ChatColor.translateAlternateColorCodes("&".charAt(0), this.getConfig().getString("msg.error.cooldown"));
+
+		this.loadMessages();
 		
 		this.getLogger().log(Level.INFO, "Attempting to load cooldown.map...");
 		cooldown = (HashMap<String, Long>) readMap("cooldown.map");
@@ -94,7 +91,15 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 		}
 
 	}
-	
+
+	public void loadMessages() {
+		this.getLogger().log(Level.INFO, "Loading messages from config.");
+		RandomTeleport.textsearch = ChatColor.translateAlternateColorCodes("&".charAt(0), this.getConfig().getString("msg.search"));
+		RandomTeleport.textteleport = ChatColor.translateAlternateColorCodes("&".charAt(0), this.getConfig().getString("msg.teleport"));
+		RandomTeleport.textlocationerror = ChatColor.translateAlternateColorCodes("&".charAt(0), this.getConfig().getString("msg.error.location"));
+		RandomTeleport.textcooldownerror = ChatColor.translateAlternateColorCodes("&".charAt(0), this.getConfig().getString("msg.error.cooldown"));
+	}
+
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) throws NumberFormatException {
     	if(cmd.getName().equalsIgnoreCase("randomteleport") || cmd.getName().equalsIgnoreCase("randomtp") || cmd.getName().equalsIgnoreCase("rtp")) {
     		boolean forceBlocks = false;
@@ -131,6 +136,13 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 						else sender.sendMessage(i + 1 + " - " + checkstat[i] + "x");
 					}
 				}
+				return true;
+			}
+
+			if(args.length == 1 && args[0].equalsIgnoreCase("reload") && sender.hasPermission("randomteleport.reload")) {
+				this.reloadConfig();
+				this.loadMessages();
+				sender.sendMessage(ChatColor.GREEN + "Config reloaded!");
 				return true;
 			}
 
