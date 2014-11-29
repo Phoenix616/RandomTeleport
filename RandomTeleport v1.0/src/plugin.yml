@@ -10,6 +10,8 @@ commands:
       aliases: [randomtp, rtp]
       description: RandomTeleport command.
       usage: |
+             /<command> - uses the default preset
+             /<command> <preset> [<playername>]- uses a specific preset
              /<command> <minRange> <maxRange> [-p, -w, -x, -z, -c, -f]             
              minRange - minimum distance to the center point (square shaped)
              maxRange - maximum distance to the center point (square shaped)
@@ -21,6 +23,7 @@ commands:
              > -c, -cooldown <seconds> - cooldown in seconds after which the player can use this teleporter again
              > -f,-force - teleport even if there is no dirt/grass/sand/gravel, only checks for lava/water/cactus, ignores WorldGuard/Faction regions
              /<command> stat - shows a statistic of the teleports since the last restart
+             /<command> reload - reloads the config
 permissions:
    randomteleport.use:
       description: Gives permission to the command
@@ -34,8 +37,20 @@ permissions:
    randomteleport.stat:
       description: Permission for showing the teleport statistic
       default: op
+   randomteleport.reload:
+         description: Permission to use the reload command
+         default: op
    randomteleport.presets.default:
-      description: Gives permission to use the default random teleport
+      description: Gives permission to use the default random teleport preset
+      default: op
+   randomteleport.presets.*:
+         description: Gives permission to use all random teleport presets
+         default: op
+   randomteleport.sign.preset.default:
+      description: Gives permission to use the default preset with a rightclick on a preset sign
+      default: op
+   randomteleport.sign.preset.*:
+      description: Gives permission to use all presets with a rightclick on a preset sign
       default: op
    randomteleport.sign.create:
       description: Allows to create and destroy preset signs ([rtp] or [RandomTP] on the 2nd line and the preset name on the 3rd)
