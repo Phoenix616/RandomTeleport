@@ -14,11 +14,7 @@ import com.massivecraft.massivecore.ps.PS;
 import com.sk89q.worldguard.bukkit.WGBukkit;
 
 import de.themoep.bukkit.plugin.RandomTeleport.Listeners.SignListener;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Block;
 import org.bukkit.command.BlockCommandSender;
@@ -35,10 +31,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 
 
@@ -104,6 +97,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
     	if(cmd.getName().equalsIgnoreCase("randomteleport") || cmd.getName().equalsIgnoreCase("randomtp") || cmd.getName().equalsIgnoreCase("rtp")) {
     		boolean forceBlocks = false;
 			boolean forceRegions = false;
+            boolean loadedChunksOnly = false;
 
 			//boolean tppoints = false;
     		boolean xoption = false;
@@ -255,6 +249,10 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
     			    			sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " Your input contains a invalid number in the " + args[i] + " option!");
     			    			return true;
     			    		}
+                        } else if(args[i].equalsIgnoreCase("-l") || args[i].equalsIgnoreCase("-loaded")) {
+                            if(i+1 >= args.length || args[i+1].startsWith("-")) {
+                                loadedChunksOnly = true;
+                            }
     					} else if(args[i].equalsIgnoreCase("-c") || args[i].equalsIgnoreCase("-cooldown")) {
     						if(i+1 >= args.length || args[i+1].startsWith("-")) {
     			    			sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " The " + args[i] + " option needs an argument (" + args[i] + " value)!");
@@ -354,28 +352,43 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 
     		getLogger().fine("RandomTeleport for player '" + playername + "' with minRange " + minRange + " maxRange " + maxRange + " xCenter " + xCenter + " zCenter " + zCenter + " forceBlocks=" + forceBlocks + " forceRegions=" + forceRegions);
 
+            int x;
     		int z;
-			int x;
     		int zold = 0;
 			int xold = 0;
 			int chunksum = 0;
 			int chunksumold = 0;
+
+            List<Integer[]> chunklist = new ArrayList<Integer[]>();
+
+            if(loadedChunksOnly)
+                for(Chunk c : world.getLoadedChunks())
+                    if(Math.abs(c.getX()) * 16 <= xCenter + maxRange && Math.abs(c.getX()) * 16 >= xCenter + minRange && Math.abs(c.getZ()) * 16 <= zCenter + maxRange && Math.abs(c.getZ()) * 16 >= zCenter + minRange )
+                        chunklist.add(new Integer[]{c.getX(), c.getZ()});
+            
 			for(int chunkcount = 0; chunkcount < 10 && chunksum < 81; chunkcount ++) {
 				int count = 0; 
 				do {
 					count++;
 		    		Random r = new Random();
-		    		
-		    		//get random range in min and max range
-		    		int xRange = minRange + r.nextInt(maxRange - minRange);
-		    		int zRange = minRange + r.nextInt(maxRange - minRange);
-		    		
-		    		//make range negative with a 50% chance
-		    		if (r.nextBoolean()) xRange = 0 - xRange;
-		    		if (r.nextBoolean()) zRange = 0 - zRange;
-		    		
-		    		x = xCenter + xRange;
-		    		z = zCenter + zRange;
+
+                    if(loadedChunksOnly) {
+                        int chunknumber = r.nextInt(chunklist.size());
+                        x = chunklist.get(chunknumber)[0] * 16 + r.nextInt(15);
+                        z = chunklist.get(chunknumber)[1] * 16 + r.nextInt(15);
+                    } else {
+                        //get random range in min and max range
+                        int xRange = minRange + r.nextInt(maxRange - minRange);
+                        int zRange = minRange + r.nextInt(maxRange - minRange);
+
+                        //make range negative with a 50% chance
+                        if (r.nextBoolean()) xRange = 0 - xRange;
+                        if (r.nextBoolean()) zRange = 0 - zRange;
+
+                        x = xCenter + xRange;
+                        z = zCenter + zRange;
+                    }
+                    
 		    		if(count == 100) {
 		    			sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " RandomTeleport could not find a save location!");
 		    			if(!sender.getName().equalsIgnoreCase(player.getName())) player.sendMessage(textlocationerror);
