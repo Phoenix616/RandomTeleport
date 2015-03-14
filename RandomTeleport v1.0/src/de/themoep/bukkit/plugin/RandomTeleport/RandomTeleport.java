@@ -554,7 +554,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 	public void writeMap(Object object, String outputFile) {
 		try
 	      {
-			File file = new File(getDataFolder().getPath() + "/" + outputFile);
+			File file = new File(getDataFolder(), outputFile);
 			if (!file.isFile()) {
 				if(!file.createNewFile()){			
 					throw new IOException("Error creating new file: " + file.getPath());
@@ -580,7 +580,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 	@SuppressWarnings("unchecked")
 	public Object readMap(String inputFile) {
 		HashMap<Object, Object> map = new HashMap<Object,Object>();
-		File file = new File(getDataFolder().getPath() + "/" + inputFile);
+		File file = new File(getDataFolder(), inputFile);
 		if (!file.isFile()) {
 			getLogger().log(Level.INFO, "No file found in " + file.getPath());
 			try {
