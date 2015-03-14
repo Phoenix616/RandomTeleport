@@ -21,7 +21,7 @@ commands:
              > -b,-biome <biomename> [<biome 2> ...] - only teleport to this biome (multiple allowed, Bukkit biome names!)
              > -x,-xPos <x value> - x axis of the center point, if not set the player's x axis is used
              > -z,-zPos <z value> - z axis of the center point, if not set the player's z axis is used
-             > -l,-loadedchunks - only search loaded chunks for possible locations
+             > -l,-loaded - only search loaded chunks for possible locations
              > -c, -cooldown <seconds> - cooldown in seconds after which the player can use this teleporter again
              > -f,-force - teleport even if there is no dirt/grass/sand/gravel, only checks for lava/water/cactus, ignores WorldGuard/Faction regions
              > -f,-force [<blocks|regions>] - only ignore blocks or regions
