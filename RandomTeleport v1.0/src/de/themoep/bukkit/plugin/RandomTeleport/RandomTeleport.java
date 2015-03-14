@@ -16,6 +16,7 @@ import com.sk89q.worldguard.bukkit.WGBukkit;
 import de.themoep.bukkit.plugin.RandomTeleport.Listeners.SignListener;
 import org.bukkit.*;
 import org.bukkit.World.Environment;
+import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.Command;
@@ -111,6 +112,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
     		int maxRange;
     		int cooldowntime = 0;
     		World world = null;
+            List<Biome> biomeList = new ArrayList<Biome>();
     		    		
     		if(args.length == 0 && sender.hasPermission("randomteleport.presets.default")) {
     			if(this.getConfig().getString("presets.default") != null) {
@@ -221,8 +223,21 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
     			    			return true;    						
 				    		}
 				    		i++;
-    			    	
-				       	// if -x/-z option is selected set x/z it to its values
+                        } else if(args[i].equalsIgnoreCase("-b") || args[i].equalsIgnoreCase("-biome")) {
+                            if(i+1 >= args.length || args[i+1].startsWith("-")) {
+                                sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " The " + args[i] + " option needs an argument (" + args[i] + " value)!");
+                                return true;
+                            }
+                            for(i = i+1; i < args.length; i++) {
+                                try {
+                                    biomeList.add(Biome.valueOf(args[i].toUpperCase()));
+                                } catch(IllegalArgumentException e) {
+                                    sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " The biome \"" + args[i] + "\" given in the -biome option does not exist!");
+                                    return true;
+                                }
+                            }
+
+                            // if -x/-z option is selected set x/z it to its values
     					} else if(args[i].equalsIgnoreCase("-x") || args[i].equalsIgnoreCase("-xPos")) {
     						if(i+1 >= args.length || (args[i+1].startsWith("-") && !isNumeric(args[i+1].substring(1)))) {
     			    			sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " The " + args[i] + " option needs an argument (" + args[i] + " value)!");
@@ -397,7 +412,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 		    			playerlock.remove(player.getUniqueId());
 		    			return true;
 		    		}
-	    		} while(!teleportCheck(player,world,x,z,forceBlocks, forceRegions));
+	    		} while(!teleportCheck(player,world,x,z,biomeList, forceBlocks, forceRegions));
 				
 				checkstat[count-1] = checkstat[count-1] + 1;
     			
@@ -485,18 +500,22 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 	 * @param world The world the coordinate is in
 	 * @param x Coordinate of the block as int
 	 * @param z Coordinate of the block as int
-	 * @param forceBlocks true if should only check if the player wont die,
-	 *              	  false for block restrictions check
-	 * @param forceRegions true if should not check if location is in region,
-	 *              	   false for region restriction
-	 * @return true if the block is a valid teleport block
+	 * @param biomeList
+     *@param forceBlocks true if should only check if the player wont die,
+     *              	  false for block restrictions check
+     * @param forceRegions true if should not check if location is in region,
+*              	   false for region restriction   @return true if the block is a valid teleport block
 	 */
 	
-	private boolean teleportCheck(Player player, World world, int x, int z, boolean forceBlocks, boolean forceRegions) {
+	private boolean teleportCheck(Player player, World world, int x, int z, List<Biome> biomeList, boolean forceBlocks, boolean forceRegions) {
 		int y = world.getHighestBlockYAt(x, z);
 		Block highest = world.getBlockAt(x, y - 1, z);
-		getLogger().finer("Checked teleport location for player '" + player.getName() + "' X: " + x + " Y: " + (y - 1) + "  Z: " + z + " is " + highest.getType() + " + " + world.getBlockAt(x, y + 1, z).getType());
-		
+
+        getLogger().finer("Checked teleport location for player '" + player.getName() + "' X: " + x + " Y: " + (y - 1) + "  Z: " + z + " is " + highest.getType() + " + " + world.getBlockAt(x, y + 1, z).getType() + ", Biome: " + highest.getBiome().toString());
+
+        if(biomeList.size() > 0 && !biomeList.contains(highest.getBiome()))
+            return false;
+        
 		if(!forceBlocks) {
 			switch (world.getEnvironment()) {
 				case NETHER:
