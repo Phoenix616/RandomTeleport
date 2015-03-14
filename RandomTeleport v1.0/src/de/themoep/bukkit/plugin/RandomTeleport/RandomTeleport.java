@@ -1,18 +1,5 @@
 package de.themoep.bukkit.plugin.RandomTeleport;
 
-/*import com.massivecraft.factions.Board;
-import com.massivecraft.factions.FLocation;
-import com.massivecraft.factions.Factions;*/
-
-import com.massivecraft.factions.entity.BoardColls;
-import com.massivecraft.factions.entity.FactionColls;
-
-import com.massivecraft.factions.entity.BoardColl;
-import com.massivecraft.factions.entity.FactionColl;
-import com.massivecraft.massivecore.ps.PS;
-
-import com.sk89q.worldguard.bukkit.WGBukkit;
-
 import de.themoep.bukkit.plugin.RandomTeleport.Listeners.SignListener;
 import org.bukkit.*;
 import org.bukkit.World.Environment;
@@ -34,6 +21,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.*;
 import java.util.logging.Level;
+
+import static com.massivecraft.massivecore.ps.PS.valueOf;
 
 
 public class RandomTeleport extends JavaPlugin implements CommandExecutor {
@@ -547,21 +536,22 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 	private boolean checkforRegion(Player player, Location location, Boolean forceRegions) {
 		if(forceRegions) return true;
 		Block block = location.getWorld().getBlockAt(location);
-		if(RandomTeleport.worldguard && !WGBukkit.getPlugin().canBuild(player, block)) {
+		if(RandomTeleport.worldguard && !com.sk89q.worldguard.bukkit.WGBukkit.getPlugin().canBuild(player, block)) {
 			return false;
 		}
+
 		if(RandomTeleport.factionsApiVersion == 27){
-			com.massivecraft.factions.entity.Faction faction = BoardColl.get().getFactionAt(PS.valueOf(block));
-			if(faction != FactionColl.get().getNone()) return false;
+			com.massivecraft.factions.entity.Faction faction = com.massivecraft.factions.entity.BoardColl.get().getFactionAt(com.massivecraft.massivecore.ps.PS.valueOf(block));
+			if(faction != com.massivecraft.factions.entity.FactionColl.get().getNone()) return false;
 		}
 		if(RandomTeleport.factionsApiVersion == 26){
-			com.massivecraft.factions.entity.Faction faction = BoardColls.get().getFactionAt(PS.valueOf(block));
-			if(faction != FactionColls.get().getForWorld(location.getWorld().getName()).getNone()) return false;
+			com.massivecraft.factions.entity.Faction faction = com.massivecraft.factions.entity.BoardColls.get().getFactionAt(com.massivecraft.mcore.ps.PS.valueOf(block));
+			if(faction != com.massivecraft.factions.entity.FactionColls.get().getForWorld(location.getWorld().getName()).getNone()) return false;
 		}
-		/*if(this.factionsApiVersion == 16){
-			com.massivecraft.factions.Faction faction = Board.getInstance().getFactionAt(new FLocation(location));
-			if(faction != Factions.getNone()) return false;
-		}*/
+		if(this.factionsApiVersion == 16){
+			com.massivecraft.factions.Faction faction = com.massivecraft.factions.Board.getInstance().getFactionAt(new com.massivecraft.factions.FLocation(location));
+			if(faction != com.massivecraft.factions.Factions.getInstance().getNone()) return false;
+		}
 		return true;
 	}
 	
