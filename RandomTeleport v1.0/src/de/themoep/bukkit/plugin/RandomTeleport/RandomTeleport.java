@@ -545,7 +545,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 			if(faction != com.massivecraft.factions.entity.FactionColl.get().getNone()) return false;
 		}
 		if(RandomTeleport.factionsApiVersion == 26){
-			com.massivecraft.factions.entity.Faction faction = com.massivecraft.factions.entity.BoardColls.get().getFactionAt(com.massivecraft.mcore.ps.PS.valueOf(block));
+			com.massivecraft.factions.entity.Faction faction = com.massivecraft.factions.entity.BoardColls.get().getFactionAt(com.massivecraft.massivecore.ps.PS.valueOf(block));
 			if(faction != com.massivecraft.factions.entity.FactionColls.get().getForWorld(location.getWorld().getName()).getNone()) return false;
 		}
 		if(this.factionsApiVersion == 16){
