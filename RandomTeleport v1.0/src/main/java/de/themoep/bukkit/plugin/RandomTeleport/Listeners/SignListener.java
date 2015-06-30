@@ -3,7 +3,6 @@ package de.themoep.bukkit.plugin.RandomTeleport.Listeners;
 import de.themoep.bukkit.plugin.RandomTeleport.RandomTeleport;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -25,7 +24,7 @@ public class SignListener implements Listener {
                 event.getPlayer().sendMessage(ChatColor.RED + "You don't have permission to create RandomTeleport preset signs! " + ChatColor.ITALIC + " (randomteleport.sign.create)");
             } else {
                 event.getPlayer().sendMessage(ChatColor.GREEN + "RandomTeleport preset sign created!");
-                if (RandomTeleport.getPlugin().getConfig().getString("presets." + event.getLine(2).toLowerCase()) == null) {
+                if (RandomTeleport.getInstance().getConfig().getString("presets." + event.getLine(2).toLowerCase()) == null) {
                     event.getPlayer().sendMessage(ChatColor.DARK_RED + "Warning: " + ChatColor.RED + "The RandomTeleport preset " + ChatColor.GOLD + event.getLine(2).toLowerCase() + ChatColor.RED + " does not exist!");
                 }
             }
@@ -51,17 +50,18 @@ public class SignListener implements Listener {
     public void onSignClick(PlayerInteractEvent event) {
         if(event.getAction() == Action.RIGHT_CLICK_BLOCK && !event.isCancelled() && (event.getClickedBlock().getType() == Material.WALL_SIGN || event.getClickedBlock().getType() == Material.SIGN_POST)) {
             Sign sign = (Sign) event.getClickedBlock().getState();
-            if(!(sign.getLine(1).equalsIgnoreCase("[rtp]") || sign.getLine(1).equalsIgnoreCase("[RandomTP]"))) return;
-            String preset = sign.getLine(2).toLowerCase();
-            if (event.getPlayer().hasPermission("randomteleport.sign.preset." + preset)) {
-                if (RandomTeleport.getPlugin().getConfig().getString("presets." + preset) == null) {
-                    event.getPlayer().sendMessage(ChatColor.RED + "The RandomTeleport preset " + ChatColor.GOLD +  preset + ChatColor.RED + " does not exist!");
+            if(sign.getLine(1).equalsIgnoreCase("[rtp]") || sign.getLine(1).equalsIgnoreCase("[RandomTP]")) {
+                String preset = sign.getLine(2).toLowerCase();
+                if (event.getPlayer().hasPermission("randomteleport.sign.preset." + preset)) {
+                    if (RandomTeleport.getInstance().getConfig().getString("presets." + preset) == null) {
+                        event.getPlayer().sendMessage(ChatColor.RED + "The RandomTeleport preset " + ChatColor.GOLD + preset + ChatColor.RED + " does not exist!");
+                    } else {
+                        String cmd = "rtp " + preset + " " + event.getPlayer().getName();
+                        RandomTeleport.getInstance().getServer().dispatchCommand(RandomTeleport.getInstance().getServer().getConsoleSender(), cmd);
+                    }
                 } else {
-                    String cmd = "rtp " + preset + " " + event.getPlayer().getName();
-                    RandomTeleport.getPlugin().getServer().dispatchCommand(RandomTeleport.getPlugin().getServer().getConsoleSender(), cmd);
+                    event.getPlayer().sendMessage(ChatColor.RED + "You don't have permission to use the preset " + preset + "! " + ChatColor.ITALIC + " (randomteleport.sign.preset." + preset + ")");
                 }
-            } else {
-                event.getPlayer().sendMessage(ChatColor.RED + "You don't have permission to use the preset " + preset + "! " + ChatColor.ITALIC + " (randomteleport.sign.preset." + preset +")");
             }
         }
     }
