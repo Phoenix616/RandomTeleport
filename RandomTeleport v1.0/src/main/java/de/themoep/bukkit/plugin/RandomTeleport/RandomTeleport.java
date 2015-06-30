@@ -1,6 +1,9 @@
 package de.themoep.bukkit.plugin.RandomTeleport;
 
 import de.themoep.bukkit.plugin.RandomTeleport.Listeners.SignListener;
+import de.themoep.clancontrol.ClanControl;
+import de.themoep.clancontrol.Region;
+import de.themoep.clancontrol.RegionStatus;
 import org.bukkit.*;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Biome;
@@ -40,6 +43,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 
     public int factionsApiVersion = 0;
     public boolean worldguard = false;
+    public boolean clancontrol = false;
 
 
     @SuppressWarnings("unchecked")
@@ -59,6 +63,11 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
         if(Bukkit.getPluginManager().getPlugin("WorldGuard") != null){
             getLogger().log(Level.INFO, "Detected WorldGuard.");
             worldguard = true;
+        }
+
+        if(Bukkit.getPluginManager().getPlugin("ClanControl") != null){
+            getLogger().log(Level.INFO, "Detected ClanControl.");
+            clancontrol = true;
         }
 
         if(Bukkit.getPluginManager().getPlugin("Factions") != null){
@@ -574,22 +583,34 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
     private boolean checkforRegion(Player player, Location location, Boolean forceRegions) {
         if(!forceRegions) {
             Block block = location.getWorld().getBlockAt(location);
-            if (worldguard && !com.sk89q.worldguard.bukkit.WGBukkit.getPlugin().canBuild(player, block)) {
+            if(worldguard && !com.sk89q.worldguard.bukkit.WGBukkit.getPlugin().canBuild(player, block)) {
                 return false;
             }
-
-            if (factionsApiVersion == 27) {
-                com.massivecraft.factions.entity.Faction faction = com.massivecraft.factions.entity.BoardColl.get().getFactionAt(com.massivecraft.massivecore.ps.PS.valueOf(block));
-                if (faction != com.massivecraft.factions.entity.FactionColl.get().getNone()) return false;
-            }
-            if (factionsApiVersion == 26) {
-                com.massivecraft.factions.entity.Faction faction = com.massivecraft.factions.entity.BoardColls.get().getFactionAt(com.massivecraft.massivecore.ps.PS.valueOf(block));
-                if (faction != com.massivecraft.factions.entity.FactionColls.get().getForWorld(location.getWorld().getName()).getNone())
+            
+            if(clancontrol) {
+                boolean chunkOccupied = ClanControl.getInstance().getRegionManager().getChunk(location) != null;
+                Region region = ClanControl.getInstance().getRegionManager().getRegion(location);
+                if(chunkOccupied || (region != null && region.getStatus() != RegionStatus.FREE)) {
                     return false;
+                }
             }
-            if (factionsApiVersion == 16) {
+            if(factionsApiVersion == 27) {
+                com.massivecraft.factions.entity.Faction faction = com.massivecraft.factions.entity.BoardColl.get().getFactionAt(com.massivecraft.massivecore.ps.PS.valueOf(block));
+                if(faction != com.massivecraft.factions.entity.FactionColl.get().getNone()) {
+                    return false;
+                }
+            }
+            if(factionsApiVersion == 26) {
+                com.massivecraft.factions.entity.Faction faction = com.massivecraft.factions.entity.BoardColls.get().getFactionAt(com.massivecraft.massivecore.ps.PS.valueOf(block));
+                if(faction != com.massivecraft.factions.entity.FactionColls.get().getForWorld(location.getWorld().getName()).getNone()) {
+                    return false;
+                }
+            }
+            if(factionsApiVersion == 16) {
                 com.massivecraft.factions.Faction faction = com.massivecraft.factions.Board.getInstance().getFactionAt(new com.massivecraft.factions.FLocation(location));
-                if (faction != com.massivecraft.factions.Factions.getInstance().getNone()) return false;
+                if(faction != com.massivecraft.factions.Factions.getInstance().getNone()) {
+                    return false;
+                }
             }
         }
         return true;
