@@ -54,7 +54,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
         getLogger().log(Level.INFO, "Attempting to load cooldown.map...");
         cooldown = (HashMap<String, Long>) readMap("cooldown.map");
 
-        getServer().getPluginManager().registerEvents(new SignListener(), this);
+        getServer().getPluginManager().registerEvents(new SignListener(this), this);
 
         if(Bukkit.getPluginManager().getPlugin("WorldGuard") != null){
             getLogger().log(Level.INFO, "Detected WorldGuard.");

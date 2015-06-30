@@ -16,6 +16,12 @@ import org.bukkit.event.player.PlayerInteractEvent;
  */
 public class SignListener implements Listener {
 
+    private final RandomTeleport plugin;
+
+    public SignListener(RandomTeleport plugin) {
+        this.plugin = plugin;
+    }
+
     @EventHandler
     public void onSignCreate(SignChangeEvent event) {
         if(event.getLine(1).equalsIgnoreCase("[rtp]") || event.getLine(1).equalsIgnoreCase("[RandomTP]")){
@@ -24,7 +30,7 @@ public class SignListener implements Listener {
                 event.getPlayer().sendMessage(ChatColor.RED + "You don't have permission to create RandomTeleport preset signs! " + ChatColor.ITALIC + " (randomteleport.sign.create)");
             } else {
                 event.getPlayer().sendMessage(ChatColor.GREEN + "RandomTeleport preset sign created!");
-                if (RandomTeleport.getInstance().getConfig().getString("presets." + event.getLine(2).toLowerCase()) == null) {
+                if(plugin.getConfig().getString("presets." + event.getLine(2).toLowerCase()) == null) {
                     event.getPlayer().sendMessage(ChatColor.DARK_RED + "Warning: " + ChatColor.RED + "The RandomTeleport preset " + ChatColor.GOLD + event.getLine(2).toLowerCase() + ChatColor.RED + " does not exist!");
                 }
             }
@@ -36,7 +42,7 @@ public class SignListener implements Listener {
         if(event.getBlock().getType() == Material.WALL_SIGN || event.getBlock().getType() == Material.SIGN_POST) {
             Sign sign = (Sign) event.getBlock().getState();
             if(sign.getLine(1).equalsIgnoreCase("[rtp]") || sign.getLine(1).equalsIgnoreCase("[RandomTP]")){
-                if (!event.getPlayer().hasPermission("randomteleport.sign.create")){
+                if(!event.getPlayer().hasPermission("randomteleport.sign.create")){
                     event.setCancelled(true);
                     event.getPlayer().sendMessage(ChatColor.RED + "You don't have permission to break RandomTeleport signs! " + ChatColor.ITALIC + " (randomteleport.sign.create)");
                 } else {
@@ -52,12 +58,12 @@ public class SignListener implements Listener {
             Sign sign = (Sign) event.getClickedBlock().getState();
             if(sign.getLine(1).equalsIgnoreCase("[rtp]") || sign.getLine(1).equalsIgnoreCase("[RandomTP]")) {
                 String preset = sign.getLine(2).toLowerCase();
-                if (event.getPlayer().hasPermission("randomteleport.sign.preset." + preset)) {
-                    if (RandomTeleport.getInstance().getConfig().getString("presets." + preset) == null) {
+                if(event.getPlayer().hasPermission("randomteleport.sign.preset." + preset)) {
+                    if(plugin.getConfig().getString("presets." + preset) == null) {
                         event.getPlayer().sendMessage(ChatColor.RED + "The RandomTeleport preset " + ChatColor.GOLD + preset + ChatColor.RED + " does not exist!");
                     } else {
                         String cmd = "rtp " + preset + " " + event.getPlayer().getName();
-                        RandomTeleport.getInstance().getServer().dispatchCommand(RandomTeleport.getInstance().getServer().getConsoleSender(), cmd);
+                        plugin.getServer().dispatchCommand(RandomTeleport.getInstance().getServer().getConsoleSender(), cmd);
                     }
                 } else {
                     event.getPlayer().sendMessage(ChatColor.RED + "You don't have permission to use the preset " + preset + "! " + ChatColor.ITALIC + " (randomteleport.sign.preset." + preset + ")");
