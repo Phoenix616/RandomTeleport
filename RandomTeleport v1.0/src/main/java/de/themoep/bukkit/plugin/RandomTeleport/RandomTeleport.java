@@ -284,7 +284,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
                                 setSpawnpoint = true;
                             }
                         } else {
-                            sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " Your input contains a invalid option (" + args[i] + ")!");
+                            sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " Your input contains an invalid option (" + args[i] + ")!");
                             return false;
                         }
                     }

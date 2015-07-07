@@ -63,7 +63,7 @@ public class SignListener implements Listener {
                         event.getPlayer().sendMessage(ChatColor.RED + "The RandomTeleport preset " + ChatColor.GOLD + preset + ChatColor.RED + " does not exist!");
                     } else {
                         String cmd = "rtp " + preset + " " + event.getPlayer().getName();
-                        plugin.getServer().dispatchCommand(RandomTeleport.getInstance().getServer().getConsoleSender(), cmd);
+                        plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), cmd);
                     }
                 } else {
                     event.getPlayer().sendMessage(ChatColor.RED + "You don't have permission to use the preset " + preset + "! " + ChatColor.ITALIC + " (randomteleport.sign.preset." + preset + ")");
