@@ -1,5 +1,6 @@
 package de.themoep.bukkit.plugin.RandomTeleport;
 
+import com.google.common.collect.ImmutableMap;
 import de.themoep.bukkit.plugin.RandomTeleport.Listeners.SignListener;
 import de.themoep.clancontrol.ClanControl;
 import de.themoep.clancontrol.Region;
@@ -36,11 +37,6 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
     public HashSet<UUID> playerlock = new HashSet<UUID> ();
     public int[] checkstat = new int[100];
 
-    public String textsearch = ChatColor.GRAY + "RandomTeleport searches for a safe place in world {worldname}. . .";
-    public String textteleport = ChatColor.GRAY + "RandomTeleport teleported you to"; //  + " X: " + xTp + " Y: " + yTp + " Z: " + zTp + "!"
-    public String textlocationerror = ChatColor.DARK_RED + "Error:" + ChatColor.RED + " RandomTeleport could not find a save location!";
-    public String textcooldownerror = ChatColor.RED + "You have to wait {cooldown_text}before using this RandomTeleport again!";
-
     public int factionsApiVersion = 0;
     public boolean worldguard = false;
     public boolean clancontrol = false;
@@ -52,8 +48,6 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
         instance = this;
 
         saveDefaultConfig();
-
-        loadMessages();
 
         getLogger().log(Level.INFO, "Attempting to load cooldown.map...");
         cooldown = (HashMap<String, Long>) readMap("cooldown.map");
@@ -84,19 +78,12 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 
     }
 
-    public void loadMessages() {
-        getLogger().log(Level.INFO, "Loading messages from config.");
-        textsearch = ChatColor.translateAlternateColorCodes("&".charAt(0), this.getConfig().getString("msg.search"));
-        textteleport = ChatColor.translateAlternateColorCodes("&".charAt(0), this.getConfig().getString("msg.teleport"));
-        textlocationerror = ChatColor.translateAlternateColorCodes("&".charAt(0), this.getConfig().getString("msg.error.location"));
-        textcooldownerror = ChatColor.translateAlternateColorCodes("&".charAt(0), this.getConfig().getString("msg.error.cooldown"));
-    }
-
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) throws NumberFormatException {
         if(cmd.getName().equalsIgnoreCase("randomteleport") || cmd.getName().equalsIgnoreCase("randomtp") || cmd.getName().equalsIgnoreCase("rtp")) {
             boolean forceBlocks = false;
             boolean forceRegions = false;
             boolean loadedChunksOnly = false;
+            boolean setSpawnpoint = false;
 
             //boolean tppoints = false;
             boolean xoption = false;
@@ -138,7 +125,6 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 
             if(args.length == 1 && args[0].equalsIgnoreCase("reload") && sender.hasPermission("randomteleport.reload")) {
                 reloadConfig();
-                loadMessages();
                 sender.sendMessage(ChatColor.GREEN + "Config reloaded!");
                 return true;
             }
@@ -293,6 +279,10 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
                                 else if(args[i+1].equalsIgnoreCase("regions"))
                                     forceRegions = true;
                             }
+                        } else if(args[i].equalsIgnoreCase("-sp") || args[i].equalsIgnoreCase("-spawnpoint")) {
+                            if(i+1 >= args.length || args[i+1].startsWith("-")) {
+                                setSpawnpoint = true;
+                            }
                         } else {
                             sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " Your input contains a invalid option (" + args[i] + ")!");
                             return false;
@@ -376,12 +366,12 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
                 if(playername.equalsIgnoreCase("CONSOLE")) {
                     sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " This teleport is on cooldown for player " + player.getName() + "!");
                 }
-                player.sendMessage(textcooldownerror.replaceAll("\\{cooldown_text\\}", cooldown_text));
+                player.sendMessage(getTranslation("error.cooldown", ImmutableMap.of("cooldown_text", cooldown_text)));
                 playerlock.remove(player.getUniqueId());
                 return true;
             }
 
-            player.sendMessage(textsearch.replaceAll("\\{worldname\\}", world.getName()));
+            player.sendMessage(getTranslation("search", ImmutableMap.of("worldname", world.getName())));
 
             // set center coordinates to player location
             if(!xoption) {
@@ -433,7 +423,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
                     if(count == 100) {
                         sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " RandomTeleport could not find a save location!");
                         if(!sender.getName().equalsIgnoreCase(player.getName())){
-                            player.sendMessage(textlocationerror);
+                            player.sendMessage(getTranslation("error.location"));
                         }
                         getLogger().info("Error: RandomTeleport could not find a save location after " + count + " tries for the player '" + playername + "' (minRange " + minRange + " maxRange " + maxRange + " xCenter " + xCenter + " zCenter " + zCenter + " forceBlocks=" + forceBlocks + " forceRegions=" + forceRegions + ")");
                         checkstat[count-1] = checkstat[count-1]++;
@@ -493,7 +483,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
             z = zold;
 
             // attempts to teleport player, sends message if it fails
-            if(!teleportPlayer(playername,x,z,world)) {
+            if(!teleportPlayer(playername,x,z,world,setSpawnpoint)) {
                 sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " Player '" + playername + "' is not online anymore!");
             } else {
                 getLogger().fine("Used teleport location X: " + x + " Z: " + z + " for player '" + playername + "' RandomTeleportID: " + cooldownid);
@@ -514,16 +504,21 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
      * @param x Coordinate of the block as int
      * @param z Coordinate of the block as int
      * @param world The world we should teleport the player to
+     * @param setSpawnpoint if we should set the player's spawnpoint to the location or not
      * @return true if player got teleported
      */
 
-    private boolean teleportPlayer(String playername, int x ,int z, World world) {
+    private boolean teleportPlayer(String playername, int x ,int z, World world, boolean setSpawnpoint) {
         final Player player = Bukkit.getServer().getPlayer(playername);
         if(player != null && world != null) {
             final int yTp = world.getHighestBlockYAt(x, z);
-
-            player.teleport(new Location(world, x + 0.5, yTp + 0.5, z + 0.5));
-            player.sendMessage(textteleport + " X: " + x + " Y: " + yTp + " Z: " + z + "!");
+            Location loc = new Location(world, x + 0.5, yTp + 0.5, z + 0.5);
+            player.teleport(loc);
+            player.sendMessage(getTranslation("teleport", ImmutableMap.of("x", Integer.toString(x), "y", Integer.toString(yTp), "z", Integer.toString(z))));
+            if(setSpawnpoint) {
+                player.setBedSpawnLocation(loc, true);
+                player.sendMessage(getTranslation("setspawnpoint"));
+            }
             return true;
         }
         return false;
@@ -689,8 +684,22 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
         return true;
     }
 
-    public static RandomTeleport getInstance() {
-        return instance;
+    public String getTranslation(String key) {
+        if(getConfig().getString("msg." + key, "").isEmpty()) {
+            return ChatColor.RED + "Unknown language key: " + ChatColor.YELLOW + key;
+        } else {
+            return ChatColor.translateAlternateColorCodes('&', getConfig().getString("msg." + key));
+        }
+    }
+
+    public String getTranslation(String key, Map<String, String> replacements) {
+        String string = getTranslation(key);
+
+        // insert replacements
+        if(replacements != null)
+            for(String variable : replacements.keySet())
+                string = string.replaceAll("{"+variable+"}", replacements.get(variable));
+        return string;
     }
 
 }

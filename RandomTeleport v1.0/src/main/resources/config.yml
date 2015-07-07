@@ -9,7 +9,8 @@ presets:
 
 msg:
    search: "&7RandomTeleport searches for a safe place in world {worldname}. . ."
-   teleport: "&7RandomTeleport teleported you to"
+   teleport: "&7RandomTeleport teleported you to X: {x} Y: {y} Z: {z}!"
+   setspawnpoint: "&7Dein Respawnpoint wurde an deine Position gesetzt!"
    error:
       location: "&4Error: &cRandomTeleport could not find a save location!"
       cooldown: "&cYou have to wait {cooldown_text}before using this RandomTeleport again!"
