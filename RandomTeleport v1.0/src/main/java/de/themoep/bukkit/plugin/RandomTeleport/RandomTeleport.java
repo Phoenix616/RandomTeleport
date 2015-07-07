@@ -83,7 +83,12 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
             boolean forceBlocks = false;
             boolean forceRegions = false;
             boolean loadedChunksOnly = false;
-            boolean setSpawnpoint = false;
+            /*
+            0 -> don't set it
+            1 -> set it only if the player doesn't have a bed spawn
+            2 -> force it even if the player has a bed spawn
+             */
+            int setSpawnpoint = 0;
 
             //boolean tppoints = false;
             boolean xoption = false;
@@ -281,7 +286,13 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
                             }
                         } else if(args[i].equalsIgnoreCase("-sp") || args[i].equalsIgnoreCase("-spawnpoint")) {
                             if(i+1 >= args.length || args[i+1].startsWith("-")) {
-                                setSpawnpoint = true;
+                                setSpawnpoint = 1;
+                            } else {
+                                i++;
+                                if(args[i+1].equalsIgnoreCase("true"))
+                                    setSpawnpoint = 2;
+                                else if(args[i+1].equalsIgnoreCase("false"))
+                                    setSpawnpoint = 1;
                             }
                         } else {
                             sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " Your input contains an invalid option (" + args[i] + ")!");
@@ -504,18 +515,18 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
      * @param x Coordinate of the block as int
      * @param z Coordinate of the block as int
      * @param world The world we should teleport the player to
-     * @param setSpawnpoint if we should set the player's spawnpoint to the location or not
+     * @param setSpawnpoint if we should set the player's spawnpoint to the location (1, 2 = force) or not (0)
      * @return true if player got teleported
      */
 
-    private boolean teleportPlayer(String playername, int x ,int z, World world, boolean setSpawnpoint) {
+    private boolean teleportPlayer(String playername, int x ,int z, World world, int setSpawnpoint) {
         final Player player = Bukkit.getServer().getPlayer(playername);
         if(player != null && world != null) {
             final int yTp = world.getHighestBlockYAt(x, z);
             Location loc = new Location(world, x + 0.5, yTp + 0.5, z + 0.5);
             player.teleport(loc);
             player.sendMessage(getTranslation("teleport", ImmutableMap.of("x", Integer.toString(x), "y", Integer.toString(yTp), "z", Integer.toString(z))));
-            if(setSpawnpoint) {
+            if(setSpawnpoint == 2 || (setSpawnpoint == 1 && player.getBedSpawnLocation() == null)) {
                 player.setBedSpawnLocation(loc, true);
                 player.sendMessage(getTranslation("setspawnpoint"));
             }
