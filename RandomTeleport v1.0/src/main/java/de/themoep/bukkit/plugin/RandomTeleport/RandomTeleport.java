@@ -335,7 +335,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 
             //getLogger().info("Starting to read cooldown hashmap");
 
-            String cooldownid = player.getUniqueId().toString() + minRange + maxRange + xCenter + zCenter + cooldowntime + forceBlocks + forceRegions;
+            String cooldownid = player.getUniqueId().toString() + minRange + maxRange + xCenter + zCenter + cooldowntime + forceBlocks + forceRegions + setSpawnpoint;
             if(cooldown.containsKey(cooldownid) && cooldown.get(cooldownid) + cooldowntime * 1000 >  System.currentTimeMillis()) {
 
                 // convert seconds in dhms format
