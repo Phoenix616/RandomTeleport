@@ -278,21 +278,23 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
                                 forceBlocks = true;
                                 forceRegions = true;
                             } else {
-                                i++;
-                                if(args[i+1].equalsIgnoreCase("blocks"))
+                                if(args[i+1].equalsIgnoreCase("blocks")) {
                                     forceBlocks = true;
-                                else if(args[i+1].equalsIgnoreCase("regions"))
+                                } else if(args[i+1].equalsIgnoreCase("regions")) {
                                     forceRegions = true;
+                                }
+                                i++;
                             }
                         } else if(args[i].equalsIgnoreCase("-sp") || args[i].equalsIgnoreCase("-spawnpoint")) {
                             if(i+1 >= args.length || args[i+1].startsWith("-")) {
                                 setSpawnpoint = 1;
                             } else {
-                                i++;
-                                if(args[i+1].equalsIgnoreCase("true"))
+                                if(args[i+1].equalsIgnoreCase("true")) {
                                     setSpawnpoint = 2;
-                                else if(args[i+1].equalsIgnoreCase("false"))
+                                } else if(args[i+1].equalsIgnoreCase("false")) {
                                     setSpawnpoint = 1;
+                                }
+                                i++;
                             }
                         } else {
                             sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " Your input contains an invalid option (" + args[i] + ")!");
