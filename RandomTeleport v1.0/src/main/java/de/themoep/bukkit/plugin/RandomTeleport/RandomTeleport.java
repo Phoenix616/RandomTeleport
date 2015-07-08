@@ -709,7 +709,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
         // insert replacements
         if(replacements != null)
             for(String variable : replacements.keySet())
-                string = string.replaceAll("{"+variable+"}", replacements.get(variable));
+                string = string.replaceAll("\\{"+variable+"\\}", replacements.get(variable));
         return string;
     }
 
