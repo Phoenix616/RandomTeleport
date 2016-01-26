@@ -15,6 +15,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockCanBuildEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -591,6 +592,13 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
     private boolean checkforRegion(Player player, Location location, Boolean forceRegions) {
         if(!forceRegions) {
             Block block = location.getWorld().getBlockAt(location);
+
+            BlockCanBuildEvent canBuildEvent = new BlockCanBuildEvent(block, block.getTypeId(), true);
+            getServer().getPluginManager().callEvent(canBuildEvent);
+            if(!canBuildEvent.isBuildable()) {
+                return false;
+            }
+
             if(worldguard && !com.sk89q.worldguard.bukkit.WGBukkit.getPlugin().canBuild(player, block)) {
                 return false;
             }
