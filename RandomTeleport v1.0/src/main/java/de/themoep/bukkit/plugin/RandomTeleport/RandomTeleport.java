@@ -5,6 +5,7 @@ import de.themoep.bukkit.plugin.RandomTeleport.Listeners.SignListener;
 import de.themoep.clancontrol.ClanControl;
 import de.themoep.clancontrol.Region;
 import de.themoep.clancontrol.RegionStatus;
+import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import org.bukkit.*;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Biome;
@@ -41,6 +42,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
     public int factionsApiVersion = 0;
     public boolean worldguard = false;
     public boolean clancontrol = false;
+    public boolean griefprevention = false;
 
 
     @SuppressWarnings("unchecked")
@@ -58,6 +60,11 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
         if(Bukkit.getPluginManager().getPlugin("WorldGuard") != null){
             getLogger().log(Level.INFO, "Detected WorldGuard.");
             worldguard = true;
+        }
+
+        if(Bukkit.getPluginManager().getPlugin("GriefPrevention") != null) {
+            getLogger().log(Level.INFO, "Detected GriefPrevention.");
+            griefprevention = true;
         }
 
         if(Bukkit.getPluginManager().getPlugin("ClanControl") != null){
@@ -602,7 +609,9 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
             if(worldguard && !com.sk89q.worldguard.bukkit.WGBukkit.getPlugin().canBuild(player, block)) {
                 return false;
             }
-            
+            if(griefprevention && GriefPrevention.instance.dataStore.getClaimAt(location, true, null) != null) {
+                return false;
+            }
             if(clancontrol) {
                 boolean chunkOccupied = ClanControl.getInstance().getRegionManager().getChunk(location) != null;
                 Region region = ClanControl.getInstance().getRegionManager().getRegion(location);
