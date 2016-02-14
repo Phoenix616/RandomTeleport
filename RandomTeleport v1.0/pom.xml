@@ -20,6 +20,10 @@
             <id>spigot-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
         </repository>
+        <repository>
+            <id>sk89q-repo</id>
+            <url>http://maven.sk89q.com/repo/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -32,6 +36,39 @@
             <groupId>de.themoep</groupId>
             <artifactId>ClanControl</artifactId>
             <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sk89q</groupId>
+            <artifactId>worldguard</artifactId>
+            <version>6.1.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>me.ryanhamshire</groupId>
+            <artifactId>GriefPrevention</artifactId>
+            <version>13.6</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/GriefPrevention-13.6.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.massivecraft</groupId>
+            <artifactId>MassiveCore</artifactId>
+            <version>2.7.1</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/MassiveCore-2.7.1.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.massivecraft</groupId>
+            <artifactId>MassiveCore-old</artifactId>
+            <version>7.4.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/MassiveCore-7.4.0.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>de.themoep</groupId>
+            <artifactId>factionsutil</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/lib/Factions-Dependencies-2.6+2.7.1+UUID.jar</systemPath>
         </dependency>
     </dependencies>
 
