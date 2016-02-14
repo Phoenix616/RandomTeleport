@@ -1,6 +1,6 @@
 name: RandomTeleport
 main: de.themoep.bukkit.plugin.RandomTeleport.RandomTeleport
-softdepend: [WorldGuard,Factions]
+softdepend: [WorldGuard,Factions,GriefPrevention,ClanControl]
 version: '${minecraft.plugin.version}'
 description: provides a command to teleport the player to a random save location
 author: Phoenix616
