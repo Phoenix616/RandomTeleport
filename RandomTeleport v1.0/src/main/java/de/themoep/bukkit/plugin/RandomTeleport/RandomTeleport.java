@@ -6,8 +6,14 @@ import de.themoep.clancontrol.ClanControl;
 import de.themoep.clancontrol.Region;
 import de.themoep.clancontrol.RegionStatus;
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.World.Environment;
+import org.bukkit.WorldBorder;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.command.BlockCommandSender;
@@ -25,10 +31,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
 import java.util.logging.Level;
-
-import static com.massivecraft.massivecore.ps.PS.valueOf;
 
 
 public class RandomTeleport extends JavaPlugin implements CommandExecutor {
@@ -551,14 +561,27 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
      * @param world The world the coordinate is in
      * @param x Coordinate of the block as int
      * @param z Coordinate of the block as int
-     * @param biomeList
-     *@param forceBlocks true if should only check if the player wont die,
+     * @param biomeList THe list of biomes at that point
+     * @param forceBlocks true if should only check if the player wont die,
      *              	  false for block restrictions check
      * @param forceRegions true if should not check if location is in region,
-     *              	   false for region restriction   @return true if the block is a valid teleport block
+     *              	   false for region restriction
+     * @return true if the block is a valid teleport block
      */
 
     private boolean teleportCheck(Player player, World world, int x, int z, List<Biome> biomeList, boolean forceBlocks, boolean forceRegions) {
+        WorldBorder wb = world.getWorldBorder();
+        if(x > 0 && wb.getCenter().getBlockX() + x > wb.getCenter().getBlockX() + wb.getSize()) {
+                return false;
+        } else if(x < 0 && wb.getCenter().getBlockX() + x < wb.getCenter().getBlockX() - wb.getSize()) {
+            return false;
+        }
+        if(z > 0 && wb.getCenter().getBlockZ() + z > wb.getCenter().getBlockZ() + wb.getSize()) {
+            return false;
+        } else if(z < 0 && wb.getCenter().getBlockZ() + z < wb.getCenter().getBlockZ() - wb.getSize()) {
+            return false;
+        }
+
         int y = world.getHighestBlockYAt(x, z);
         Block highest = world.getBlockAt(x, y - 1, z);
 
