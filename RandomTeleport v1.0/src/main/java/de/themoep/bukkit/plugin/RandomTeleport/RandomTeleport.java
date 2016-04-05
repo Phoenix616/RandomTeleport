@@ -1,6 +1,8 @@
 package de.themoep.bukkit.plugin.RandomTeleport;
 
 import com.google.common.collect.ImmutableMap;
+import com.wimbli.WorldBorder.BorderData;
+import com.wimbli.WorldBorder.WorldBorder;
 import de.themoep.bukkit.plugin.RandomTeleport.Listeners.SignListener;
 import de.themoep.clancontrol.ClanControl;
 import de.themoep.clancontrol.Region;
@@ -13,7 +15,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
-import org.bukkit.WorldBorder;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.command.BlockCommandSender;
@@ -53,6 +54,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
     public boolean worldguard = false;
     public boolean clancontrol = false;
     public boolean griefprevention = false;
+    public boolean worldborder = false;
 
 
     @SuppressWarnings("unchecked")
@@ -80,6 +82,11 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
         if(Bukkit.getPluginManager().getPlugin("ClanControl") != null){
             getLogger().log(Level.INFO, "Detected ClanControl.");
             clancontrol = true;
+        }
+
+        if(Bukkit.getPluginManager().getPlugin("WorldBorder") != null) {
+            getLogger().log(Level.INFO, "Detected WorldBorder.");
+            worldborder = true;
         }
 
         if(Bukkit.getPluginManager().getPlugin("Factions") != null){
@@ -570,15 +577,24 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
      */
 
     private boolean teleportCheck(Player player, World world, int x, int z, List<Biome> biomeList, boolean forceBlocks, boolean forceRegions) {
-        WorldBorder wb = world.getWorldBorder();
-        if(x > 0 && wb.getCenter().getBlockX() + x > wb.getCenter().getBlockX() + wb.getSize()) {
+        if(worldborder) {
+            WorldBorder wbPlugin = (WorldBorder) getServer().getPluginManager().getPlugin("WorldBorder");
+            BorderData border = wbPlugin.getWorldBorder(world.getName());
+            if(border != null && !border.insideBorder(x, z)) {
                 return false;
-        } else if(x < 0 && wb.getCenter().getBlockX() + x < wb.getCenter().getBlockX() - wb.getSize()) {
+            }
+        }
+
+        org.bukkit.WorldBorder wb = world.getWorldBorder();
+        double wbMaxX = wb.getCenter().getX() + wb.getSize();
+        double wbMinX = wb.getCenter().getX() - wb.getSize();
+        double wbMaxZ = wb.getCenter().getZ() + wb.getSize();
+        double wbMinZ = wb.getCenter().getZ() - wb.getSize();
+
+        if(x > wbMaxX || x < wbMinX) {
             return false;
         }
-        if(z > 0 && wb.getCenter().getBlockZ() + z > wb.getCenter().getBlockZ() + wb.getSize()) {
-            return false;
-        } else if(z < 0 && wb.getCenter().getBlockZ() + z < wb.getCenter().getBlockZ() - wb.getSize()) {
+        if(z > wbMaxZ || z < wbMinZ) {
             return false;
         }
 
