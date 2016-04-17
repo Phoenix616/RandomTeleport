@@ -246,12 +246,19 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
                                 return true;
                             }
                             for(i = i+1; i < args.length; i++) {
+                                if(args[i].startsWith("-")) {
+                                    break;
+                                }
                                 try {
                                     biomeList.add(Biome.valueOf(args[i].toUpperCase()));
                                 } catch(IllegalArgumentException e) {
                                     sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " The biome \"" + args[i] + "\" given in the -biome option does not exist!");
                                     return true;
                                 }
+                            }
+                            if(biomeList.size() == 0) {
+                                sender.sendMessage(ChatColor.DARK_RED + "Error:" + ChatColor.RED + " Please specify at least one biome after the -biome option!");
+                                return true;
                             }
 
                             // if -x/-z option is selected set x/z it to its values
