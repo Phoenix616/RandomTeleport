@@ -529,8 +529,8 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
                 //(re)set sum of valid chunks to zero
                 chunksum = 0;
 
-                // checks a square of 15x15 around the random position for protected WorldGuard and Factions regions
-                if(Bukkit.getPluginManager().getPlugin("Factions") != null) {
+                // checks a square of 9x9 chunks around the random position for protected regions
+                if(worldguard || factionsApiVersion > 0 || griefprevention || clancontrol) {
                     for(int i = -4; i <= 4; i++) {
                         for(int j = -4; j <= 4; j++) {
                             int xcheck = x + i * 16;
