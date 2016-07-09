@@ -36,16 +36,19 @@
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
             <version>1.9-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>de.themoep</groupId>
             <artifactId>ClanControl</artifactId>
             <version>1.0-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.sk89q</groupId>
             <artifactId>worldguard</artifactId>
             <version>6.1.1-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>me.ryanhamshire</groupId>
@@ -79,6 +82,7 @@
             <groupId>com.github.Brettflan</groupId>
             <artifactId>WorldBorder</artifactId>
             <version>master-c5df3417c8-1</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
