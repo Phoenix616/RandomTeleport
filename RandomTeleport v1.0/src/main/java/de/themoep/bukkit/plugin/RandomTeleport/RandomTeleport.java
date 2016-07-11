@@ -629,10 +629,10 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
         }
 
         org.bukkit.WorldBorder wb = world.getWorldBorder();
-        double wbMaxX = wb.getCenter().getX() + wb.getSize();
-        double wbMinX = wb.getCenter().getX() - wb.getSize();
-        double wbMaxZ = wb.getCenter().getZ() + wb.getSize();
-        double wbMinZ = wb.getCenter().getZ() - wb.getSize();
+        double wbMaxX = wb.getCenter().getX() + wb.getSize() / 2;
+        double wbMinX = wb.getCenter().getX() - wb.getSize() / 2;
+        double wbMaxZ = wb.getCenter().getZ() + wb.getSize() / 2;
+        double wbMinZ = wb.getCenter().getZ() - wb.getSize() / 2;
 
         if(x > wbMaxX || x < wbMinX) {
             return false;
