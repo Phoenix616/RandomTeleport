@@ -6,7 +6,7 @@
 
     <groupId>de.themoep</groupId>
     <artifactId>RandomTeleport</artifactId>
-    <version>1.7.3</version>
+    <version>1.7.4</version>
     <description>Randomly teleport players on your server!</description>
     <name>RandomTeleport</name>
 
