@@ -469,7 +469,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 
             if(loadedChunksOnly)
                 for(Chunk c : world.getLoadedChunks())
-                    if(Math.abs(c.getX()) * 16 <= xCenter + maxRange && Math.abs(c.getX()) * 16 >= xCenter + minRange && Math.abs(c.getZ()) * 16 <= zCenter + maxRange && Math.abs(c.getZ()) * 16 >= zCenter + minRange )
+                    if(Math.abs(c.getX()) * 16 <= xCenter + maxRange && Math.abs(c.getZ()) * 16 <= zCenter + maxRange && (Math.abs(c.getX()) * 16 >= xCenter + minRange || Math.abs(c.getZ()) * 16 >= zCenter + minRange))
                         chunklist.add(new Integer[]{c.getX(), c.getZ()});
 
             for(int chunkcount = 0; chunkcount < 10 && chunksum < 81; chunkcount ++) {
@@ -483,9 +483,16 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
                         x = chunklist.get(chunknumber)[0] * 16 + r.nextInt(15);
                         z = chunklist.get(chunknumber)[1] * 16 + r.nextInt(15);
                     } else {
+                        int xRange;
+                        int zRange;
                         //get random range in min and max range
-                        int xRange = minRange + r.nextInt(maxRange - minRange);
-                        int zRange = minRange + r.nextInt(maxRange - minRange);
+                        if (r.nextBoolean()) {
+                            xRange = minRange + r.nextInt(maxRange - minRange);
+                            zRange = r.nextInt(maxRange);
+                        } else {
+                            xRange = r.nextInt(maxRange);
+                            zRange = minRange + r.nextInt(maxRange - minRange);
+                        }
 
                         //make range negative with a 50% chance
                         if (r.nextBoolean()) xRange = 0 - xRange;
