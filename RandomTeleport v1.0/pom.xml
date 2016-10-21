@@ -29,6 +29,10 @@
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
+        <repository>
+            <id>minebench-repo</id>
+            <url>http://repo.minebench.de/</url>
+        </repository>
     </repositories>
 
     <dependencies>
