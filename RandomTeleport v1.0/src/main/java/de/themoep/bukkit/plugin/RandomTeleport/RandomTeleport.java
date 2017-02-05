@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.wimbli.WorldBorder.BorderData;
 import com.wimbli.WorldBorder.WorldBorder;
 import de.themoep.bukkit.plugin.RandomTeleport.Listeners.SignListener;
+import de.themoep.bukkit.plugin.RandomTeleport.util.SlowChunkGenerator;
 import de.themoep.clancontrol.ClanControl;
 import de.themoep.clancontrol.Region;
 import de.themoep.clancontrol.RegionStatus;
@@ -596,17 +597,22 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
      * @return true if player got teleported
      */
 
-    private boolean teleportPlayer(String playername, int x ,int z, World world, int setSpawnpoint) {
+    private boolean teleportPlayer(String playername, final int x ,final int z, World world, final int setSpawnpoint) {
         final Player player = Bukkit.getServer().getPlayer(playername);
         if(player != null && world != null) {
             final int yTp = world.getHighestBlockYAt(x, z);
-            Location loc = new Location(world, x + 0.5, yTp + 0.5, z + 0.5);
-            player.teleport(loc);
-            player.sendMessage(getTranslation("teleport", ImmutableMap.of("x", Integer.toString(x), "y", Integer.toString(yTp), "z", Integer.toString(z))));
-            if(setSpawnpoint == 2 || (setSpawnpoint == 1 && player.getBedSpawnLocation() == null)) {
-                player.setBedSpawnLocation(loc, true);
-                player.sendMessage(getTranslation("setspawnpoint"));
-            }
+            final Location loc = new Location(world, x + 0.5, yTp + 0.5, z + 0.5);
+            SlowChunkGenerator.loadChunkSlowly(world, loc.getChunk().getX(), loc.getChunk().getZ(), new Runnable(){
+				@Override
+				public void run() {
+		            player.teleport(loc);
+		            player.sendMessage(getTranslation("teleport", ImmutableMap.of("x", Integer.toString(x), "y", Integer.toString(yTp), "z", Integer.toString(z))));
+		            if(setSpawnpoint == 2 || (setSpawnpoint == 1 && player.getBedSpawnLocation() == null)) {
+		                player.setBedSpawnLocation(loc, true);
+		                player.sendMessage(getTranslation("setspawnpoint"));
+		            }
+				}
+            });
             return true;
         }
         return false;
