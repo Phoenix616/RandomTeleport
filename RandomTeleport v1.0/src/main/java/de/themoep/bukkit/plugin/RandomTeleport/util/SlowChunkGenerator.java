@@ -48,7 +48,9 @@ public class SlowChunkGenerator {
 							continue;
 						
 						//set this chunk as loading
-						loading.add(scLoc);
+						synchronized(loading){
+							loading.add(scLoc);
+						}
 						
 						BukkitTask task = Bukkit.getScheduler().runTask(RandomTeleport.instance, new Runnable(){
 							@Override
@@ -67,7 +69,9 @@ public class SlowChunkGenerator {
 						} while (Bukkit.getScheduler().isCurrentlyRunning(task.getTaskId()));
 						
 						//remove this chunk from loading
-						loading.remove(scLoc);
+						synchronized(loading){
+							loading.remove(scLoc);
+						}				
 					}
 				}
 				
