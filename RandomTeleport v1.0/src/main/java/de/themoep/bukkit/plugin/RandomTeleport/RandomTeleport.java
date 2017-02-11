@@ -51,6 +51,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 
     public HashMap<String,Long> cooldown = new HashMap<String,Long> ();
     public HashSet<UUID> playerlock = new HashSet<UUID> ();
+    public HashSet<UUID> searchingLock = new HashSet<UUID> ();
     public int[] checkstat = new int[100];
 
     public int factionsApiVersion = 0;
@@ -608,15 +609,27 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
         if(player != null && world != null) {
             final int yTp = world.getHighestBlockYAt(x, z);
             final Location loc = new Location(world, x + 0.5, yTp + 0.5, z + 0.5);
+            if(searchingLock.contains(player.getUniqueId())){
+            	player.sendMessage(ChatColor.GRAY+"Searching in progress...");
+            	//player.sendMessage(getTranslation("alreadysearching"));
+            	return false;
+            }
+            searchingLock.add(player.getUniqueId());
             SlowChunkGenerator.loadChunkSlowly(world, loc.getChunk().getX(), loc.getChunk().getZ(), new Runnable(){
 				@Override
 				public void run() {
-		            player.teleport(loc);
-		            player.sendMessage(getTranslation("teleport", ImmutableMap.of("x", Integer.toString(x), "y", Integer.toString(yTp), "z", Integer.toString(z))));
-		            if(setSpawnpoint == 2 || (setSpawnpoint == 1 && player.getBedSpawnLocation() == null)) {
-		                player.setBedSpawnLocation(loc, true);
-		                player.sendMessage(getTranslation("setspawnpoint"));
-		            }
+					try{
+			            player.teleport(loc);
+			            player.sendMessage(getTranslation("teleport", ImmutableMap.of("x", Integer.toString(x), "y", Integer.toString(yTp), "z", Integer.toString(z))));
+			            if(setSpawnpoint == 2 || (setSpawnpoint == 1 && player.getBedSpawnLocation() == null)) {
+			                player.setBedSpawnLocation(loc, true);
+			                player.sendMessage(getTranslation("setspawnpoint"));
+			            }
+					}catch(Exception e){
+						e.printStackTrace();
+					}finally{
+						searchingLock.remove(player.getUniqueId());
+					}            
 				}
             });
             return true;
