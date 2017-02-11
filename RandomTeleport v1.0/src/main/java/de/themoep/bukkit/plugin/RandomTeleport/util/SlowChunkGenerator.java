@@ -16,109 +16,59 @@
  *******************************************************************************/
 package de.themoep.bukkit.plugin.RandomTeleport.util;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.World;
-import org.bukkit.scheduler.BukkitTask;
-
-import de.themoep.bukkit.plugin.RandomTeleport.RandomTeleport;
 
 public class SlowChunkGenerator {
-	private static final Set<SimpleChunkLocation> loading = new HashSet<SimpleChunkLocation>();
-	public static void loadChunkSlowly(final World world, final int i, final int j, final Runnable next){
-		final int range = Bukkit.getServer().getViewDistance();
+	private static final Queue<ChunkGroup> queue = new LinkedList<ChunkGroup>();
+	
+	public static void tick(){
+		if(queue.isEmpty())
+			return;
 		
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				for(int x = -range; x <= range; x++){
-					for(int z = -range; z <= range; z++){
-						final int currX = i + x;
-						final int currZ = j + z;
-						
-						//skip if already loaded
-						if(world.isChunkLoaded(currX, currZ))
-							continue;
-						
-						SimpleChunkLocation scLoc = new SimpleChunkLocation(world.getName(), currX, currZ);
-						//skip if another thread is working on it
-						if(loading.contains(scLoc))
-							continue;
-						
-						//set this chunk as loading
-						synchronized(loading){
-							loading.add(scLoc);
-						}
-						
-						BukkitTask task = Bukkit.getScheduler().runTask(RandomTeleport.instance, new Runnable(){
-							@Override
-							public void run() {
-								world.loadChunk(currX, currZ, true);
-							}
-						});
-						
-						do {
-							try {
-								Thread.yield();
-								Thread.sleep(100L);
-							} catch (InterruptedException e) {
-								e.printStackTrace();
-							}
-						} while (Bukkit.getScheduler().isCurrentlyRunning(task.getTaskId()));
-						
-						//remove this chunk from loading
-						synchronized(loading){
-							loading.remove(scLoc);
-						}				
-					}
-				}
-				
-				Bukkit.getScheduler().runTask(RandomTeleport.instance, next);
-			}
-		}){{setPriority(Thread.MIN_PRIORITY);}}.start();
+		ChunkGroup group = queue.peek();
+		if(group == null)
+			return;
+		
+		if(group.chunks.isEmpty()){
+			queue.poll();
+			group.next.run();
+			return;
+		}
+		
+		Chunk chunk = group.chunks.peek();
+		if(chunk.isLoaded()){
+			group.chunks.poll();
+			return;
+		}
+		
+		chunk.load(true);
 	}
 	
-	private static class SimpleChunkLocation{
-		String world;
-		int i;
-		int j;
+	public static void loadChunkSlowly(final World world, final int i, final int j, final Runnable next){
+		Validate.notNull(next);
 		
-		public SimpleChunkLocation(String world, int i, int j) {
-			this.world = world;
-			this.i = i;
-			this.j = j;
-		}
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + i;
-			result = prime * result + j;
-			result = prime * result + ((world == null) ? 0 : world.hashCode());
-			return result;
-		}
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			SimpleChunkLocation other = (SimpleChunkLocation) obj;
-			if (i != other.i)
-				return false;
-			if (j != other.j)
-				return false;
-			if (world == null) {
-				if (other.world != null)
-					return false;
-			} else if (!world.equals(other.world))
-				return false;
-			return true;
-		}
+		final int range = Bukkit.getServer().getViewDistance();
 		
+		ChunkGroup group = new ChunkGroup();
+		for(int x = -range; x <= range; x++){
+			for(int z = -range; z <= range; z++){
+				group.chunks.add(world.getChunkAt(x, z));
+			}
+		}
+		group.next = next;
+		queue.add(group);
+	}
+	
+	private static class ChunkGroup{
+		Queue<Chunk> chunks = new LinkedList<Chunk>();
+		Runnable next;
 	}
 }

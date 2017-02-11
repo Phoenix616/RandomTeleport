@@ -104,6 +104,12 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
             getLogger().log(Level.INFO, "Detected Factions " + version + ".");
         }
 
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, new Runnable(){
+			@Override
+			public void run() {
+				SlowChunkGenerator.tick();
+			}
+        }, 1L, 1L);
     }
 
     private void loadConfig() {
