@@ -1,14 +1,20 @@
 package de.themoep.bukkit.plugin.RandomTeleport;
 
-import com.google.common.collect.ImmutableMap;
-import com.wimbli.WorldBorder.BorderData;
-import com.wimbli.WorldBorder.WorldBorder;
-import de.themoep.bukkit.plugin.RandomTeleport.Listeners.SignListener;
-import de.themoep.bukkit.plugin.RandomTeleport.util.SlowChunkGenerator;
-import de.themoep.clancontrol.ClanControl;
-import de.themoep.clancontrol.Region;
-import de.themoep.clancontrol.RegionStatus;
-import me.ryanhamshire.GriefPrevention.GriefPrevention;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
+import java.util.logging.Level;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -27,20 +33,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockCanBuildEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
-import java.util.logging.Level;
+import com.google.common.collect.ImmutableMap;
+import com.wimbli.WorldBorder.BorderData;
+import com.wimbli.WorldBorder.WorldBorder;
+
+import de.themoep.bukkit.plugin.RandomTeleport.Listeners.SignListener;
+import de.themoep.bukkit.plugin.RandomTeleport.util.SlowChunkGenerator;
+import de.themoep.clancontrol.ClanControl;
+import de.themoep.clancontrol.Region;
+import de.themoep.clancontrol.RegionStatus;
+import me.ryanhamshire.GriefPrevention.GriefPrevention;
 
 
 public class RandomTeleport extends JavaPlugin implements CommandExecutor {
@@ -120,6 +122,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
         debugLevel = getConfig().getBoolean("debug", false) ? Level.INFO : Level.FINER;
     }
 
+    @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) throws NumberFormatException {
         if(cmd.getName().equalsIgnoreCase("randomteleport") || cmd.getName().equalsIgnoreCase("randomtp") || cmd.getName().equalsIgnoreCase("rtp")) {
             boolean forceBlocks = false;
@@ -407,34 +410,34 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
                 // convert seconds in dhms format
                 long cooldown_seconds = (cooldown.get(cooldownid)/1000 + cooldowntime - System.currentTimeMillis()/1000) + 1;
                 String cooldown_text = "";
-                
+
                 int cooldown_days = (int) (cooldown_seconds / 86400);
                 if(cooldown_days > 0) {
                     cooldown_seconds = cooldown_seconds - 86400 * cooldown_days;
                 }
-                
+
                 int cooldown_hours = (int) (cooldown_seconds / 3600);
                 if(cooldown_hours > 0) {
                     cooldown_seconds = cooldown_seconds - 3600 * cooldown_hours;
                 }
-                
+
                 int cooldown_minutes = (int) (cooldown_seconds / 60);
                 if(cooldown_minutes > 0) {
                     cooldown_seconds = cooldown_seconds - 60 * cooldown_minutes;
                 }
-                
+
                 if(cooldown_days > 0) {
                     cooldown_text = cooldown_days + "d ";
                 }
-                
+
                 if(cooldown_hours > 0) {
                     cooldown_text = cooldown_text + cooldown_hours + "h ";
                 }
-                
+
                 if(cooldown_minutes > 0) {
                     cooldown_text = cooldown_text + cooldown_minutes + "m ";
                 }
-                
+
                 if(cooldown_seconds > 0) {
                     cooldown_text = cooldown_text + cooldown_seconds + "s ";
                 }
@@ -604,33 +607,32 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
      * @return true if player got teleported
      */
 
-    private boolean teleportPlayer(String playername, final int x ,final int z, World world, final int setSpawnpoint) {
+    private boolean teleportPlayer(String playername, final int x, final int z, World world, final int setSpawnpoint) {
         final Player player = Bukkit.getServer().getPlayer(playername);
-        if(player != null && world != null) {
+        if (player != null && world != null) {
             final int yTp = world.getHighestBlockYAt(x, z);
             final Location loc = new Location(world, x + 0.5, yTp + 0.5, z + 0.5);
-            if(searchingLock.contains(player.getUniqueId())){
-            	player.sendMessage(ChatColor.GRAY+"Searching in progress...");
-            	//player.sendMessage(getTranslation("alreadysearching"));
-            	return false;
+            if (searchingLock.contains(player.getUniqueId())) {
+                player.sendMessage(getTranslation("error.searching"));
+                return false;
             }
             searchingLock.add(player.getUniqueId());
-            SlowChunkGenerator.loadChunkSlowly(world, loc.getChunk().getX(), loc.getChunk().getZ(), new Runnable(){
-				@Override
-				public void run() {
-					try{
-			            player.teleport(loc);
-			            player.sendMessage(getTranslation("teleport", ImmutableMap.of("x", Integer.toString(x), "y", Integer.toString(yTp), "z", Integer.toString(z))));
-			            if(setSpawnpoint == 2 || (setSpawnpoint == 1 && player.getBedSpawnLocation() == null)) {
-			                player.setBedSpawnLocation(loc, true);
-			                player.sendMessage(getTranslation("setspawnpoint"));
-			            }
-					}catch(Exception e){
-						e.printStackTrace();
-					}finally{
-						searchingLock.remove(player.getUniqueId());
-					}            
-				}
+            SlowChunkGenerator.loadChunkSlowly(world, loc.getChunk().getX(), loc.getChunk().getZ(), new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        player.teleport(loc);
+                        player.sendMessage(getTranslation("teleport", ImmutableMap.of("x", Integer.toString(x), "y", Integer.toString(yTp), "z", Integer.toString(z))));
+                        if (setSpawnpoint == 2 || (setSpawnpoint == 1 && player.getBedSpawnLocation() == null)) {
+                            player.setBedSpawnLocation(loc, true);
+                            player.sendMessage(getTranslation("setspawnpoint"));
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    } finally {
+                        searchingLock.remove(player.getUniqueId());
+                    }
+                }
             });
             return true;
         }

@@ -16,9 +16,7 @@
  *******************************************************************************/
 package de.themoep.bukkit.plugin.RandomTeleport.util;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 
 import org.apache.commons.lang.Validate;
@@ -27,48 +25,48 @@ import org.bukkit.Chunk;
 import org.bukkit.World;
 
 public class SlowChunkGenerator {
-	private static final Queue<ChunkGroup> queue = new LinkedList<ChunkGroup>();
-	
-	public static void tick(){
-		if(queue.isEmpty())
-			return;
-		
-		ChunkGroup group = queue.peek();
-		if(group == null)
-			return;
-		
-		if(group.chunks.isEmpty()){
-			queue.poll();
-			group.next.run();
-			return;
-		}
-		
-		Chunk chunk = group.chunks.peek();
-		if(chunk.isLoaded()){
-			group.chunks.poll();
-			return;
-		}
-		
-		chunk.load(true);
-	}
-	
-	public static void loadChunkSlowly(final World world, final int i, final int j, final Runnable next){
-		Validate.notNull(next);
-		
-		final int range = Bukkit.getServer().getViewDistance();
-		
-		ChunkGroup group = new ChunkGroup();
-		for(int x = -range; x <= range; x++){
-			for(int z = -range; z <= range; z++){
-				group.chunks.add(world.getChunkAt(x, z));
-			}
-		}
-		group.next = next;
-		queue.add(group);
-	}
-	
-	private static class ChunkGroup{
-		Queue<Chunk> chunks = new LinkedList<Chunk>();
-		Runnable next;
-	}
+    private static final Queue<ChunkGroup> queue = new LinkedList<ChunkGroup>();
+
+    public static void tick() {
+        if (queue.isEmpty())
+            return;
+
+        ChunkGroup group = queue.peek();
+        if (group == null)
+            return;
+
+        if (group.chunks.isEmpty()) {
+            queue.poll();
+            group.next.run();
+            return;
+        }
+
+        Chunk chunk = group.chunks.peek();
+        if (chunk.isLoaded()) {
+            group.chunks.poll();
+            return;
+        }
+
+        chunk.load(true);
+    }
+
+    public static void loadChunkSlowly(final World world, final int i, final int j, final Runnable next) {
+        Validate.notNull(next);
+
+        final int range = Bukkit.getServer().getViewDistance();
+
+        ChunkGroup group = new ChunkGroup();
+        for (int x = -range; x <= range; x++) {
+            for (int z = -range; z <= range; z++) {
+                group.chunks.add(world.getChunkAt(x, z));
+            }
+        }
+        group.next = next;
+        queue.add(group);
+    }
+
+    private static class ChunkGroup {
+        Queue<Chunk> chunks = new LinkedList<Chunk>();
+        Runnable next;
+    }
 }
