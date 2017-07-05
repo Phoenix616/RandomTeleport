@@ -71,36 +71,39 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 
         getServer().getPluginManager().registerEvents(new SignListener(this), this);
 
-        if(Bukkit.getPluginManager().getPlugin("WorldGuard") != null){
+        if(Bukkit.getPluginManager().isPluginEnabled("WorldGuard")){
             getLogger().log(Level.INFO, "Detected WorldGuard.");
             worldguard = true;
         }
 
-        if(Bukkit.getPluginManager().getPlugin("GriefPrevention") != null) {
+        if(Bukkit.getPluginManager().isPluginEnabled("GriefPrevention")) {
             getLogger().log(Level.INFO, "Detected GriefPrevention.");
             griefprevention = true;
         }
 
-        if(Bukkit.getPluginManager().getPlugin("ClanControl") != null){
+        if(Bukkit.getPluginManager().isPluginEnabled("ClanControl")){
             getLogger().log(Level.INFO, "Detected ClanControl.");
             clancontrol = true;
         }
 
-        if(Bukkit.getPluginManager().getPlugin("WorldBorder") != null) {
+        if(Bukkit.getPluginManager().isPluginEnabled("WorldBorder")) {
             getLogger().log(Level.INFO, "Detected WorldBorder.");
             worldborder = true;
         }
 
-        if(Bukkit.getPluginManager().getPlugin("Factions") != null){
-            String version = Bukkit.getPluginManager().getPlugin("Factions").getDescription().getVersion();
-            if(version.startsWith("2.7") || version.startsWith("2.8") || version.startsWith("2.9") || version.startsWith("2.10")) {
+        if(Bukkit.getPluginManager().isPluginEnabled("Factions")){
+            String[] version = Bukkit.getPluginManager().getPlugin("Factions").getDescription().getVersion().split(" ")[0].split("-")[0].split("\\.");
+            int major = Integer.parseInt(version[0]);
+            int minor = Integer.parseInt(version[1]);
+
+            if(major >= 2 && minor >= 7) {
                 factionsApiVersion = 27;
-            } else if(version.startsWith("1.6")){
-                factionsApiVersion = 16;
-            } else {
+            } else if (major >= 2 && minor >= 6) {
                 factionsApiVersion = 26;
+            } else if (major >= 1 && minor >= 6){
+                factionsApiVersion = 16;
             }
-            getLogger().log(Level.INFO, "Detected Factions " + version + ".");
+            getLogger().log(Level.INFO, "Detected Factions " + major + "." + minor + " (" + factionsApiVersion + ")");
         }
 
     }
