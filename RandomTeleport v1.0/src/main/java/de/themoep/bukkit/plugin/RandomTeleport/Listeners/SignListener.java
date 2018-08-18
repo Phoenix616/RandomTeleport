@@ -2,7 +2,6 @@ package de.themoep.bukkit.plugin.RandomTeleport.Listeners;
 
 import de.themoep.bukkit.plugin.RandomTeleport.RandomTeleport;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.block.Sign;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -39,7 +38,7 @@ public class SignListener implements Listener {
 
     @EventHandler
     public void onSignDestroy(BlockBreakEvent event){
-        if(event.getBlock().getType() == Material.WALL_SIGN || event.getBlock().getType() == Material.SIGN_POST) {
+        if(event.getBlock().getType().name().contains("SIGN")) {
             Sign sign = (Sign) event.getBlock().getState();
             if(sign.getLine(1).equalsIgnoreCase("[rtp]") || sign.getLine(1).equalsIgnoreCase("[RandomTP]")){
                 if(!event.getPlayer().hasPermission("randomteleport.sign.create")){
@@ -54,7 +53,7 @@ public class SignListener implements Listener {
 
     @EventHandler
     public void onSignClick(PlayerInteractEvent event) {
-        if(event.getAction() == Action.RIGHT_CLICK_BLOCK && !event.isCancelled() && (event.getClickedBlock().getType() == Material.WALL_SIGN || event.getClickedBlock().getType() == Material.SIGN_POST)) {
+        if(event.getAction() == Action.RIGHT_CLICK_BLOCK && !event.isCancelled() && event.getClickedBlock().getType().name().contains("SIGN")) {
             Sign sign = (Sign) event.getClickedBlock().getState();
             if(sign.getLine(1).equalsIgnoreCase("[rtp]") || sign.getLine(1).equalsIgnoreCase("[RandomTP]")) {
                 String preset = sign.getLine(2).toLowerCase();

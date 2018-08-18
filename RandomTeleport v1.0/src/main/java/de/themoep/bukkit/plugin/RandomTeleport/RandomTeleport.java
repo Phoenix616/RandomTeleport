@@ -12,7 +12,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.block.Biome;
@@ -33,30 +32,68 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 
 
 public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 
-    public static RandomTeleport instance;
+    private static RandomTeleport instance;
 
-    public Level debugLevel;
+    private static final Set<String> INVALID_MATERIALS = new HashSet<>(Arrays.asList(
+            "AIR",
+            "WATER",
+            "STATIONARY_WATER",
+            "LAVA",
+            "STATIONARY_LAVA",
+            "MAGMA",
+            "MAGMA_BLOCK",
+            "FIRE",
+            "WEB",
+            "CACTUS",
+            "ENDER_PORTAL",
+            "PORTAL",
+            "NETHER_PORTAL",
+            "END_PORTAL"
+    ));
 
-    public HashMap<String,Long> cooldown = new HashMap<String,Long> ();
-    public HashSet<UUID> playerlock = new HashSet<UUID> ();
-    public int[] checkstat = new int[100];
+    private static final Set<String> VALID_MATERIALS = new HashSet<>(Arrays.asList(
+            "STONE",
+            "GRANITE",
+            "DIORITE",
+            "ANDESITE",
+            "GRASS",
+            "DIRT",
+            "PODZOL",
+            "MYCELIUM",
+            "GRANITE",
+            "SAND",
+            "SANDSTONE",
+            "RED_SAND",
+            "RED_SANDSTONE",
+            "GRAVEL"
+    ));
 
-    public int factionsApiVersion = 0;
-    public boolean worldguard = false;
-    public boolean clancontrol = false;
-    public boolean griefprevention = false;
-    public boolean worldborder = false;
+    private Level debugLevel;
+
+    private HashMap<String,Long> cooldown = new HashMap<>();
+    private HashSet<UUID> playerlock = new HashSet<>();
+    private int[] checkstat = new int[100];
+
+    private int factionsApiVersion = 0;
+    private boolean worldguard = false;
+    private boolean clancontrol = false;
+    private boolean griefprevention = false;
+    private boolean worldborder = false;
+
+
 
 
     @SuppressWarnings("unchecked")
@@ -665,15 +702,15 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
                 case NETHER:
                     return false;
                 case THE_END:
-                    if(highest.getType() == Material.AIR || highest.getType() == Material.WATER || highest.getType() == Material.STATIONARY_WATER || highest.getType() == Material.STATIONARY_LAVA || highest.getType() == Material.WEB || highest.getType() == Material.LAVA || highest.getType() == Material.CACTUS || highest.getType() == Material.ENDER_PORTAL || highest.getType() == Material.PORTAL)
+                    if(INVALID_MATERIALS.contains(highest.getType().name()))
                         return false;
                 case NORMAL:
                 default:
-                    if(highest.getType() != Material.SAND && highest.getType() != Material.GRAVEL && highest.getType() != Material.DIRT && highest.getType() != Material.GRASS)
+                    if(!VALID_MATERIALS.contains(highest.getType().name()))
                         return false;
             }
         } else {
-            if(highest.getType() == Material.AIR || highest.getType() == Material.WATER || highest.getType() == Material.STATIONARY_WATER || highest.getType() == Material.STATIONARY_LAVA || highest.getType() == Material.WEB || highest.getType() == Material.LAVA || highest.getType() == Material.CACTUS || highest.getType() == Material.ENDER_PORTAL || highest.getType() == Material.PORTAL)
+            if(INVALID_MATERIALS.contains(highest.getType().name()))
                 return false;
         }
         return checkforRegion(player, highest.getLocation(), forceRegions);
@@ -692,7 +729,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
         if(!forceRegions) {
             Block block = location.getWorld().getBlockAt(location);
 
-            BlockCanBuildEvent canBuildEvent = new BlockCanBuildEvent(block, block.getTypeId(), true);
+            BlockCanBuildEvent canBuildEvent = new BlockCanBuildEvent(block, block.getBlockData(), true);
             getServer().getPluginManager().callEvent(canBuildEvent);
             if(!canBuildEvent.isBuildable()) {
                 return false;
