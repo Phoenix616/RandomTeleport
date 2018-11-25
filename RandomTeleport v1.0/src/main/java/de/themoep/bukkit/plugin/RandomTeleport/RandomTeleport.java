@@ -69,7 +69,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
             "GRANITE",
             "DIORITE",
             "ANDESITE",
-            "GRASS",
+            "GRASS_BLOCK",
             "DIRT",
             "PODZOL",
             "MYCELIUM",
