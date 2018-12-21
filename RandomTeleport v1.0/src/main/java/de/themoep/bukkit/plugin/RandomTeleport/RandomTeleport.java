@@ -1,13 +1,7 @@
 package de.themoep.bukkit.plugin.RandomTeleport;
 
 import com.google.common.collect.ImmutableMap;
-import com.wimbli.WorldBorder.BorderData;
-import com.wimbli.WorldBorder.WorldBorder;
 import de.themoep.bukkit.plugin.RandomTeleport.Listeners.SignListener;
-import de.themoep.clancontrol.ClanControl;
-import de.themoep.clancontrol.Region;
-import de.themoep.clancontrol.RegionStatus;
-import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -88,7 +82,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
     private int[] checkstat = new int[100];
 
     private int factionsApiVersion = 0;
-    private boolean worldguard = false;
+    private int worldguardVersion = 0;
     private boolean clancontrol = false;
     private boolean griefprevention = false;
     private boolean worldborder = false;
@@ -109,8 +103,9 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
         getServer().getPluginManager().registerEvents(new SignListener(this), this);
 
         if(Bukkit.getPluginManager().isPluginEnabled("WorldGuard")){
-            getLogger().log(Level.INFO, "Detected WorldGuard.");
-            worldguard = true;
+            String[] version = Bukkit.getPluginManager().getPlugin("WorldGuard").getDescription().getVersion().split(" ")[0].split("-")[0].split("\\.");
+            worldguardVersion = Integer.parseInt(version[0]);
+            getLogger().log(Level.INFO, "Detected WorldGuard " + worldguardVersion + ".");
         }
 
         if(Bukkit.getPluginManager().isPluginEnabled("GriefPrevention")) {
@@ -577,7 +572,7 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
                 chunksum = 0;
 
                 // checks a square of 9x9 chunks around the random position for protected regions
-                if(worldguard || factionsApiVersion > 0 || griefprevention || clancontrol) {
+                if(worldguardVersion > 0 || factionsApiVersion > 0 || griefprevention || clancontrol) {
                     for(int i = -4; i <= 4; i++) {
                         for(int j = -4; j <= 4; j++) {
                             int xcheck = x + i * 16;
@@ -668,8 +663,8 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
 
     private boolean teleportCheck(Player player, World world, int x, int z, List<Biome> biomeList, boolean forceBlocks, boolean forceRegions) {
         if(worldborder) {
-            WorldBorder wbPlugin = (WorldBorder) getServer().getPluginManager().getPlugin("WorldBorder");
-            BorderData border = wbPlugin.getWorldBorder(world.getName());
+            com.wimbli.WorldBorder.WorldBorder wbPlugin = (com.wimbli.WorldBorder.WorldBorder) getServer().getPluginManager().getPlugin("WorldBorder");
+            com.wimbli.WorldBorder.BorderData border = wbPlugin.getWorldBorder(world.getName());
             if(border != null && !border.insideBorder(x, z)) {
                 return false;
             }
@@ -729,22 +724,30 @@ public class RandomTeleport extends JavaPlugin implements CommandExecutor {
         if(!forceRegions) {
             Block block = location.getWorld().getBlockAt(location);
 
-            BlockCanBuildEvent canBuildEvent = new BlockCanBuildEvent(block, block.getBlockData(), true);
-            getServer().getPluginManager().callEvent(canBuildEvent);
-            if(!canBuildEvent.isBuildable()) {
-                return false;
-            }
+            try {
+                BlockCanBuildEvent canBuildEvent = new BlockCanBuildEvent(block, block.getBlockData(), true);
+                getServer().getPluginManager().callEvent(canBuildEvent);
+                if (!canBuildEvent.isBuildable()) {
+                    return false;
+                }
+            } catch (NoSuchMethodError ignored) {}
 
-            if(worldguard && !com.sk89q.worldguard.bukkit.WGBukkit.getPlugin().canBuild(player, block)) {
+            if(worldguardVersion == 6 && !com.sk89q.worldguard.bukkit.WGBukkit.getPlugin().canBuild(player, block)) {
                 return false;
             }
-            if(griefprevention && GriefPrevention.instance.dataStore.getClaimAt(location, true, null) != null) {
+            if(worldguardVersion > 6 && !com.sk89q.worldguard.WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery().testBuild(
+                    com.sk89q.worldedit.bukkit.BukkitAdapter.adapt(location),
+                    com.sk89q.worldguard.bukkit.WorldGuardPlugin.inst().wrapPlayer(player),
+                    com.sk89q.worldguard.protection.flags.Flags.BUILD)) {
+                return false;
+            }
+            if(griefprevention && me.ryanhamshire.GriefPrevention.GriefPrevention.instance.dataStore.getClaimAt(location, true, null) != null) {
                 return false;
             }
             if(clancontrol) {
-                boolean chunkOccupied = ClanControl.getInstance().getRegionManager().getChunk(location) != null;
-                Region region = ClanControl.getInstance().getRegionManager().getRegion(location);
-                if(chunkOccupied || (region != null && region.getStatus() != RegionStatus.FREE)) {
+                boolean chunkOccupied = de.themoep.clancontrol.ClanControl.getInstance().getRegionManager().getChunk(location) != null;
+                de.themoep.clancontrol.Region region = de.themoep.clancontrol.ClanControl.getInstance().getRegionManager().getRegion(location);
+                if(chunkOccupied || (region != null && region.getStatus() != de.themoep.clancontrol.RegionStatus.FREE)) {
                     return false;
                 }
             }
