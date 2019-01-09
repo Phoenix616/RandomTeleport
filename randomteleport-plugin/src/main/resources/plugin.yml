@@ -1,0 +1,60 @@
+name: RandomTeleport
+main: de.themoep.randomteleport.RandomTeleport
+version: '${minecraft.plugin.version}'
+api-version: 1.13
+description: ${project.description}
+author: Phoenix616
+website: https://github.com/Phoenix616/RandomTeleport/
+commands:
+   randomteleport:
+      aliases: [randomtp, rtp]
+      description: RandomTeleport command.
+      usage: |
+             /<command> - uses the default preset
+             /<command> <preset> [<playername>]- uses a specific preset
+             /<command> <minRange> <maxRange> [-p, -w, -x, -z, -c, -f]
+             minRange - minimum distance to the center point (square shaped)
+             maxRange - maximum distance to the center point (square shaped)
+             Options:
+             > -p,-player <playername> - teleports other players
+             > -w,-world <worldname> - teleports the player in a specific world
+             > -b,-biome <biomename> [<biome 2> ...] - only teleport to this biome (multiple allowed, Bukkit biome names!)
+             > -x,-xPos <x value> - x axis of the center point, if not set the player's x axis is used
+             > -z,-zPos <z value> - z axis of the center point, if not set the player's z axis is used
+             > -l,-loaded - only search loaded chunks for possible locations
+             > -c, -cooldown <seconds> - cooldown in seconds after which the player can use this teleporter again
+             > -f,-force - teleport even if there is no dirt/grass/sand/gravel, only checks for lava/water/cactus, ignores WorldGuard/Faction regions
+             > -f,-force [<blocks|regions>] - only ignore blocks or regions
+             /<command> stat - shows a statistic of the teleports since the last restart
+             /<command> reload - reloads the config
+permissions:
+   randomteleport.use:
+      description: Gives permission to the command
+      default: op
+   randomteleport.tpothers:
+      description: Gives permission to teleport other players
+      default: op
+   randomteleport.cooldownexempt:
+      description: Teleportcooldown does not effect these players
+      default: op
+   randomteleport.stat:
+      description: Permission for showing the teleport statistic
+      default: op
+   randomteleport.reload:
+         description: Permission to use the reload command
+         default: op
+   randomteleport.presets.default:
+      description: Gives permission to use the default random teleport preset
+      default: op
+   randomteleport.presets.*:
+         description: Gives permission to use all random teleport presets
+         default: op
+   randomteleport.sign.preset.default:
+      description: Gives permission to use the default preset with a rightclick on a preset sign
+      default: op
+   randomteleport.sign.preset.*:
+      description: Gives permission to use all presets with a rightclick on a preset sign
+      default: op
+   randomteleport.sign.create:
+      description: Allows to create and destroy preset signs ([rtp] or [RandomTP] on the 2nd line and the preset name on the 3rd)
+      default: op
