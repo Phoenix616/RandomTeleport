@@ -28,7 +28,7 @@
 
     <modules>
         <module>randomteleport-plugin</module>
-        <module>randomteleport-hooks</module>
+        <module>randomteleport-hook</module>
     </modules>
 
     <repositories>
