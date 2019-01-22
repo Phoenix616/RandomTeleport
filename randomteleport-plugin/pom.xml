@@ -19,15 +19,33 @@
 
     <dependencies>
         <dependency>
-            <groupId>de.themoep.randomteleport</groupId>
-            <artifactId>randomteleport-hooks</artifactId>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>randomteleport-hook</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}.pluginhook</groupId>
+            <artifactId>worldguard-6</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}.pluginhook</groupId>
+            <artifactId>worldguard-7</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}.pluginhook</groupId>
+            <artifactId>worldborder</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
 
     <build>
-        <finalName>${parent.name}</finalName>
+        <finalName>${minecraft.plugin.name}</finalName>
         <outputDirectory>../target/</outputDirectory>
         <resources>
             <resource>
@@ -35,6 +53,30 @@
                 <directory>${project.basedir}/src/main/resources</directory>
             </resource>
         </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.1.1</version>
+                <configuration>
+                    <dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml</dependencyReducedPomLocation>
+                    <relocations>
+                        <relocation>
+                            <pattern>io.papermc.lib</pattern>
+                            <shadedPattern>de.themoep.randomteleport.paperlib</shadedPattern>
+                        </relocation>
+                    </relocations>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
 </project>

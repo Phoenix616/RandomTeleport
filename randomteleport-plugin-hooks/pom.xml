@@ -24,7 +24,8 @@
         <dependency>
             <groupId>de.themoep.randomteleport</groupId>
             <artifactId>randomteleport-hook</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
