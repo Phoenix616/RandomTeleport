@@ -27,8 +27,9 @@
     </licenses>
 
     <modules>
-        <module>randomteleport-plugin</module>
         <module>randomteleport-hook</module>
+        <module>randomteleport-plugin-hooks</module>
+        <module>randomteleport-plugin</module>
     </modules>
 
     <repositories>
