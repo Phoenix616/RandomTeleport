@@ -23,6 +23,7 @@ import io.papermc.lib.features.blockstatesnapshot.BlockStateSnapshotResult;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Lockable;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 public class MinecraftHook implements ProtectionHook, WorldborderHook {
@@ -43,31 +44,17 @@ public class MinecraftHook implements ProtectionHook, WorldborderHook {
     }
 
     @Override
-    public boolean isProtected(Location location) {
+    public boolean canBuild(Player player, Location location) {
         BlockStateSnapshotResult state = PaperLib.getBlockState(location.getBlock(), true);
         if (state.getState() instanceof Lockable) {
-            return ((Lockable) state.getState()).getLock() != null;
+            return ((Lockable) state.getState()).getLock() == null;
         }
-        return false;
+        return true;
     }
 
     @Override
-    public String getOwner(Location location) {
-        BlockStateSnapshotResult state = PaperLib.getBlockState(location.getBlock(), true);
-        if (state.getState() instanceof Lockable) {
-            return ((Lockable) state.getState()).getLock();
-        }
-        return null;
-    }
-
-    @Override
-    public boolean isProtected(World world, int chunkX, int chunkZ) {
-        return false;
-    }
-
-    @Override
-    public String getOwner(World world, int chunkX, int chunkZ) {
-        return null;
+    public boolean canBuild(Player player, World world, int chunkX, int chunkZ) {
+        return true;
     }
 
     @Override

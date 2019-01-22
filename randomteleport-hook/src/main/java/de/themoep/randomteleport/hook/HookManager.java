@@ -20,6 +20,7 @@ package de.themoep.randomteleport.hook;
 
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.PluginDisableEvent;
@@ -126,45 +127,23 @@ public class HookManager implements Listener, ProtectionHook, WorldborderHook {
     // Convenience methods to check all registered hooks
 
     @Override
-    public boolean isProtected(Location location) {
+    public boolean canBuild(Player player, Location location) {
         for (ProtectionHook hook : getHooks(ProtectionHook.class)) {
-            if (hook.isProtected(location)) {
-                return true;
+            if (!hook.canBuild(player, location)) {
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
     @Override
-    public String getOwner(Location location) {
+    public boolean canBuild(Player player, World world, int chunkX, int chunkZ) {
         for (ProtectionHook hook : getHooks(ProtectionHook.class)) {
-            String owner = hook.getOwner(location);
-            if (owner != null) {
-                return owner;
+            if (!hook.canBuild(player, world, chunkX, chunkZ)) {
+                return false;
             }
         }
-        return null;
-    }
-
-    @Override
-    public boolean isProtected(World world, int chunkX, int chunkZ) {
-        for (ProtectionHook hook : getHooks(ProtectionHook.class)) {
-            if (hook.isProtected(world, chunkX, chunkZ)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public String getOwner(World world, int chunkX, int chunkZ) {
-        for (ProtectionHook hook : getHooks(ProtectionHook.class)) {
-            String owner = hook.getOwner(world, chunkX, chunkZ);
-            if (owner != null) {
-                return owner;
-            }
-        }
-        return null;
+        return true;
     }
 
     @Override

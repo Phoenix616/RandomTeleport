@@ -21,57 +21,37 @@ package de.themoep.randomteleport.hook;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 
 public interface ProtectionHook extends PluginHook {
 
     /**
-     * Check if a certain location is protected
+     * Check if a player can build at a location
+     *
+     * @param player The player to check
      * @param location The location to check
-     * @return Whether or not it is protected
+     * @return Whether or not the player can build
      */
-    boolean isProtected(Location location);
+    boolean canBuild(Player player, Location location);
 
     /**
-     * Get the owner of a protection at a certain location, null if no owner
-     * @param location The location to check
-     * @return The name of the owner of the location, null if no owner
-     */
-    String getOwner(Location location);
-
-    /**
-     * Check if a certain chunk is protected
+     * Check if a player can build in a chunk
+     * @param player The player to check
      * @param chunk The chunk to check
-     * @return Whether or not it is protected
+     * @return Whether or not the player can build
      */
-    default boolean isProtected(Chunk chunk) {
-        return isProtected(chunk.getWorld(), chunk.getX(), chunk.getZ());
-    };
-
-    /**
-     * Check if a certain chunk is protected
-     * @param world The chunk's world
-     * @param chunkX The chunk's X coordinate
-     * @param chunkZ The chunk's Z coordinate
-     * @return Whether or not it is protected
-     */
-    boolean isProtected(World world, int chunkX, int chunkZ);
-
-    /**
-     * Get the owner of a protection at a certain chunk, null if no owner
-     * @param chunk The chunk to check
-     * @return The name of the owner of the location, null if no owner
-     */
-    default String getOwner(Chunk chunk) {
-        return getOwner(chunk.getWorld(), chunk.getX(), chunk.getZ());
+    default boolean canBuild(Player player, Chunk chunk) {
+        return canBuild(player, chunk.getWorld(), chunk.getX(), chunk.getZ());
     }
 
     /**
-     * Get the owner of a protection at a certain chunk, null if no owner
+     * Check if a player can build in a chunk
+     * @param player The player to check
      * @param world The chunk's world
      * @param chunkX The chunk's X coordinate
      * @param chunkZ The chunk's Z coordinate
-     * @return The name of the owner of the location, null if no owner
+     * @return Whether or not the player can build
      */
-    String getOwner(World world, int chunkX, int chunkZ);
+    boolean canBuild(Player player, World world, int chunkX, int chunkZ);
 
 }
