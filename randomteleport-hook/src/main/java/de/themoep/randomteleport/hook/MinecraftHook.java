@@ -45,7 +45,7 @@ public class MinecraftHook implements ProtectionHook, WorldborderHook {
 
     @Override
     public boolean canBuild(Player player, Location location) {
-        BlockStateSnapshotResult state = PaperLib.getBlockState(location.getBlock(), true);
+        BlockStateSnapshotResult state = PaperLib.getBlockState(location.getBlock(), false);
         if (state.getState() instanceof Lockable) {
             return ((Lockable) state.getState()).getLock() == null;
         }
