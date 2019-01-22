@@ -14,9 +14,14 @@
     <artifactId>randomteleport-plugin-hooks</artifactId>
     <packaging>pom</packaging>
 
+    <modules>
+        <module>worldguard-6</module>
+        <module>worldguard-7</module>
+    </modules>
+
     <dependencies>
         <dependency>
-            <groupId>${parent.groupId}</groupId>
+            <groupId>de.themoep.randomteleport</groupId>
             <artifactId>randomteleport-hook</artifactId>
             <version>${version}</version>
         </dependency>
