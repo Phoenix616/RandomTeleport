@@ -1,0 +1,72 @@
+# Default language to use when client's language isn't available
+lang: en
+# Some debug information
+debug: true
+
+# Blocks to teleport on in normal mode
+save-blocks:
+- sand
+- gravel
+- dirt
+- stone
+- cobblestone
+- ender_stone
+- netherrack
+
+# Blocks unsave when in "--force blocks" mode
+unsave-blocks:
+- air
+- water
+- stationary_water
+- lava
+- stationary_lava
+- sapling
+- bed_block
+- powered_rail
+- detector_rail
+- web
+- piston_extension
+- tnt
+- torch
+- fire
+- sign_post
+- wooden_door
+- ladder
+- rails
+- wall_sign
+- lever
+- stone_plate
+- iron_door_block
+- redstone_torch_off
+- redstone_torch_on
+- stone_button
+- cactus
+- magma
+- portal
+- vine
+- ender_portal
+- tripwire_hook
+- tripwire
+- wood_button
+- flower_pot
+- leaves
+- leaves_2
+- barrier
+- iron_trapdoor
+- wall_banner
+- spruce_door
+- birch_door
+- jungle_door
+- acacia_door
+- dark_oak_door
+- end_rod
+- end_gateway
+
+# Just write your command as you would use it ingame here
+# Don't use the -p parameter, this will get added automaticly with the senders name/the specified playername
+presets:
+  # Triggered when you use /rtp without any additional paramters
+  default: "/rtp 100 1000 -f"
+  # add more to use /rtp <rtpname>, player needs "randomteleport.presets.<rtpname>"
+  #   <rtpname>: "/rtp 1 2"
+  test: "rtp 10 200 -f"

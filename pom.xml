@@ -42,6 +42,10 @@
             <id>paper-repo</id>
             <url>https://papermc.io/repo/content/groups/public</url>
         </repository>
+        <repository>
+            <id>minebench-repo</id>
+            <url>https://repo.minebench.de/</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -56,6 +60,11 @@
             <artifactId>paperlib</artifactId>
             <version>1.0.1</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.themoep.utils</groupId>
+            <artifactId>lang-bukkit</artifactId>
+            <version>1.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
