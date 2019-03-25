@@ -20,6 +20,7 @@ package de.themoep.randomteleport.searcher.validators;
 
 import de.themoep.randomteleport.searcher.RandomSearcher;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 public class ProtectionValidator extends LocationValidator {
@@ -33,8 +34,8 @@ public class ProtectionValidator extends LocationValidator {
         if (searcher.getTargets().isEmpty()) {
             return true;
         }
-        for (Player player : searcher.getTargets()) {
-            if (!searcher.getPlugin().getHookManager().canBuild(player, location)) {
+        for (Entity entity : searcher.getTargets()) {
+            if (entity instanceof Player && !searcher.getPlugin().getHookManager().canBuild((Player) entity, location)) {
                 return false;
             }
         }

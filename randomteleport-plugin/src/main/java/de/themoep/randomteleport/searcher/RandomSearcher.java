@@ -26,7 +26,7 @@ import io.papermc.lib.PaperLib;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.Entity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +41,7 @@ public class RandomSearcher {
 
     private Random random = RandomTeleport.RANDOM;
 
-    private List<Player> targets = new ArrayList<>();
+    private List<Entity> targets = new ArrayList<>();
 
     private long seed = -1;
     private Location center;
@@ -64,10 +64,10 @@ public class RandomSearcher {
     }
 
     /**
-     * Get all players targeted by this searcher
-     * @return The players to target
+     * Get all entities targeted by this searcher
+     * @return The entitiy to target
      */
-    public List<Player> getTargets() {
+    public List<Entity> getTargets() {
         return targets;
     }
 

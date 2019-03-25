@@ -259,11 +259,11 @@ public class RandomTeleport extends JavaPlugin {
             parser.parse(searcher, optionArgs);
         }
 
-        searcher.getTargets().forEach(p -> sendMessage(p, "search", "world", searcher.getCenter().getWorld().getName()));
+        searcher.getTargets().forEach(e -> sendMessage(e, "search", "world", searcher.getCenter().getWorld().getName()));
         searcher.search().thenApply(targetLoc -> {
-            searcher.getTargets().forEach(p -> {
-                p.teleport(targetLoc);
-                sendMessage(p, "teleport",
+            searcher.getTargets().forEach(e -> {
+                e.teleport(targetLoc);
+                sendMessage(e, "teleport",
                         "world", center.getWorld().getName(),
                         "x", String.valueOf(center.getBlockX()),
                         "y", String.valueOf(center.getBlockY()),
@@ -274,7 +274,7 @@ public class RandomTeleport extends JavaPlugin {
         }).exceptionally(ex -> {
             sendMessage(sender, "error.location");
             sender.sendMessage(ex.getMessage());
-            searcher.getTargets().forEach(p -> sendMessage(p, "error.location"));
+            searcher.getTargets().forEach(e -> sendMessage(e, "error.location"));
             return true;
         });
         return searcher;
