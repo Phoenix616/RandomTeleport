@@ -122,9 +122,9 @@ public class RandomTeleport extends JavaPlugin {
             }
             return false;
         }));
-        addOptionParser(new SimpleOptionParser(array("y", "ypos"), (searcher, args) -> {
+        addOptionParser(new SimpleOptionParser(array("z", "zpos"), (searcher, args) -> {
             if (args.length > 0) {
-                searcher.getCenter().setX(Integer.parseInt(args[0]));
+                searcher.getCenter().setZ(Integer.parseInt(args[0]));
                 return true;
             }
             return false;
