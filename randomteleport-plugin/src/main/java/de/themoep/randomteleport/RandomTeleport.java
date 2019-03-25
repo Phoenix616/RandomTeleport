@@ -104,11 +104,13 @@ public class RandomTeleport extends JavaPlugin {
             if (args.length > 0) {
                 List<Player> players = new ArrayList<>();
                 for (String arg : args) {
-                    Player player = getServer().getPlayer(arg);
-                    if (player == null) {
-                        throw new PlayerNotFoundException(arg);
+                    for (String s : arg.split(",")) {
+                        Player player = getServer().getPlayer(s);
+                        if (player == null) {
+                            throw new PlayerNotFoundException(s);
+                        }
+                        players.add(player);
                     }
-                    players.add(player);
                 }
                 searcher.getTargets().addAll(players);
                 return true;
