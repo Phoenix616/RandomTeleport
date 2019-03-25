@@ -19,6 +19,8 @@ package de.themoep.randomteleport;
  */
 
 import de.themoep.randomteleport.hook.HookManager;
+import de.themoep.randomteleport.listeners.SignListener;
+import de.themoep.randomteleport.searcher.RandomSearcher;
 import de.themoep.randomteleport.searcher.options.NotFoundException;
 import de.themoep.randomteleport.searcher.options.OptionParser;
 import de.themoep.randomteleport.searcher.options.PlayerNotFoundException;
@@ -29,6 +31,7 @@ import de.themoep.randomteleport.searcher.validators.BlockValidator;
 import de.themoep.randomteleport.searcher.validators.ProtectionValidator;
 import de.themoep.randomteleport.searcher.validators.WorldborderValidator;
 import de.themoep.utils.lang.bukkit.LanguageManager;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
@@ -37,10 +40,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
+import java.util.Set;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 public class RandomTeleport extends JavaPlugin {
 
@@ -53,6 +59,7 @@ public class RandomTeleport extends JavaPlugin {
 
     private Material[] saveBlocks;
     private Material[] unsaveBlocks;
+    private Set<String> signVariables;
 
     public void onEnable() {
         hookManager = new HookManager(this);
@@ -60,6 +67,7 @@ public class RandomTeleport extends JavaPlugin {
         initOptionParsers();
         initValidators();
         getCommand("randomteleport").setExecutor(new RandomTeleportCommand(this));
+        getServer().getPluginManager().registerEvents(new SignListener(this), this);
     }
 
     public void loadConfig() {
@@ -85,6 +93,7 @@ public class RandomTeleport extends JavaPlugin {
                 })
                 .filter(Objects::nonNull)
                 .toArray(Material[]::new);
+        signVariables = getConfig().getStringList("sign-variables").stream().map(String::toLowerCase).collect(Collectors.toSet());
         lang = new LanguageManager(this, getConfig().getString("lang"));
         lang.setPlaceholderPrefix("{");
         lang.setPlaceholderSuffix("}");
@@ -223,4 +232,68 @@ public class RandomTeleport extends JavaPlugin {
         optionParsers.add(parser);
     }
 
+    /**
+     * Check whether or not a sign line matches the configured variables
+     * @param line The line to match
+     * @return <tt>true</tt> if it matches; <tt>false</tt> if not
+     */
+    public boolean matchesSignVariable(String line) {
+        return signVariables.contains(line.toLowerCase());
+    }
+
+    /**
+     * Create and run a searcher using specified args the same way the command does
+     * @param sender    The sender of the command
+     * @param center    The center location for the searcher
+     * @param args      The arguments to parse
+     * @return Returns the searcher that is running
+     * @throws IllegalArgumentException Thrown when arguments couldn't be handled properly
+     */
+    public RandomSearcher parseAndRun(CommandSender sender, Location center, String[] args) {
+        RandomSearcher searcher = new RandomSearcher(this, sender, center, Integer.parseInt(args[0]), Integer.parseInt(args[1]));
+
+        String[] optionArgs = Arrays.copyOfRange(args, 2, args.length);
+        for (OptionParser parser : getOptionParsers()) {
+            parser.parse(searcher, optionArgs);
+        }
+
+        searcher.getTargets().forEach(p -> sendMessage(p, "search", "world", searcher.getCenter().getWorld().getName()));
+        searcher.search().thenApply(targetLoc -> {
+            searcher.getTargets().forEach(p -> {
+                p.teleport(targetLoc);
+                sendMessage(p, "teleport",
+                        "world", center.getWorld().getName(),
+                        "x", String.valueOf(center.getBlockX()),
+                        "y", String.valueOf(center.getBlockY()),
+                        "z", String.valueOf(center.getBlockZ())
+                );
+            });
+            return true;
+        }).exceptionally(ex -> {
+            sendMessage(sender, "error.location");
+            sender.sendMessage(ex.getMessage());
+            searcher.getTargets().forEach(p -> sendMessage(p, "error.location"));
+            return true;
+        });
+        return searcher;
+    }
+
+    /**
+     * Run a preset
+     * @param sender The sender that executed the preset
+     * @param preset The preset ID to run
+     * @param target The player targeted by the teleporter
+     * @param center The center for the search
+     * @return The RandomSearcher instance that is searching
+     */
+    public RandomSearcher runPreset(CommandSender sender, String preset, Player target, Location center) {
+        String cmd = getConfig().getString("presets." + preset) + " -p " + target.getName();
+        if (cmd.startsWith("/")) {
+            cmd = cmd.substring(1);
+        }
+        if (cmd.startsWith("rtp ")) {
+            cmd = cmd.substring(4);
+        }
+        return parseAndRun(sender, center, cmd.split(" "));
+    }
 }

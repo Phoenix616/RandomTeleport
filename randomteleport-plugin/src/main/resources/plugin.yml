@@ -11,7 +11,7 @@ commands:
       description: RandomTeleport command.
       usage: |
              /<command> - uses the default preset
-             /<command> <preset> [<playername>]- uses a specific preset
+             /<command> <preset> [<playername>] - uses a specific preset
              /<command> <minRange> <maxRange> [-p, -w, -x, -z, -c, -f]
              minRange - minimum distance to the center point (square shaped)
              maxRange - maximum distance to the center point (square shaped)
@@ -25,8 +25,8 @@ commands:
              > -c, -cooldown <seconds> - cooldown in seconds after which the player can use this teleporter again
              > -f,-force - teleport even if there is no dirt/grass/sand/gravel, only checks for lava/water/cactus, ignores WorldGuard/Faction regions
              > -f,-force [<blocks|regions>] - only ignore blocks or regions
-             /<command> stat - shows a statistic of the teleports since the last restart
-             /<command> reload - reloads the config
+             /<command> --stat - shows a statistic of the teleports since the last restart
+             /<command> --reload - reloads the config
 permissions:
    randomteleport.use:
       description: Gives permission to the command
@@ -56,5 +56,8 @@ permissions:
       description: Gives permission to use all presets with a rightclick on a preset sign
       default: op
    randomteleport.sign.create:
-      description: Allows to create and destroy preset signs ([rtp] or [RandomTP] on the 2nd line and the preset name on the 3rd)
+      description: Allows creating preset signs ([rtp] or [RandomTP] on the 2nd line and the preset name on the 3rd)
+      default: op
+   randomteleport.sign.destroy:
+      description: Allows destroying preset signs ([rtp] or [RandomTP] on the 2nd line and the preset name on the 3rd)
       default: op

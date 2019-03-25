@@ -18,8 +18,6 @@ package de.themoep.randomteleport;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.themoep.randomteleport.searcher.RandomSearcher;
-import de.themoep.randomteleport.searcher.options.OptionParser;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.BlockCommandSender;
@@ -27,8 +25,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 
-import java.util.Arrays;
+import java.util.logging.Level;
 
 public class RandomTeleportCommand implements CommandExecutor {
     private final RandomTeleport plugin;
@@ -39,44 +38,60 @@ public class RandomTeleportCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (args.length == 1) {
-            if ("reload".equalsIgnoreCase(args[0])) {
+        if (args.length == 0) {
+            if (sender instanceof Player) {
+                runPreset("default", sender, (Player) sender, ((Player) sender).getLocation());
+                return true;
+            }
+        } else if (args.length == 1) {
+            if ("--reload".equalsIgnoreCase(args[0])) {
                 plugin.loadConfig();
                 plugin.sendMessage(sender, "reloaded");
                 return true;
+            } else if ("--stat".equalsIgnoreCase(args[0])) {
+                //TODO: teleporter and searcher statistics
+            } else if (sender instanceof Player) {
+                runPreset(args[0].toLowerCase(), sender, (Player) sender, ((Player) sender).getLocation());
+                return true;
             }
-        } else if (args.length > 1) {
+        } else {
             try {
-                RandomSearcher searcher = new RandomSearcher(plugin, sender, getLocation(sender), Integer.parseInt(args[0]), Integer.parseInt(args[1]));
-
-                String[] optionArgs = Arrays.copyOfRange(args, 2, args.length);
-                for (OptionParser parser : plugin.getOptionParsers()) {
-                    parser.parse(searcher, optionArgs);
-                }
-
-                searcher.getTargets().forEach(p -> plugin.sendMessage(p, "search", "world", searcher.getCenter().getWorld().getName()));
-                searcher.search().thenApply(location -> {
-                    searcher.getTargets().forEach(p -> {
-                        p.teleport(location);
-                        plugin.sendMessage(p, "teleport",
-                                "world", location.getWorld().getName(),
-                                "x", String.valueOf(location.getBlockX()),
-                                "y", String.valueOf(location.getBlockY()),
-                                "z", String.valueOf(location.getBlockZ())
-                        );
-                    });
-                    return true;
-                }).exceptionally(ex -> {
-                    plugin.sendMessage(sender, "error.location");
-                    sender.sendMessage(ex.getMessage());
-                    return true;
-                });
+                plugin.parseAndRun(sender, getLocation(sender), args);
                 return true;
             } catch (IllegalArgumentException e) {
+                if (args.length == 2) {
+                    Player target = plugin.getServer().getPlayer(args[1]);
+                    if (target == null) {
+                        plugin.sendMessage(sender, "error.player-not-found", "what", args[1]);
+                        return true;
+                    }
+                    runPreset(args[0].toLowerCase(), sender, target, target.getLocation());
+                    return true;
+                }
                 sender.sendMessage(e.getMessage());
             }
         }
         return false;
+    }
+
+    private void runPreset(String preset, CommandSender sender, Player target, Location center) {
+        if (!sender.hasPermission("randomteleport.presets." + preset)) {
+            plugin.sendMessage(sender, "error.no-permission.preset",
+                    "preset", preset, "perm",
+                    "randomteleport.presets." + preset
+            );
+        } else if (sender != target && !sender.hasPermission("randomteleport.tpothers")) {
+            plugin.sendMessage(sender, "error.no-permission.tp-others", "perm", "randomteleport.tpothers");
+        } else if (plugin.getConfig().getString("presets." + preset) == null) {
+            plugin.sendMessage(sender, "error.preset-doesnt-exist", "preset", preset);
+        } else {
+            try {
+                plugin.runPreset(plugin.getServer().getConsoleSender(), preset, target, center);
+            } catch (IllegalArgumentException e) {
+                plugin.sendMessage(sender, "error.preset-invalid", "preset", preset);
+                plugin.getLogger().log(Level.SEVERE, "Error while parsing preset " + preset, e);
+            }
+        }
     }
 
     private static Location getLocation(CommandSender sender) {

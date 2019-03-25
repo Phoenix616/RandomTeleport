@@ -52,6 +52,8 @@ public class RandomSearcher {
     private int cooldown;
     private int checks = 0;
 
+    private CompletableFuture<Location> future = null;
+
     public RandomSearcher(RandomTeleport plugin, CommandSender initiator, Location center, int minRadius, int maxRadius) {
         this.plugin = plugin;
         this.initiator = initiator;
@@ -201,7 +203,7 @@ public class RandomSearcher {
      * @return A CompletableFuture for when the search task is complete
      */
     public CompletableFuture<Location> search() {
-        CompletableFuture<Location> future = new CompletableFuture<>();
+        future = new CompletableFuture<>();
         plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> checkRandom(future));
         return future;
     }
@@ -243,5 +245,13 @@ public class RandomSearcher {
      */
     public CommandSender getInitiator() {
         return initiator;
+    }
+
+    /**
+     * Get the currently running search future
+     * @return The currently running search future or null if none is running
+     */
+    public CompletableFuture<Location> getFuture() {
+        return future;
     }
 }

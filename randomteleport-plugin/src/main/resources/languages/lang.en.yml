@@ -2,6 +2,13 @@ reloaded: "&eReloaded the config. Some settings might require a server restart!"
 search: "&7RandomTeleport searches for a safe place in world {worldname}. . ."
 teleport: "&7RandomTeleport teleported you to X: {x} Y: {y} Z: {z}!"
 setspawnpoint: "&7Your Respawnpoint has been set to your current location!"
+sign:
+   created: "&aRandomTeleport preset sign &e{preset}&a created!"
+   destroyed: "&aRandomTeleport preset sign &e{preset}&a destroyed!"
+   no-permission:
+      destroy: "&cYou don't have permission to destroy RandomTeleport preset signs! &o({perm})"
+      create: "&cYou don't have permission to create RandomTeleport preset signs! &o({perm})"
+      use: "&cYou don't have permission to use the preset &6{preset}&c! &o({perm})"
 error:
    location: "&4Error: &cRandomTeleport could not find a save location!"
    cooldown: "&cYou have to wait {cooldown_text}before using this RandomTeleport again!"
@@ -9,3 +16,9 @@ error:
    not-found: "&cCould not find &f{what}&c!"
    player-not-found: "&cCould not find a player with the name &f{what}&c!"
    world-not-found: "&cCould not find a world with the name &f{what}&c!"
+   preset-doesnt-exist: "&cThe RandomTeleport preset &6{preset}&c does not exist!"
+   preset-invalid: "&cThe preset &6{preset}&c is not setup correctly! Please contact an admin."
+   no-permission:
+      general: "&cYou don't have permission to do that! &o({perm})"
+      preset: "&cYou don't have permission to use the preset &6{preset}&c! &o({perm})"
+      tp-others: "&cYou don't have permission to teleport other players! &o({perm})"
