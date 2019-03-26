@@ -49,7 +49,7 @@ public class HookManager implements Listener, ProtectionHook, WorldborderHook {
 
         for (Plugin p : plugin.getServer().getPluginManager().getPlugins()) {
             if (p.isEnabled()) {
-                registerHook(plugin);
+                registerHook(p);
             }
         }
     }
@@ -66,7 +66,7 @@ public class HookManager implements Listener, ProtectionHook, WorldborderHook {
                 }
             } catch (ClassNotFoundException ignored) {}
             if (version.contains(".")) {
-                version = version.substring(version.lastIndexOf('.'));
+                version = version.substring(0, version.lastIndexOf('.'));
             } else {
                 try {
                     hookClass = Class.forName(path + "Hook");
