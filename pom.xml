@@ -14,7 +14,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <build.number>${buildNumber}</build.number>
-        <minecraft.plugin.name>${project.name}</minecraft.plugin.name>
+        <minecraft.plugin.name>RandomTeleport</minecraft.plugin.name>
         <minecraft.plugin.version>${project.version} ${buildDescription}</minecraft.plugin.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -65,6 +65,7 @@
             <groupId>de.themoep.utils</groupId>
             <artifactId>lang-bukkit</artifactId>
             <version>1.1-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
