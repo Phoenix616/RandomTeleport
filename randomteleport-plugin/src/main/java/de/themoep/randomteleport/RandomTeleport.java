@@ -18,6 +18,8 @@ package de.themoep.randomteleport;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import de.themoep.randomteleport.hook.HookManager;
 import de.themoep.randomteleport.listeners.SignListener;
 import de.themoep.randomteleport.searcher.RandomSearcher;
@@ -37,15 +39,19 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
@@ -54,6 +60,7 @@ public class RandomTeleport extends JavaPlugin {
     public static final Random RANDOM = new Random();
     private HookManager hookManager;
     private LanguageManager lang;
+    private Table<String, UUID, Map.Entry<Long, Integer>> cooldowns = HashBasedTable.create();
 
     private ValidatorRegistry locationValidators = new ValidatorRegistry();
     private List<OptionParser> optionParsers = new ArrayList<>();
@@ -185,6 +192,13 @@ public class RandomTeleport extends JavaPlugin {
             searcher.searchInGeneratedOnly(true);
             return true;
         }));
+        addOptionParser(new SimpleOptionParser(array("id"), (searcher, args) -> {
+            if (args.length > 0) {
+                searcher.setId(args[0]);
+                return true;
+            }
+            return false;
+        }));
     }
 
     private void initValidators() {
@@ -195,12 +209,20 @@ public class RandomTeleport extends JavaPlugin {
     }
 
     /**
-     * Utility method to create arrays with a nicer syntax. Seriously, why does Java not just accept {"string"}?!?
+     * Utility method to create arrays with a nicer syntax. Seriously, why does Java not just accept {"string"} as parameters?!?
      * @param array The array values
      * @return The same array
      */
     private static <T> T[] array(T... array) {
         return array;
+    }
+
+    public boolean sendMessage(List<? extends CommandSender> senders, String key, String... replacements) {
+        boolean r = false;
+        for (CommandSender sender : senders) {
+            r |= sendMessage(sender, key, replacements);
+        }
+        return r;
     }
 
     public boolean sendMessage(CommandSender sender, String key, String... replacements) {
@@ -250,7 +272,7 @@ public class RandomTeleport extends JavaPlugin {
      * @param sender    The sender of the command
      * @param center    The center location for the searcher
      * @param args      The arguments to parse
-     * @return Returns the searcher that is running
+     * @return Returns the searcher that is running or null if it was stopped due to a cooldown
      * @throws IllegalArgumentException Thrown when arguments couldn't be handled properly
      */
     public RandomSearcher parseAndRun(CommandSender sender, Location center, String[] args) {
@@ -261,9 +283,26 @@ public class RandomTeleport extends JavaPlugin {
             parser.parse(searcher, optionArgs);
         }
 
-        searcher.getTargets().forEach(e -> sendMessage(e, "search", "worldname", searcher.getCenter().getWorld().getName()));
+        int cooldown = 0;
+
+        for (Entity target : searcher.getTargets()) {
+            Map.Entry<Long, Integer> lastUse = cooldowns.get(searcher.getId(), target.getUniqueId());
+            if (lastUse != null) {
+                int targetCooldown = (int) ((System.currentTimeMillis() - lastUse.getKey()) / 1000);
+                if (targetCooldown > cooldown) {
+                    cooldown = targetCooldown;
+                }
+            }
+        }
+
+        if (cooldown > 0) {
+            sendMessage(searcher.getTargets(), "cooldown", "cooldown_text", cooldown + "s");
+            return null;
+        }
+        sendMessage(searcher.getTargets(), "search", "worldname", searcher.getCenter().getWorld().getName());
         searcher.search().thenApply(targetLoc -> {
             searcher.getTargets().forEach(e -> {
+                cooldowns.put(searcher.getId(), e.getUniqueId(), new AbstractMap.SimpleImmutableEntry<>(System.currentTimeMillis(), searcher.getCooldown()));
                 e.teleport(targetLoc);
                 sendMessage(e, "teleport",
                         "worldname", center.getWorld().getName(),
