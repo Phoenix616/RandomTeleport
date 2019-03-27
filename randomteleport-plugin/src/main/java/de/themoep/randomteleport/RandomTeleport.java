@@ -28,6 +28,7 @@ import de.themoep.randomteleport.searcher.options.SimpleOptionParser;
 import de.themoep.randomteleport.searcher.options.WorldNotFoundException;
 import de.themoep.randomteleport.searcher.validators.BiomeValidator;
 import de.themoep.randomteleport.searcher.validators.BlockValidator;
+import de.themoep.randomteleport.searcher.validators.HeightValidator;
 import de.themoep.randomteleport.searcher.validators.ProtectionValidator;
 import de.themoep.randomteleport.searcher.validators.WorldborderValidator;
 import de.themoep.utils.lang.bukkit.LanguageManager;
@@ -188,6 +189,7 @@ public class RandomTeleport extends JavaPlugin {
 
     private void initValidators() {
         locationValidators.add(new WorldborderValidator());
+        locationValidators.add(new HeightValidator());
         locationValidators.add(new ProtectionValidator());
         locationValidators.add(new BlockValidator(saveBlocks));
     }
@@ -259,12 +261,12 @@ public class RandomTeleport extends JavaPlugin {
             parser.parse(searcher, optionArgs);
         }
 
-        searcher.getTargets().forEach(e -> sendMessage(e, "search", "world", searcher.getCenter().getWorld().getName()));
+        searcher.getTargets().forEach(e -> sendMessage(e, "search", "worldname", searcher.getCenter().getWorld().getName()));
         searcher.search().thenApply(targetLoc -> {
             searcher.getTargets().forEach(e -> {
                 e.teleport(targetLoc);
                 sendMessage(e, "teleport",
-                        "world", center.getWorld().getName(),
+                        "worldname", center.getWorld().getName(),
                         "x", String.valueOf(center.getBlockX()),
                         "y", String.valueOf(center.getBlockY()),
                         "z", String.valueOf(center.getBlockZ())

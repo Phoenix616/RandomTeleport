@@ -204,7 +204,7 @@ public class RandomSearcher {
      */
     public CompletableFuture<Location> search() {
         future = new CompletableFuture<>();
-        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> checkRandom(future));
+        plugin.getServer().getScheduler().runTask(plugin, () -> checkRandom(future));
         return future;
     }
 
@@ -218,9 +218,9 @@ public class RandomSearcher {
         }
         Location randomLoc = new Location(
                 center.getWorld(),
-                center.getBlockX() + random.nextInt(maxRadius - minRadius),
+                center.getBlockX() + (random.nextBoolean() ? 1 : -1) * (minRadius + random.nextInt(maxRadius - minRadius)),
                 0,
-                center.getBlockX() + random.nextInt(maxRadius - minRadius)
+                center.getBlockX() + (random.nextBoolean() ? 1 : -1) * (minRadius + random.nextInt(maxRadius - minRadius))
         );
         PaperLib.getChunkAtAsync(randomLoc, generatedOnly).thenApply(c -> {
             checks++;
@@ -232,7 +232,7 @@ public class RandomSearcher {
             }
             future.complete(randomLoc);
             return true;
-        });
+        }).exceptionally(future::completeExceptionally);
     }
 
     public RandomTeleport getPlugin() {
