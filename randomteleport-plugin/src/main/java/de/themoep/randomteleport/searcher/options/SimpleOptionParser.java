@@ -20,9 +20,7 @@ package de.themoep.randomteleport.searcher.options;
 
 import de.themoep.randomteleport.searcher.RandomSearcher;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -44,22 +42,14 @@ public class SimpleOptionParser implements OptionParser {
     @Override
     public boolean parse(RandomSearcher searcher, String[] args) {
         boolean ret = false;
-        String option = null;
-        List<String> values = new ArrayList<>();
-        for (String arg : args) {
-            if (arg.startsWith("-")) {
-                if (option != null) {
-                    if (aliases.contains(option.toLowerCase())) {
-                        ret |= parser.apply(searcher, values.toArray(new String[0]));
-                    }
-                    values.clear();
-                }
-                option = arg.substring(1);
-                if (option.startsWith("-") && option.length() > 1) {
-                    option = option.substring(1);
-                }
-            } else {
-                values.add(arg);
+        String[] optionParts = String.join(" ", args).split(" -");
+        for (String optionPart : optionParts) {
+            String[] parts = optionPart.split(" ");
+            while (parts[0].startsWith("-")) {
+                parts[0] = parts[0].substring(1);
+            }
+            if (aliases.contains(parts[0].toLowerCase())) {
+                ret |= parser.apply(searcher, Arrays.copyOfRange(parts, 1, parts.length));
             }
         }
         return ret;
