@@ -285,7 +285,7 @@ public class RandomSearcher {
             checks++;
             int startIndex = random.nextInt(RANDOM_LIST.size());
             Location foundLoc = null;
-            for (int index = startIndex; index != startIndex; index++ ) {
+            for (int index = startIndex; index != startIndex - 1; index++) {
                 if (index >= RANDOM_LIST.size()) {
                     index = 0;
                 }
