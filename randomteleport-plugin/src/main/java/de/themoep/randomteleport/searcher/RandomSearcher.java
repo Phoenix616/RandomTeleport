@@ -28,8 +28,10 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -42,6 +44,15 @@ public class RandomSearcher {
     private final UUID uniqueId = UUID.randomUUID();
 
     private ValidatorRegistry validators = new ValidatorRegistry();
+
+    private static final List<int[]> RANDOM_LIST = new ArrayList<int[]>();
+    static {
+        for (int x = 0; x < 16; x++) {
+            for (int z = 0; z < 16; z++) {
+                RANDOM_LIST.add(new int[] {x, z});
+            }
+        }
+    }
 
     private Random random = RandomTeleport.RANDOM;
 
@@ -260,23 +271,60 @@ public class RandomSearcher {
         if (future.isCancelled() || future.isDone() || future.isCompletedExceptionally()) {
             return;
         }
-        Location randomLoc = new Location(
-                center.getWorld(),
-                center.getBlockX() + (random.nextBoolean() ? 1 : -1) * (minRadius + random.nextInt(maxRadius - minRadius)),
-                0,
-                center.getBlockX() + (random.nextBoolean() ? 1 : -1) * (minRadius + random.nextInt(maxRadius - minRadius))
-        );
+        Location randomLoc = center.clone();
+        randomLoc.setY(0);
+        do {
+            randomLoc.setX(center.getBlockX() + (random.nextBoolean() ? 1 : -1) * random.nextInt(maxRadius));
+        } while (!inRange(randomLoc.getBlockX(), center.getBlockX()));
+        do {
+            randomLoc.setZ(center.getBlockZ() + (random.nextBoolean() ? 1 : -1) * random.nextInt(maxRadius));
+        } while (!inRange(randomLoc.getBlockZ(), center.getBlockX()));
+        randomLoc.setX((randomLoc.getBlockX() >> 4) * 16);
+        randomLoc.setZ((randomLoc.getBlockZ() >> 4) * 16);
         PaperLib.getChunkAtAsync(randomLoc, generatedOnly).thenApply(c -> {
             checks++;
-            for (LocationValidator validator : getValidators().getAll()) {
-                if (!validator.validate(this, randomLoc)) {
-                    checkRandom(future);
-                    return false;
+            int startIndex = random.nextInt(RANDOM_LIST.size());
+            Location foundLoc = null;
+            for (int index = startIndex; index != startIndex; index++ ) {
+                if (index >= RANDOM_LIST.size()) {
+                    index = 0;
+                }
+                boolean validated = true;
+                Location loc = randomLoc.clone().add(RANDOM_LIST.get(index)[0], 0, RANDOM_LIST.get(index)[1]);
+
+                if (!inRadius(loc)) {
+                    continue;
+                }
+
+                for (LocationValidator validator : getValidators().getAll()) {
+                    if (!validator.validate(this, loc)) {
+                        validated = false;
+                        break;
+                    }
+                }
+                if (validated) {
+                    foundLoc = loc;
+                    break;
                 }
             }
-            future.complete(randomLoc);
-            return true;
+
+            if (foundLoc != null) {
+                future.complete(foundLoc);
+                return true;
+            }
+            checkRandom(future);
+            return false;
         }).exceptionally(future::completeExceptionally);
+    }
+
+    private boolean inRadius(Location location) {
+        return inRange(location.getBlockX(), center.getBlockX())
+                || inRange(location.getBlockZ(), center.getBlockZ()) ;
+    }
+
+    private boolean inRange(int coord, int check) {
+        int diff = Math.abs(check - coord);
+        return diff >= minRadius && diff < maxRadius;
     }
 
     public RandomTeleport getPlugin() {
