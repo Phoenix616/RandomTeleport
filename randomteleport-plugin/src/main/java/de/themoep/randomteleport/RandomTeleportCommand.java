@@ -18,6 +18,7 @@ package de.themoep.randomteleport;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.themoep.randomteleport.searcher.RandomSearcher;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.BlockCommandSender;
@@ -85,6 +86,15 @@ public class RandomTeleportCommand implements CommandExecutor {
         } else if (plugin.getConfig().getString("presets." + preset) == null) {
             plugin.sendMessage(sender, "error.preset-doesnt-exist", "preset", preset);
         } else {
+            if (sender == target) {
+                for (RandomSearcher searcher : plugin.getRunningSearchers().values()) {
+                    if (searcher.getTargets().contains(target)) {
+                        plugin.sendMessage(sender, "error.already-searching", "preset", preset);
+                        return;
+                    }
+                }
+            }
+
             try {
                 plugin.runPreset(plugin.getServer().getConsoleSender(), preset, target, center);
             } catch (IllegalArgumentException e) {

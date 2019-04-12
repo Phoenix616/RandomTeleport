@@ -18,6 +18,7 @@ error:
    world-not-found: "&cCould not find a world with the name &f{what}&c!"
    preset-doesnt-exist: "&cThe RandomTeleport preset &6{preset}&c does not exist!"
    preset-invalid: "&cThe preset &6{preset}&c is not setup correctly! Please contact an admin."
+   already-searching: "&cA search is already in progress&c!"
    no-permission:
       general: "&cYou don't have permission to do that! &o({perm})"
       preset: "&cYou don't have permission to use the preset &6{preset}&c! &o({perm})"

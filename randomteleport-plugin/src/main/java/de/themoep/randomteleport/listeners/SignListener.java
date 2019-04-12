@@ -19,6 +19,7 @@ package de.themoep.randomteleport.listeners;
  */
 
 import de.themoep.randomteleport.RandomTeleport;
+import de.themoep.randomteleport.searcher.RandomSearcher;
 import org.bukkit.block.Sign;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -79,6 +80,13 @@ public class SignListener implements Listener {
                     if (plugin.getConfig().getString("presets." + preset) == null) {
                         plugin.sendMessage(event.getPlayer(), "error.preset-doesnt-exist", "preset", preset);
                     } else {
+                        for (RandomSearcher searcher : plugin.getRunningSearchers().values()) {
+                            if (searcher.getTargets().contains(event.getPlayer())) {
+                                plugin.sendMessage(event.getPlayer(), "error.already-searching", "preset", preset);
+                                return;
+                            }
+                        }
+
                         try {
                             plugin.runPreset(plugin.getServer().getConsoleSender(), preset, event.getPlayer(), event.getClickedBlock().getLocation());
                         } catch (IllegalArgumentException e) {

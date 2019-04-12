@@ -28,22 +28,24 @@ import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class RandomSearcher {
     private final RandomTeleport plugin;
     private final CommandSender initiator;
+    private final UUID uniqueId = UUID.randomUUID();
 
     private ValidatorRegistry validators = new ValidatorRegistry();
 
     private Random random = RandomTeleport.RANDOM;
 
-    private List<Entity> targets = new ArrayList<>();
+    private Set<Entity> targets = Collections.newSetFromMap(new LinkedHashMap<>());
 
     private String id = null;
     private long seed = -1;
@@ -72,12 +74,20 @@ public class RandomSearcher {
      * Get all entities targeted by this searcher
      * @return The entitiy to target
      */
-    public List<Entity> getTargets() {
+    public Set<Entity> getTargets() {
         return targets;
     }
 
     public ValidatorRegistry getValidators() {
         return validators;
+    }
+
+    /**
+     * Get a ID unique to each searcher
+     * @return The searcher's version 4 UUID
+     */
+    public UUID getUniqueId() {
+        return uniqueId;
     }
 
     /**
@@ -235,8 +245,10 @@ public class RandomSearcher {
      * @return A CompletableFuture for when the search task is complete
      */
     public CompletableFuture<Location> search() {
+        plugin.getRunningSearchers().put(uniqueId, this);
         future = new CompletableFuture<>();
         plugin.getServer().getScheduler().runTask(plugin, () -> checkRandom(future));
+        future.whenComplete((l, e) -> plugin.getRunningSearchers().remove(uniqueId));
         return future;
     }
 

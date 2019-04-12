@@ -47,6 +47,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -62,6 +64,7 @@ public class RandomTeleport extends JavaPlugin {
     private HookManager hookManager;
     private LanguageManager lang;
     private Table<String, UUID, Map.Entry<Long, Integer>> cooldowns = HashBasedTable.create();
+    private Map<UUID, RandomSearcher> runningSearchers = new HashMap<>();
 
     private ValidatorRegistry locationValidators = new ValidatorRegistry();
     private List<OptionParser> optionParsers = new ArrayList<>();
@@ -211,6 +214,14 @@ public class RandomTeleport extends JavaPlugin {
     }
 
     /**
+     * Get the map of all running searchers
+     * @return The map of running searchers
+     */
+    public Map<UUID, RandomSearcher> getRunningSearchers() {
+        return runningSearchers;
+    }
+
+    /**
      * Utility method to create arrays with a nicer syntax. Seriously, why does Java not just accept {"string"} as parameters?!?
      * @param array The array values
      * @return The same array
@@ -219,7 +230,7 @@ public class RandomTeleport extends JavaPlugin {
         return array;
     }
 
-    public boolean sendMessage(List<? extends CommandSender> senders, String key, String... replacements) {
+    public boolean sendMessage(Collection<? extends CommandSender> senders, String key, String... replacements) {
         boolean r = false;
         for (CommandSender sender : senders) {
             r |= sendMessage(sender, key, replacements);
