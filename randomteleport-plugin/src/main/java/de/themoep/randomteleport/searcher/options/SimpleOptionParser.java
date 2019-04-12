@@ -19,6 +19,7 @@ package de.themoep.randomteleport.searcher.options;
  */
 
 import de.themoep.randomteleport.searcher.RandomSearcher;
+import org.apache.commons.lang.Validate;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -35,6 +36,7 @@ public class SimpleOptionParser implements OptionParser {
     }
 
     public SimpleOptionParser(String[] optionAliases, BiFunction<RandomSearcher, String[], Boolean> parser) {
+        Validate.notEmpty(optionAliases);
         this.aliases = Arrays.stream(optionAliases).map(String::toLowerCase).collect(Collectors.toSet());
         this.parser = parser;
     }

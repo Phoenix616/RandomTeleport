@@ -26,6 +26,7 @@ commands:
         > -id <id> - The ID to use for the cooldown, uses automatically generated one if not provided
         > -f,-force - teleport even if there is no dirt/grass/sand/gravel, only checks for lava/water/cactus, ignores WorldGuard/Faction regions
         > -f,-force [<blocks|regions>] - only ignore blocks or regions
+        > -sp,spawnpoint [force] - set the respawn point of the player to the location he teleported to (force overrides existing spawnpoint)
         /<command> --stat - shows a statistic of the teleports since the last restart
         /<command> --reload - reloads the config
 permissions:

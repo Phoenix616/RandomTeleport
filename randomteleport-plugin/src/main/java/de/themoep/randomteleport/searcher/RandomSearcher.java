@@ -29,7 +29,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 
@@ -51,6 +53,7 @@ public class RandomSearcher {
     private boolean generatedOnly = false;
     private int maxChecks = 100;
     private int cooldown;
+    private Map<String, String> options = new LinkedHashMap<>();
 
     private int checks = 0;
 
@@ -217,6 +220,14 @@ public class RandomSearcher {
      */
     public int getCooldown() {
         return cooldown;
+    }
+
+    /**
+     * Get additional options
+     * @return A map of additional options
+     */
+    public Map<String, String> getOptions() {
+        return options;
     }
 
     /**

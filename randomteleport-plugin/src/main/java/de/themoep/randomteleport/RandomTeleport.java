@@ -23,6 +23,7 @@ import com.google.common.collect.Table;
 import de.themoep.randomteleport.hook.HookManager;
 import de.themoep.randomteleport.listeners.SignListener;
 import de.themoep.randomteleport.searcher.RandomSearcher;
+import de.themoep.randomteleport.searcher.options.AdditionalOptionParser;
 import de.themoep.randomteleport.searcher.options.NotFoundException;
 import de.themoep.randomteleport.searcher.options.OptionParser;
 import de.themoep.randomteleport.searcher.options.PlayerNotFoundException;
@@ -199,6 +200,7 @@ public class RandomTeleport extends JavaPlugin {
             }
             return false;
         }));
+        addOptionParser(new AdditionalOptionParser("spawnpoint", "sp"));
     }
 
     private void initValidators() {
@@ -310,6 +312,17 @@ public class RandomTeleport extends JavaPlugin {
                         "y", String.valueOf(center.getBlockY()),
                         "z", String.valueOf(center.getBlockZ())
                 );
+                if (searcher.getOptions().containsKey("spawnpoint") && e instanceof Player) {
+                    if (((Player) e).getBedSpawnLocation() == null || "force".equalsIgnoreCase(searcher.getOptions().get("spawnpoint"))){
+                        ((Player) e).setBedSpawnLocation(targetLoc, true);
+                        sendMessage(e, "setspawnpoint",
+                                "worldname", center.getWorld().getName(),
+                                "x", String.valueOf(center.getBlockX()),
+                                "y", String.valueOf(center.getBlockY()),
+                                "z", String.valueOf(center.getBlockZ())
+                        );
+                    }
+                }
             });
             return true;
         }).exceptionally(ex -> {
