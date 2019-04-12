@@ -121,7 +121,9 @@ public class HookManager implements Listener, ProtectionHook, WorldborderHook {
      * @return A list of hooks, empty if there are none
      */
     public  <T extends PluginHook> List<T> getHooks(Class<T> hookClass) {
-        return hookMap.values().stream().filter(hookClass::isInstance).map(h -> (T) h).sorted(Collections.reverseOrder()).collect(Collectors.toList());
+        List<T> list = hookMap.values().stream().filter(hookClass::isInstance).map(h -> (T) h).collect(Collectors.toList());
+        Collections.reverse(list);
+        return list;
     }
 
     // Convenience methods to check all registered hooks
