@@ -31,8 +31,14 @@ public class HeightValidator extends LocationValidator {
 
     @Override
     public boolean validate(RandomSearcher searcher, Location location) {
-        location.setY(location.getWorld().getHighestBlockYAt(location));
-        Block block = location.getBlock();
-        return !block.isEmpty() && !block.getRelative(BlockFace.UP).getType().isSolid() && !block.getRelative(BlockFace.UP, 2).getType().isSolid();
+        Block block = location.getWorld().getHighestBlockAt(location);
+        while (block.isEmpty()) {
+            block = block.getRelative(BlockFace.DOWN);
+            if (block == null || block.getY() == 0) {
+                return false;
+            }
+        }
+        location.setY(block.getY());
+        return !block.getRelative(BlockFace.UP).getType().isSolid() && !block.getRelative(BlockFace.UP, 2).getType().isSolid();
     }
 }

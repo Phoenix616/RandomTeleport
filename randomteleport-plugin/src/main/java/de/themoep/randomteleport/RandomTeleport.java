@@ -308,12 +308,13 @@ public class RandomTeleport extends JavaPlugin {
             }
         }
 
-        if (cooldown > 0) {
-            sendMessage(searcher.getTargets(), "error.cooldown", "cooldown_text", cooldown + "s");
+        if (cooldown > 0 && cooldown < searcher.getCooldown()) {
+            sendMessage(searcher.getTargets(), "error.cooldown", "cooldown_text", (searcher.getCooldown() - cooldown) + "s");
             return null;
         }
         sendMessage(searcher.getTargets(), "search", "worldname", searcher.getCenter().getWorld().getName());
         searcher.search().thenApply(targetLoc -> {
+            targetLoc.add(0, 1, 0);
             searcher.getTargets().forEach(e -> {
                 cooldowns.put(searcher.getId(), e.getUniqueId(), new AbstractMap.SimpleImmutableEntry<>(System.currentTimeMillis(), searcher.getCooldown()));
                 e.teleport(targetLoc);
