@@ -309,7 +309,7 @@ public class RandomTeleport extends JavaPlugin {
         }
 
         if (cooldown > 0) {
-            sendMessage(searcher.getTargets(), "cooldown", "cooldown_text", cooldown + "s");
+            sendMessage(searcher.getTargets(), "error.cooldown", "cooldown_text", cooldown + "s");
             return null;
         }
         sendMessage(searcher.getTargets(), "search", "worldname", searcher.getCenter().getWorld().getName());
