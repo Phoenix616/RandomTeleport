@@ -319,19 +319,19 @@ public class RandomTeleport extends JavaPlugin {
                 cooldowns.put(searcher.getId(), e.getUniqueId(), new AbstractMap.SimpleImmutableEntry<>(System.currentTimeMillis(), searcher.getCooldown()));
                 e.teleport(targetLoc);
                 sendMessage(e, "teleport",
-                        "worldname", center.getWorld().getName(),
-                        "x", String.valueOf(center.getBlockX()),
-                        "y", String.valueOf(center.getBlockY()),
-                        "z", String.valueOf(center.getBlockZ())
+                        "worldname", targetLoc.getWorld().getName(),
+                        "x", String.valueOf(targetLoc.getBlockX()),
+                        "y", String.valueOf(targetLoc.getBlockY()),
+                        "z", String.valueOf(targetLoc.getBlockZ())
                 );
                 if (searcher.getOptions().containsKey("spawnpoint") && e instanceof Player) {
                     if (((Player) e).getBedSpawnLocation() == null || "force".equalsIgnoreCase(searcher.getOptions().get("spawnpoint"))){
                         ((Player) e).setBedSpawnLocation(targetLoc, true);
                         sendMessage(e, "setspawnpoint",
-                                "worldname", center.getWorld().getName(),
-                                "x", String.valueOf(center.getBlockX()),
-                                "y", String.valueOf(center.getBlockY()),
-                                "z", String.valueOf(center.getBlockZ())
+                                "worldname", targetLoc.getWorld().getName(),
+                                "x", String.valueOf(targetLoc.getBlockX()),
+                                "y", String.valueOf(targetLoc.getBlockY()),
+                                "z", String.valueOf(targetLoc.getBlockZ())
                         );
                     }
                 }
