@@ -123,14 +123,6 @@ public class RandomSearcher {
     }
 
     /**
-     * Get the seed of this random searcher. Returns -1 if none was set.
-     * @return The seed or -1
-     */
-    public long getSeed() {
-        return seed;
-    }
-
-    /**
      * Set the seed that should be used when selecting locations. See {@link Random#setSeed(long)}.
      * @param seed The seed.
      */
@@ -144,11 +136,11 @@ public class RandomSearcher {
     }
 
     /**
-     * Get the random instance that is used for finding locations
-     * @return The random instance; {@link RandomTeleport#RANDOM} by default
+     * Get the seed of this random searcher. Returns -1 if none was set.
+     * @return The seed or -1
      */
-    public Random getRandom() {
-        return random;
+    public long getSeed() {
+        return seed;
     }
 
     /**
@@ -157,6 +149,14 @@ public class RandomSearcher {
      */
     public void setRandom(Random random) {
         this.random = random;
+    }
+
+    /**
+     * Get the random instance that is used for finding locations
+     * @return The random instance; {@link RandomTeleport#RANDOM} by default
+     */
+    public Random getRandom() {
+        return random;
     }
 
     /**
