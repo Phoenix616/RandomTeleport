@@ -23,6 +23,7 @@ import de.themoep.randomteleport.ValidatorRegistry;
 import de.themoep.randomteleport.searcher.options.NotFoundException;
 import de.themoep.randomteleport.searcher.validators.LocationValidator;
 import io.papermc.lib.PaperLib;
+import java.util.Arrays;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -45,7 +46,7 @@ public class RandomSearcher {
 
     private ValidatorRegistry validators = new ValidatorRegistry();
 
-    private static final List<int[]> RANDOM_LIST = new ArrayList<int[]>();
+    private static final List<int[]> RANDOM_LIST = new ArrayList<>();
     static {
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
@@ -72,13 +73,14 @@ public class RandomSearcher {
 
     private CompletableFuture<Location> future = null;
 
-    public RandomSearcher(RandomTeleport plugin, CommandSender initiator, Location center, int minRadius, int maxRadius) {
+    public RandomSearcher(RandomTeleport plugin, CommandSender initiator, Location center, int minRadius, int maxRadius, LocationValidator... validators) {
         this.plugin = plugin;
         this.initiator = initiator;
         setCenter(center);
         setMinRadius(minRadius);
         setMaxRadius(maxRadius);
-        validators.getRaw().putAll(plugin.getLocationValidators().getRaw());
+        this.validators.getRaw().putAll(plugin.getLocationValidators().getRaw());
+        Arrays.asList(validators).forEach(this.validators::add);
     }
 
     /**
