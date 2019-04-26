@@ -101,8 +101,7 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
                 .map(s -> {
                     Material mat = Material.matchMaterial(s);
                     if (mat == null) {
-                        getLogger().log(Level.WARNING,
-                                "Error in save-blocks config! No material found with name " + s);
+                        getLogger().log(Level.WARNING, "Error in save-blocks config! No material found with name " + s);
                     }
                     return mat;
                 })
@@ -112,8 +111,7 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
                 .map(s -> {
                     Material mat = Material.matchMaterial(s);
                     if (mat == null) {
-                        getLogger().log(Level.WARNING,
-                                "Error in unsave-blocks config! No material found with name " + s);
+                        getLogger().log(Level.WARNING, "Error in unsave-blocks config! No material found with name " + s);
                     }
                     return mat;
                 })
@@ -206,8 +204,7 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
             }
             return false;
         }));
-        addOptionParser(
-                new SimpleOptionParser(array("g", "generated", "l", "loaded"), (searcher, args) -> {
+        addOptionParser(new SimpleOptionParser(array("g", "generated", "l", "loaded"), (searcher, args) -> {
                     // loaded is removed as we load chunks async which should no longer lead to performance issues
                     // now it just works like the new "generated" option where it only checks generated chunks
                     searcher.searchInGeneratedOnly(true);
@@ -239,8 +236,7 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
         return runningSearchers;
     }
 
-    public boolean sendMessage(Collection<? extends CommandSender> senders, String key,
-            String... replacements) {
+    public boolean sendMessage(Collection<? extends CommandSender> senders, String key, String... replacements) {
         boolean r = false;
         for (CommandSender sender : senders) {
             r |= sendMessage(sender, key, replacements);
@@ -344,8 +340,7 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
                         "z", String.valueOf(targetLoc.getBlockZ())
                 );
                 if (searcher.getOptions().containsKey("spawnpoint") && e instanceof Player) {
-                    if (((Player) e).getBedSpawnLocation() == null || "force"
-                            .equalsIgnoreCase(searcher.getOptions().get("spawnpoint"))) {
+                    if (((Player) e).getBedSpawnLocation() == null || "force".equalsIgnoreCase(searcher.getOptions().get("spawnpoint"))) {
                         ((Player) e).setBedSpawnLocation(targetLoc, true);
                         sendMessage(e, "setspawnpoint",
                                 "worldname", targetLoc.getWorld().getName(),

@@ -227,8 +227,7 @@ public class RandomSearcher {
     }
 
     /**
-     * By default it will search for coordinates in any chunk, even ungenerated ones prompting the world to get generated at the point which might result in some performance
-     * impact. This disables that and only searches in already generated chunks.
+     * By default it will search for coordinates in any chunk, even ungenerated ones prompting the world to get generated at the point which might result in some performance impact. This disables that and only searches in already generated chunks.
      *
      * @param generatedOnly Whether or not to search in generated chunks only
      */
