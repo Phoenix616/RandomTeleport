@@ -35,11 +35,9 @@ public interface RandomTeleportAPI {
      * @param minRange the minimum distance a found location has to the center location
      * @param maxRange the maximum distance a found location has to the center location
      * @param validators additional LocationValidators to customize validity check of a location
-     * @return a random Location
-     * @throws ExecutionException see {@link CompletableFuture#get()}
-     * @throws InterruptedException see {@link CompletableFuture#get()}
+     * @return a random CompletableFuture<Location>
      */
-    Location getRandomLocation(Player player, Location center, int minRange, int maxRange, LocationValidator... validators) throws ExecutionException, InterruptedException;
+    CompletableFuture<Location> getRandomLocation(Player player, Location center, int minRange, int maxRange, LocationValidator... validators);
 
     /**
      * Teleports the passed Player to a random Location
@@ -49,8 +47,6 @@ public interface RandomTeleportAPI {
      * @param minRange the minimum distance a found location has to the center location
      * @param maxRange the maximum distance a found location has to the center location
      * @param validators additional LocationValidators to customize validity check of a location
-     * @throws ExecutionException see {@link CompletableFuture#get()}
-     * @throws InterruptedException see {@link CompletableFuture#get()}
      */
     void teleportToRandomLocation(Player player, Location center, int minRange, int maxRange, LocationValidator... validators) throws ExecutionException, InterruptedException;
 
