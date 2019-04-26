@@ -20,11 +20,10 @@ package de.themoep.randomteleport.api;
 
 import de.themoep.randomteleport.searcher.RandomSearcher;
 import de.themoep.randomteleport.searcher.validators.LocationValidator;
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
-
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 public interface RandomTeleportAPI {
 
@@ -32,48 +31,48 @@ public interface RandomTeleportAPI {
     /**
      * Returns a random Location
      *
-     * @param player     the Player initiating the search
-     * @param center     the location where the search should begin
-     * @param minRange   the minimum distance a found location has to the center location
-     * @param maxRange   the maximum distance a found location has to the center location
+     * @param player the Player initiating the search
+     * @param center the location where the search should begin
+     * @param minRange the minimum distance a found location has to the center location
+     * @param maxRange the maximum distance a found location has to the center location
      * @param validators additional LocationValidators to customize validity check of a location
      * @return a random Location
-     * @throws ExecutionException   see {@link CompletableFuture#get()}
+     * @throws ExecutionException see {@link CompletableFuture#get()}
      * @throws InterruptedException see {@link CompletableFuture#get()}
      */
     Location getRandomLocation(Player player, Location center, int minRange, int maxRange,
-                               LocationValidator... validators)
-            throws ExecutionException, InterruptedException;
+        LocationValidator... validators)
+        throws ExecutionException, InterruptedException;
 
     /**
      * Teleports the passed Player to a random Location
      *
-     * @param player     the Player initiating the search
-     * @param center     the location where the search should begin
-     * @param minRange   the minimum distance a found location has to the center location
-     * @param maxRange   the maximum distance a found location has to the center location
+     * @param player the Player initiating the search
+     * @param center the location where the search should begin
+     * @param minRange the minimum distance a found location has to the center location
+     * @param maxRange the maximum distance a found location has to the center location
      * @param validators additional LocationValidators to customize validity check of a location
-     * @throws ExecutionException   see {@link CompletableFuture#get()}
+     * @throws ExecutionException see {@link CompletableFuture#get()}
      * @throws InterruptedException see {@link CompletableFuture#get()}
      */
     void teleportToRandomLocation(Player player, Location center, int minRange, int maxRange,
-                                  LocationValidator... validators)
-            throws ExecutionException, InterruptedException;
+        LocationValidator... validators)
+        throws ExecutionException, InterruptedException;
 
     /**
      * Creates a RandomSearcher instance with the passed parameters
      *
-     * @param player     the Player initiating the search
-     * @param center     the location where the search should begin
-     * @param minRange   the minimum distance a found location has to the center location
-     * @param maxRange   the maximum distance a found location has to the center location
+     * @param player the Player initiating the search
+     * @param center the location where the search should begin
+     * @param minRange the minimum distance a found location has to the center location
+     * @param maxRange the maximum distance a found location has to the center location
      * @param validators additional LocationValidators to customize validity check of a location
      * @return a randomSearcher instance
-     * @throws ExecutionException   see {@link CompletableFuture#get()}
+     * @throws ExecutionException see {@link CompletableFuture#get()}
      * @throws InterruptedException see {@link CompletableFuture#get()}
      */
     RandomSearcher getRandomSearcher(Player player, Location center, int minRange, int maxRange,
-                                     LocationValidator... validators)
-            throws ExecutionException, InterruptedException;
+        LocationValidator... validators)
+        throws ExecutionException, InterruptedException;
 
 }

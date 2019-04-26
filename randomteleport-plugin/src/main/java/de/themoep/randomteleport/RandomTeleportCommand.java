@@ -19,6 +19,7 @@ package de.themoep.randomteleport;
  */
 
 import de.themoep.randomteleport.searcher.RandomSearcher;
+import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.BlockCommandSender;
@@ -28,13 +29,21 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-import java.util.logging.Level;
-
 public class RandomTeleportCommand implements CommandExecutor {
+
     private final RandomTeleport plugin;
 
     public RandomTeleportCommand(RandomTeleport plugin) {
         this.plugin = plugin;
+    }
+
+    private static Location getLocation(CommandSender sender) {
+        if (sender instanceof Entity) {
+            return ((Entity) sender).getLocation();
+        } else if (sender instanceof BlockCommandSender) {
+            return ((BlockCommandSender) sender).getBlock().getLocation();
+        }
+        return new Location(Bukkit.getWorlds().get(0), 0, 0, 0);
     }
 
     @Override
@@ -52,7 +61,8 @@ public class RandomTeleportCommand implements CommandExecutor {
             } else if ("--stat".equalsIgnoreCase(args[0])) {
                 //TODO: teleporter and searcher statistics
             } else if (sender instanceof Player) {
-                runPreset(args[0].toLowerCase(), sender, (Player) sender, ((Player) sender).getLocation());
+                runPreset(args[0].toLowerCase(), sender, (Player) sender,
+                    ((Player) sender).getLocation());
                 return true;
             }
         } else {
@@ -78,11 +88,12 @@ public class RandomTeleportCommand implements CommandExecutor {
     private void runPreset(String preset, CommandSender sender, Player target, Location center) {
         if (!sender.hasPermission("randomteleport.presets." + preset)) {
             plugin.sendMessage(sender, "error.no-permission.preset",
-                    "preset", preset, "perm",
-                    "randomteleport.presets." + preset
+                "preset", preset, "perm",
+                "randomteleport.presets." + preset
             );
         } else if (sender != target && !sender.hasPermission("randomteleport.tpothers")) {
-            plugin.sendMessage(sender, "error.no-permission.tp-others", "perm", "randomteleport.tpothers");
+            plugin.sendMessage(sender, "error.no-permission.tp-others", "perm",
+                "randomteleport.tpothers");
         } else if (plugin.getConfig().getString("presets." + preset) == null) {
             plugin.sendMessage(sender, "error.preset-doesnt-exist", "preset", preset);
         } else {
@@ -102,14 +113,5 @@ public class RandomTeleportCommand implements CommandExecutor {
                 plugin.getLogger().log(Level.SEVERE, "Error while parsing preset " + preset, e);
             }
         }
-    }
-
-    private static Location getLocation(CommandSender sender) {
-        if (sender instanceof Entity) {
-            return ((Entity) sender).getLocation();
-        } else if (sender instanceof BlockCommandSender) {
-            return ((BlockCommandSender) sender).getBlock().getLocation();
-        }
-        return new Location(Bukkit.getWorlds().get(0), 0, 0, 0);
     }
 }
