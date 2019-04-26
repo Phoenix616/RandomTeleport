@@ -76,8 +76,7 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
     private Set<String> signVariables;
 
     /**
-     * Utility method to create arrays with a nicer syntax. Seriously, why does Java not just accept
-     * {"string"} as parameters?!?
+     * Utility method to create arrays with a nicer syntax. Seriously, why does Java not just accept {"string"} as parameters?!?
      *
      * @param array The array values
      * @return The same array
