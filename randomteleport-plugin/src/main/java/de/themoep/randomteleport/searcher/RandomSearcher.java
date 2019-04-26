@@ -227,20 +227,20 @@ public class RandomSearcher {
     }
 
     /**
-     * Get the cooldown that a player has to wait before using a searcher with similar settings again
-     * @return The cooldown in seconds
-     */
-    public int getCooldown() {
-        return cooldown;
-    }
-
-    /**
      * Set the cooldown that a player has to wait before using a searcher with similar settings again
      * @param cooldown The cooldown in seconds
      */
     public void setCooldown(int cooldown) {
         Validate.isTrue(cooldown >= 0, "Cooldown can't be negative!");
         this.cooldown = cooldown;
+    }
+
+    /**
+     * Get the cooldown that a player has to wait before using a searcher with similar settings again
+     * @return The cooldown in seconds
+     */
+    public int getCooldown() {
+        return cooldown;
     }
 
     /**
