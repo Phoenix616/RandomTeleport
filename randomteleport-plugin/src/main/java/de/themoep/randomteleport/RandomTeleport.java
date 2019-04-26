@@ -117,9 +117,7 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
                 })
                 .filter(Objects::nonNull)
                 .toArray(Material[]::new);
-        signVariables = getConfig().getStringList("sign-variables").stream()
-                .map(String::toLowerCase)
-                .collect(Collectors.toSet());
+        signVariables = getConfig().getStringList("sign-variables").stream().map(String::toLowerCase).collect(Collectors.toSet());
         lang = new LanguageManager(this, getConfig().getString("lang"));
         lang.setPlaceholderPrefix("{");
         lang.setPlaceholderSuffix("}");
@@ -205,11 +203,11 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
             return false;
         }));
         addOptionParser(new SimpleOptionParser(array("g", "generated", "l", "loaded"), (searcher, args) -> {
-                    // loaded is removed as we load chunks async which should no longer lead to performance issues
-                    // now it just works like the new "generated" option where it only checks generated chunks
-                    searcher.searchInGeneratedOnly(true);
-                    return true;
-                }));
+            // loaded is removed as we load chunks async which should no longer lead to performance issues
+            // now it just works like the new "generated" option where it only checks generated chunks
+            searcher.searchInGeneratedOnly(true);
+            return true;
+        }));
         addOptionParser(new SimpleOptionParser(array("id"), (searcher, args) -> {
             if (args.length > 0) {
                 searcher.setId(args[0]);
@@ -229,7 +227,6 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
 
     /**
      * Get the map of all running searchers
-     *
      * @return The map of running searchers
      */
     public Map<UUID, RandomSearcher> getRunningSearchers() {
@@ -263,6 +260,7 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
 
     /**
      *
+     * @return
      */
     public List<OptionParser> getOptionParsers() {
         return optionParsers;
@@ -270,7 +268,6 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
 
     /**
      * Add an option parser to this plugin
-     *
      * @param parser The parser to add
      */
     public void addOptionParser(OptionParser parser) {
@@ -279,7 +276,6 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
 
     /**
      * Check whether or not a sign line matches the configured variables
-     *
      * @param line The line to match
      * @return <tt>true</tt> if it matches; <tt>false</tt> if not
      */
@@ -289,17 +285,15 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
 
     /**
      * Create and run a searcher using specified args the same way the command does
-     *
      * @param sender The sender of the command
      * @param center The center location for the searcher
      * @param args The arguments to parse
+     *
      * @return Returns the searcher that is running or null if it was stopped due to a cooldown
      * @throws IllegalArgumentException Thrown when arguments couldn't be handled properly
      */
     public RandomSearcher parseAndRun(CommandSender sender, Location center, String[] args) {
-        RandomSearcher searcher = new RandomSearcher(this, sender, center,
-                Integer.parseInt(args[0]),
-                Integer.parseInt(args[1]));
+        RandomSearcher searcher = new RandomSearcher(this, sender, center, Integer.parseInt(args[0]), Integer.parseInt(args[1]));
 
         String[] optionArgs = Arrays.copyOfRange(args, 2, args.length);
         for (OptionParser parser : getOptionParsers()) {
@@ -309,8 +303,7 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
         int cooldown = 0;
 
         for (Entity target : searcher.getTargets()) {
-            Map.Entry<Long, Integer> lastUse = cooldowns
-                    .get(searcher.getId(), target.getUniqueId());
+            Map.Entry<Long, Integer> lastUse = cooldowns.get(searcher.getId(), target.getUniqueId());
             if (lastUse != null) {
                 int targetCooldown = (int) ((System.currentTimeMillis() - lastUse.getKey()) / 1000);
                 if (targetCooldown > cooldown) {
@@ -340,7 +333,7 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
                         "z", String.valueOf(targetLoc.getBlockZ())
                 );
                 if (searcher.getOptions().containsKey("spawnpoint") && e instanceof Player) {
-                    if (((Player) e).getBedSpawnLocation() == null || "force".equalsIgnoreCase(searcher.getOptions().get("spawnpoint"))) {
+                    if (((Player) e).getBedSpawnLocation() == null || "force".equalsIgnoreCase(searcher.getOptions().get("spawnpoint"))){
                         ((Player) e).setBedSpawnLocation(targetLoc, true);
                         sendMessage(e, "setspawnpoint",
                                 "worldname", targetLoc.getWorld().getName(),
@@ -363,15 +356,13 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
 
     /**
      * Run a preset
-     *
      * @param sender The sender that executed the preset
      * @param preset The preset ID to run
      * @param target The player targeted by the teleporter
      * @param center The center for the search
      * @return The RandomSearcher instance that is searching
      */
-    public RandomSearcher runPreset(CommandSender sender, String preset, Player target,
-            Location center) {
+    public RandomSearcher runPreset(CommandSender sender, String preset, Player target, Location center){
         String cmd = getConfig().getString("presets." + preset) + " -p " + target.getName();
         if (cmd.startsWith("/")) {
             cmd = cmd.substring(1);
