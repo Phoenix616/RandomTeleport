@@ -24,33 +24,9 @@ import de.themoep.randomteleport.api.RandomTeleportAPI;
 import de.themoep.randomteleport.hook.HookManager;
 import de.themoep.randomteleport.listeners.SignListener;
 import de.themoep.randomteleport.searcher.RandomSearcher;
-import de.themoep.randomteleport.searcher.options.AdditionalOptionParser;
-import de.themoep.randomteleport.searcher.options.NotFoundException;
-import de.themoep.randomteleport.searcher.options.OptionParser;
-import de.themoep.randomteleport.searcher.options.PlayerNotFoundException;
-import de.themoep.randomteleport.searcher.options.SimpleOptionParser;
-import de.themoep.randomteleport.searcher.options.WorldNotFoundException;
-import de.themoep.randomteleport.searcher.validators.BiomeValidator;
-import de.themoep.randomteleport.searcher.validators.BlockValidator;
-import de.themoep.randomteleport.searcher.validators.HeightValidator;
-import de.themoep.randomteleport.searcher.validators.LocationValidator;
-import de.themoep.randomteleport.searcher.validators.ProtectionValidator;
-import de.themoep.randomteleport.searcher.validators.WorldborderValidator;
+import de.themoep.randomteleport.searcher.options.*;
+import de.themoep.randomteleport.searcher.validators.*;
 import de.themoep.utils.lang.bukkit.LanguageManager;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Random;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ExecutionException;
-import java.util.logging.Level;
-import java.util.stream.Collectors;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -59,6 +35,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
 
@@ -99,30 +80,30 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
         saveDefaultConfig();
         reloadConfig();
         saveBlocks = getConfig().getStringList("save-blocks").stream()
-            .map(s -> {
-                Material mat = Material.matchMaterial(s);
-                if (mat == null) {
-                    getLogger().log(Level.WARNING,
-                        "Error in save-blocks config! No material found with name " + s);
-                }
-                return mat;
-            })
-            .filter(Objects::nonNull)
-            .toArray(Material[]::new);
+                .map(s -> {
+                    Material mat = Material.matchMaterial(s);
+                    if (mat == null) {
+                        getLogger().log(Level.WARNING,
+                                "Error in save-blocks config! No material found with name " + s);
+                    }
+                    return mat;
+                })
+                .filter(Objects::nonNull)
+                .toArray(Material[]::new);
         unsaveBlocks = getConfig().getStringList("unsave-blocks").stream()
-            .map(s -> {
-                Material mat = Material.matchMaterial(s);
-                if (mat == null) {
-                    getLogger().log(Level.WARNING,
-                        "Error in unsave-blocks config! No material found with name " + s);
-                }
-                return mat;
-            })
-            .filter(Objects::nonNull)
-            .toArray(Material[]::new);
+                .map(s -> {
+                    Material mat = Material.matchMaterial(s);
+                    if (mat == null) {
+                        getLogger().log(Level.WARNING,
+                                "Error in unsave-blocks config! No material found with name " + s);
+                    }
+                    return mat;
+                })
+                .filter(Objects::nonNull)
+                .toArray(Material[]::new);
         signVariables = getConfig().getStringList("sign-variables").stream()
-            .map(String::toLowerCase)
-            .collect(Collectors.toSet());
+                .map(String::toLowerCase)
+                .collect(Collectors.toSet());
         lang = new LanguageManager(this, getConfig().getString("lang"));
         lang.setPlaceholderPrefix("{");
         lang.setPlaceholderSuffix("}");
@@ -208,12 +189,12 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
             return false;
         }));
         addOptionParser(
-            new SimpleOptionParser(array("g", "generated", "l", "loaded"), (searcher, args) -> {
-                // loaded is removed as we load chunks async which should no longer lead to performance issues
-                // now it just works like the new "generated" option where it only checks generated chunks
-                searcher.searchInGeneratedOnly(true);
-                return true;
-            }));
+                new SimpleOptionParser(array("g", "generated", "l", "loaded"), (searcher, args) -> {
+                    // loaded is removed as we load chunks async which should no longer lead to performance issues
+                    // now it just works like the new "generated" option where it only checks generated chunks
+                    searcher.searchInGeneratedOnly(true);
+                    return true;
+                }));
         addOptionParser(new SimpleOptionParser(array("id"), (searcher, args) -> {
             if (args.length > 0) {
                 searcher.setId(args[0]);
@@ -241,7 +222,7 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
     }
 
     public boolean sendMessage(Collection<? extends CommandSender> senders, String key,
-        String... replacements) {
+                               String... replacements) {
         boolean r = false;
         for (CommandSender sender : senders) {
             r |= sendMessage(sender, key, replacements);
@@ -297,14 +278,14 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
      *
      * @param sender The sender of the command
      * @param center The center location for the searcher
-     * @param args The arguments to parse
+     * @param args   The arguments to parse
      * @return Returns the searcher that is running or null if it was stopped due to a cooldown
      * @throws IllegalArgumentException Thrown when arguments couldn't be handled properly
      */
     public RandomSearcher parseAndRun(CommandSender sender, Location center, String[] args) {
         RandomSearcher searcher = new RandomSearcher(this, sender, center,
-            Integer.parseInt(args[0]),
-            Integer.parseInt(args[1]));
+                Integer.parseInt(args[0]),
+                Integer.parseInt(args[1]));
 
         String[] optionArgs = Arrays.copyOfRange(args, 2, args.length);
         for (OptionParser parser : getOptionParsers()) {
@@ -315,7 +296,7 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
 
         for (Entity target : searcher.getTargets()) {
             Map.Entry<Long, Integer> lastUse = cooldowns
-                .get(searcher.getId(), target.getUniqueId());
+                    .get(searcher.getId(), target.getUniqueId());
             if (lastUse != null) {
                 int targetCooldown = (int) ((System.currentTimeMillis() - lastUse.getKey()) / 1000);
                 if (targetCooldown > cooldown) {
@@ -326,33 +307,33 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
 
         if (cooldown > 0 && cooldown < searcher.getCooldown()) {
             sendMessage(searcher.getTargets(), "error.cooldown", "cooldown_text",
-                (searcher.getCooldown() - cooldown) + "s");
+                    (searcher.getCooldown() - cooldown) + "s");
             return null;
         }
         sendMessage(searcher.getTargets(), "search", "worldname",
-            searcher.getCenter().getWorld().getName());
+                searcher.getCenter().getWorld().getName());
         searcher.search().thenApply(targetLoc -> {
             targetLoc.add(0, 1, 0);
             searcher.getTargets().forEach(e -> {
                 cooldowns.put(searcher.getId(), e.getUniqueId(),
-                    new AbstractMap.SimpleImmutableEntry<>(System.currentTimeMillis(),
-                        searcher.getCooldown()));
+                        new AbstractMap.SimpleImmutableEntry<>(System.currentTimeMillis(),
+                                searcher.getCooldown()));
                 e.teleport(targetLoc);
                 sendMessage(e, "teleport",
-                    "worldname", targetLoc.getWorld().getName(),
-                    "x", String.valueOf(targetLoc.getBlockX()),
-                    "y", String.valueOf(targetLoc.getBlockY()),
-                    "z", String.valueOf(targetLoc.getBlockZ())
+                        "worldname", targetLoc.getWorld().getName(),
+                        "x", String.valueOf(targetLoc.getBlockX()),
+                        "y", String.valueOf(targetLoc.getBlockY()),
+                        "z", String.valueOf(targetLoc.getBlockZ())
                 );
                 if (searcher.getOptions().containsKey("spawnpoint") && e instanceof Player) {
                     if (((Player) e).getBedSpawnLocation() == null || "force"
-                        .equalsIgnoreCase(searcher.getOptions().get("spawnpoint"))) {
+                            .equalsIgnoreCase(searcher.getOptions().get("spawnpoint"))) {
                         ((Player) e).setBedSpawnLocation(targetLoc, true);
                         sendMessage(e, "setspawnpoint",
-                            "worldname", targetLoc.getWorld().getName(),
-                            "x", String.valueOf(targetLoc.getBlockX()),
-                            "y", String.valueOf(targetLoc.getBlockY()),
-                            "z", String.valueOf(targetLoc.getBlockZ())
+                                "worldname", targetLoc.getWorld().getName(),
+                                "x", String.valueOf(targetLoc.getBlockX()),
+                                "y", String.valueOf(targetLoc.getBlockY()),
+                                "z", String.valueOf(targetLoc.getBlockZ())
                         );
                     }
                 }
@@ -377,7 +358,7 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
      * @return The RandomSearcher instance that is searching
      */
     public RandomSearcher runPreset(CommandSender sender, String preset, Player target,
-        Location center) {
+                                    Location center) {
         String cmd = getConfig().getString("presets." + preset) + " -p " + target.getName();
         if (cmd.startsWith("/")) {
             cmd = cmd.substring(1);
@@ -390,20 +371,20 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
 
     @Override
     public Location getRandomLocation(Player player, Location origin, int minRange, int maxRange,
-        LocationValidator... validators)
-        throws ExecutionException, InterruptedException {
+                                      LocationValidator... validators)
+            throws ExecutionException, InterruptedException {
         return getRandomSearcher(player, origin, minRange, maxRange, validators).search().get();
     }
 
     @Override
     public void teleportToRandomLocation(Player player, Location origin, int minRange, int maxRange,
-        LocationValidator... validators) throws ExecutionException, InterruptedException {
+                                         LocationValidator... validators) throws ExecutionException, InterruptedException {
         player.teleport(getRandomLocation(player, origin, minRange, maxRange, validators));
     }
 
     @Override
     public RandomSearcher getRandomSearcher(Player player, Location origin, int minRange,
-        int maxRange, LocationValidator... validators) {
+                                            int maxRange, LocationValidator... validators) {
         return new RandomSearcher(this, player, origin, minRange, maxRange, validators);
     }
 }

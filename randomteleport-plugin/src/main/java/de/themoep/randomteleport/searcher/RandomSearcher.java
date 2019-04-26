@@ -23,20 +23,13 @@ import de.themoep.randomteleport.ValidatorRegistry;
 import de.themoep.randomteleport.searcher.options.NotFoundException;
 import de.themoep.randomteleport.searcher.validators.LocationValidator;
 import io.papermc.lib.PaperLib;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
+
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public class RandomSearcher {
 
@@ -73,7 +66,7 @@ public class RandomSearcher {
     private CompletableFuture<Location> future = null;
 
     public RandomSearcher(RandomTeleport plugin, CommandSender initiator, Location center,
-        int minRadius, int maxRadius, LocationValidator... validators) {
+                          int minRadius, int maxRadius, LocationValidator... validators) {
         this.plugin = plugin;
         this.initiator = initiator;
         setCenter(center);
@@ -204,7 +197,7 @@ public class RandomSearcher {
      */
     public void setMinRadius(int minRadius) {
         Validate.isTrue(minRadius >= 0 && minRadius < maxRadius,
-            "Min radius has to be positive and less than the max radius!");
+                "Min radius has to be positive and less than the max radius!");
         this.minRadius = minRadius;
     }
 
@@ -301,11 +294,11 @@ public class RandomSearcher {
         randomLoc.setY(0);
         do {
             randomLoc.setX(
-                center.getBlockX() + (random.nextBoolean() ? 1 : -1) * random.nextInt(maxRadius));
+                    center.getBlockX() + (random.nextBoolean() ? 1 : -1) * random.nextInt(maxRadius));
         } while (!inRange(randomLoc.getBlockX(), center.getBlockX()));
         do {
             randomLoc.setZ(
-                center.getBlockZ() + (random.nextBoolean() ? 1 : -1) * random.nextInt(maxRadius));
+                    center.getBlockZ() + (random.nextBoolean() ? 1 : -1) * random.nextInt(maxRadius));
         } while (!inRange(randomLoc.getBlockZ(), center.getBlockX()));
         randomLoc.setX((randomLoc.getBlockX() >> 4) * 16);
         randomLoc.setZ((randomLoc.getBlockZ() >> 4) * 16);
@@ -319,7 +312,7 @@ public class RandomSearcher {
                 }
                 boolean validated = true;
                 Location loc = randomLoc.clone()
-                    .add(RANDOM_LIST.get(index)[0], 0, RANDOM_LIST.get(index)[1]);
+                        .add(RANDOM_LIST.get(index)[0], 0, RANDOM_LIST.get(index)[1]);
 
                 if (!inRadius(loc)) {
                     continue;
@@ -348,7 +341,7 @@ public class RandomSearcher {
 
     private boolean inRadius(Location location) {
         return inRange(location.getBlockX(), center.getBlockX())
-            || inRange(location.getBlockZ(), center.getBlockZ());
+                || inRange(location.getBlockZ(), center.getBlockZ());
     }
 
     private boolean inRange(int coord, int check) {
@@ -381,14 +374,14 @@ public class RandomSearcher {
     @Override
     public String toString() {
         return "RandomSearcher{" +
-            "id='" + id + '\'' +
-            ", seed=" + seed +
-            ", center=" + center +
-            ", minRadius=" + minRadius +
-            ", maxRadius=" + maxRadius +
-            ", generatedOnly=" + generatedOnly +
-            ", maxChecks=" + maxChecks +
-            ", cooldown=" + cooldown +
-            '}';
+                "id='" + id + '\'' +
+                ", seed=" + seed +
+                ", center=" + center +
+                ", minRadius=" + minRadius +
+                ", maxRadius=" + maxRadius +
+                ", generatedOnly=" + generatedOnly +
+                ", maxChecks=" + maxChecks +
+                ", cooldown=" + cooldown +
+                '}';
     }
 }
