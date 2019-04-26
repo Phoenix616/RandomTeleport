@@ -27,7 +27,6 @@ import org.bukkit.entity.Player;
 
 public interface RandomTeleportAPI {
 
-
     /**
      * Returns a random Location
      *
@@ -68,5 +67,4 @@ public interface RandomTeleportAPI {
      * @throws InterruptedException see {@link CompletableFuture#get()}
      */
     RandomSearcher getRandomSearcher(Player player, Location center, int minRange, int maxRange, LocationValidator... validators) throws ExecutionException, InterruptedException;
-
 }
