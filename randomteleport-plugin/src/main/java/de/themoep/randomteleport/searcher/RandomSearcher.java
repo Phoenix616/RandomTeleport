@@ -211,7 +211,9 @@ public class RandomSearcher {
     }
 
     /**
-     * By default it will search for coordinates in any chunk, even ungenerated ones prompting the world to get generated at the point which might result in some performance impact. This disables that and only searches in already generated chunks.
+     * By default it will search for coordinates in any chunk, even ungenerated ones prompting the world to get
+     * generated at the point which might result in some performance impact. This disables that and only searches
+     * in already generated chunks.
      * @param generatedOnly Whether or not to search in generated chunks only
      */
     public void searchInGeneratedOnly(boolean generatedOnly) {
@@ -237,7 +239,7 @@ public class RandomSearcher {
 
     /**
      * Get the cooldown that a player has to wait before using a searcher with similar settings again
-     * @return The cooldown in seconds
+     * @return  The cooldown in seconds
      */
     public int getCooldown() {
         return cooldown;
