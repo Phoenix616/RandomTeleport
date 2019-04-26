@@ -211,7 +211,6 @@ public class RandomSearcher {
 
     /**
      * By default it will search for coordinates in any chunk, even ungenerated ones prompting the world to get generated at the point which might result in some performance impact. This disables that and only searches in already generated chunks.
-     *
      * @param generatedOnly Whether or not to search in generated chunks only
      */
     public void searchInGeneratedOnly(boolean generatedOnly) {
@@ -228,7 +227,6 @@ public class RandomSearcher {
 
     /**
      * Get the cooldown that a player has to wait before using a searcher with similar settings again
-     *
      * @return The cooldown in seconds
      */
     public int getCooldown() {
@@ -237,7 +235,6 @@ public class RandomSearcher {
 
     /**
      * Set the cooldown that a player has to wait before using a searcher with similar settings again
-     *
      * @param cooldown The cooldown in seconds
      */
     public void setCooldown(int cooldown) {
@@ -247,7 +244,6 @@ public class RandomSearcher {
 
     /**
      * Get additional options
-     *
      * @return A map of additional options
      */
     public Map<String, String> getOptions() {
@@ -256,7 +252,6 @@ public class RandomSearcher {
 
     /**
      * Search for a valid location
-     *
      * @return A CompletableFuture for when the search task is complete
      */
     public CompletableFuture<Location> search() {
@@ -278,8 +273,7 @@ public class RandomSearcher {
         Location randomLoc = center.clone();
         randomLoc.setY(0);
         do {
-            randomLoc.setX(
-                    center.getBlockX() + (random.nextBoolean() ? 1 : -1) * random.nextInt(maxRadius));
+            randomLoc.setX(center.getBlockX() + (random.nextBoolean() ? 1 : -1) * random.nextInt(maxRadius));
         } while (!inRange(randomLoc.getBlockX(), center.getBlockX()));
         do {
             randomLoc.setZ(center.getBlockZ() + (random.nextBoolean() ? 1 : -1) * random.nextInt(maxRadius));
