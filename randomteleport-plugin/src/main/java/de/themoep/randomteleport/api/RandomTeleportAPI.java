@@ -40,9 +40,7 @@ public interface RandomTeleportAPI {
      * @throws ExecutionException see {@link CompletableFuture#get()}
      * @throws InterruptedException see {@link CompletableFuture#get()}
      */
-    Location getRandomLocation(Player player, Location center, int minRange, int maxRange,
-            LocationValidator... validators)
-            throws ExecutionException, InterruptedException;
+    Location getRandomLocation(Player player, Location center, int minRange, int maxRange, LocationValidator... validators) throws ExecutionException, InterruptedException;
 
     /**
      * Teleports the passed Player to a random Location
@@ -55,9 +53,7 @@ public interface RandomTeleportAPI {
      * @throws ExecutionException see {@link CompletableFuture#get()}
      * @throws InterruptedException see {@link CompletableFuture#get()}
      */
-    void teleportToRandomLocation(Player player, Location center, int minRange, int maxRange,
-            LocationValidator... validators)
-            throws ExecutionException, InterruptedException;
+    void teleportToRandomLocation(Player player, Location center, int minRange, int maxRange, LocationValidator... validators) throws ExecutionException, InterruptedException;
 
     /**
      * Creates a RandomSearcher instance with the passed parameters
@@ -71,8 +67,6 @@ public interface RandomTeleportAPI {
      * @throws ExecutionException see {@link CompletableFuture#get()}
      * @throws InterruptedException see {@link CompletableFuture#get()}
      */
-    RandomSearcher getRandomSearcher(Player player, Location center, int minRange, int maxRange,
-            LocationValidator... validators)
-            throws ExecutionException, InterruptedException;
+    RandomSearcher getRandomSearcher(Player player, Location center, int minRange, int maxRange, LocationValidator... validators) throws ExecutionException, InterruptedException;
 
 }
