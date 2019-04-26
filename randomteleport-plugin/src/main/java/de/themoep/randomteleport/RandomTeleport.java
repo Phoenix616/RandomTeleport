@@ -75,16 +75,6 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
     private Material[] unsaveBlocks;
     private Set<String> signVariables;
 
-    /**
-     * Utility method to create arrays with a nicer syntax. Seriously, why does Java not just accept {"string"} as parameters?!?
-     *
-     * @param array The array values
-     * @return The same array
-     */
-    private static <T> T[] array(T... array) {
-        return array;
-    }
-
     public void onEnable() {
         hookManager = new HookManager(this);
         loadConfig();
@@ -233,6 +223,15 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
         return runningSearchers;
     }
 
+    /**
+     * Utility method to create arrays with a nicer syntax. Seriously, why does Java not just accept {"string"} as parameters?!?
+     * @param array The array values
+     * @return The same array
+     */
+    private static <T> T[] array(T... array) {
+        return array;
+    }
+
     public boolean sendMessage(Collection<? extends CommandSender> senders, String key, String... replacements) {
         boolean r = false;
         for (CommandSender sender : senders) {
@@ -285,9 +284,9 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
 
     /**
      * Create and run a searcher using specified args the same way the command does
-     * @param sender The sender of the command
-     * @param center The center location for the searcher
-     * @param args The arguments to parse
+     * @param sender    The sender of the command
+     * @param center    The center location for the searcher
+     * @param args      The arguments to parse
      * @return Returns the searcher that is running or null if it was stopped due to a cooldown
      * @throws IllegalArgumentException Thrown when arguments couldn't be handled properly
      */
