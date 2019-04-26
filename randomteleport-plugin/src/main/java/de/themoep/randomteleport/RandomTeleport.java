@@ -20,6 +20,7 @@ package de.themoep.randomteleport;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import de.themoep.randomteleport.api.RandomTeleportAPI;
 import de.themoep.randomteleport.hook.HookManager;
 import de.themoep.randomteleport.listeners.SignListener;
 import de.themoep.randomteleport.searcher.RandomSearcher;
@@ -32,6 +33,7 @@ import de.themoep.randomteleport.searcher.options.WorldNotFoundException;
 import de.themoep.randomteleport.searcher.validators.BiomeValidator;
 import de.themoep.randomteleport.searcher.validators.BlockValidator;
 import de.themoep.randomteleport.searcher.validators.HeightValidator;
+import de.themoep.randomteleport.searcher.validators.LocationValidator;
 import de.themoep.randomteleport.searcher.validators.ProtectionValidator;
 import de.themoep.randomteleport.searcher.validators.WorldborderValidator;
 import de.themoep.utils.lang.bukkit.LanguageManager;
@@ -55,10 +57,11 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
-public class RandomTeleport extends JavaPlugin {
+public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
 
     public static final Random RANDOM = new Random();
     private HookManager hookManager;
@@ -363,5 +366,20 @@ public class RandomTeleport extends JavaPlugin {
             cmd = cmd.substring(4);
         }
         return parseAndRun(sender, center, cmd.split(" "));
+    }
+
+    @Override
+    public CompletableFuture<Location> getRandomLocation(Player player, Location origin, int minRange, int maxRange, LocationValidator... validators) {
+        return getRandomSearcher(player, origin, minRange, maxRange, validators).search();
+    }
+
+    @Override
+    public CompletableFuture<Boolean> teleportToRandomLocation(Player player, Location origin, int minRange, int maxRange, LocationValidator... validators) {
+        return getRandomLocation(player, origin, minRange, maxRange, validators).thenApply(player::teleport);
+    }
+
+    @Override
+    public RandomSearcher getRandomSearcher(Player player, Location origin, int minRange, int maxRange, LocationValidator... validators) {
+        return new RandomSearcher(this, player, origin, minRange, maxRange, validators);
     }
 }

@@ -29,6 +29,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -72,13 +73,14 @@ public class RandomSearcher {
 
     private CompletableFuture<Location> future = null;
 
-    public RandomSearcher(RandomTeleport plugin, CommandSender initiator, Location center, int minRadius, int maxRadius) {
+    public RandomSearcher(RandomTeleport plugin, CommandSender initiator, Location center, int minRadius, int maxRadius, LocationValidator... validators) {
         this.plugin = plugin;
         this.initiator = initiator;
         setCenter(center);
         setMinRadius(minRadius);
         setMaxRadius(maxRadius);
-        validators.getRaw().putAll(plugin.getLocationValidators().getRaw());
+        this.validators.getRaw().putAll(plugin.getLocationValidators().getRaw());
+        Arrays.asList(validators).forEach(this.validators::add);
     }
 
     /**
