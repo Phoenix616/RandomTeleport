@@ -223,7 +223,8 @@ public class RandomSearcher {
      * @param maxRadius The max radius; has to be greater than the min radius!
      */
     public void setMaxRadius(int maxRadius) {
-        Validate.isTrue(maxRadius > minRadius, "Max radius has to be greater than the min radius!");
+        Validate
+            .isTrue(maxRadius > minRadius, "Max radius has to be greater than the min radius!");
         this.maxRadius = maxRadius;
     }
 
@@ -301,11 +302,13 @@ public class RandomSearcher {
         randomLoc.setY(0);
         do {
             randomLoc.setX(
-                center.getBlockX() + (random.nextBoolean() ? 1 : -1) * random.nextInt(maxRadius));
+                center.getBlockX() + (random.nextBoolean() ? 1 : -1) * random
+                    .nextInt(maxRadius));
         } while (!inRange(randomLoc.getBlockX(), center.getBlockX()));
         do {
             randomLoc.setZ(
-                center.getBlockZ() + (random.nextBoolean() ? 1 : -1) * random.nextInt(maxRadius));
+                center.getBlockZ() + (random.nextBoolean() ? 1 : -1) * random
+                    .nextInt(maxRadius));
         } while (!inRange(randomLoc.getBlockZ(), center.getBlockX()));
         randomLoc.setX((randomLoc.getBlockX() >> 4) * 16);
         randomLoc.setZ((randomLoc.getBlockZ() >> 4) * 16);
