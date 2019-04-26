@@ -279,13 +279,10 @@ public class RandomSearcher {
         randomLoc.setY(0);
         do {
             randomLoc.setX(
-                    center.getBlockX() + (random.nextBoolean() ? 1 : -1) * random
-                            .nextInt(maxRadius));
+                    center.getBlockX() + (random.nextBoolean() ? 1 : -1) * random.nextInt(maxRadius));
         } while (!inRange(randomLoc.getBlockX(), center.getBlockX()));
         do {
-            randomLoc.setZ(
-                    center.getBlockZ() + (random.nextBoolean() ? 1 : -1) * random
-                            .nextInt(maxRadius));
+            randomLoc.setZ(center.getBlockZ() + (random.nextBoolean() ? 1 : -1) * random.nextInt(maxRadius));
         } while (!inRange(randomLoc.getBlockZ(), center.getBlockX()));
         randomLoc.setX((randomLoc.getBlockX() >> 4) * 16);
         randomLoc.setZ((randomLoc.getBlockZ() >> 4) * 16);
@@ -298,8 +295,7 @@ public class RandomSearcher {
                     index = 0;
                 }
                 boolean validated = true;
-                Location loc = randomLoc.clone()
-                        .add(RANDOM_LIST.get(index)[0], 0, RANDOM_LIST.get(index)[1]);
+                Location loc = randomLoc.clone().add(RANDOM_LIST.get(index)[0], 0, RANDOM_LIST.get(index)[1]);
 
                 if (!inRadius(loc)) {
                     continue;
@@ -328,7 +324,7 @@ public class RandomSearcher {
 
     private boolean inRadius(Location location) {
         return inRange(location.getBlockX(), center.getBlockX())
-                || inRange(location.getBlockZ(), center.getBlockZ());
+                || inRange(location.getBlockZ(), center.getBlockZ()) ;
     }
 
     private boolean inRange(int coord, int check) {
@@ -342,7 +338,6 @@ public class RandomSearcher {
 
     /**
      * The sender who initiated this search
-     *
      * @return The initiator
      */
     public CommandSender getInitiator() {
@@ -351,7 +346,6 @@ public class RandomSearcher {
 
     /**
      * Get the currently running search future
-     *
      * @return The currently running search future or null if none is running
      */
     public CompletableFuture<Location> getFuture() {
