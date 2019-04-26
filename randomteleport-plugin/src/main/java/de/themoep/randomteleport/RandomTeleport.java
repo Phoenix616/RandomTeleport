@@ -374,8 +374,8 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
     }
 
     @Override
-    public void teleportToRandomLocation(Player player, Location origin, int minRange, int maxRange, LocationValidator... validators) {
-        getRandomLocation(player, origin, minRange, maxRange, validators).thenApply(player::teleport);
+    public CompletableFuture<Boolean> teleportToRandomLocation(Player player, Location origin, int minRange, int maxRange, LocationValidator... validators) {
+        return getRandomLocation(player, origin, minRange, maxRange, validators).thenApply(player::teleport);
     }
 
     @Override
