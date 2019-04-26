@@ -84,7 +84,6 @@ public class RandomSearcher {
 
     /**
      * Get all entities targeted by this searcher
-     *
      * @return The entitiy to target
      */
     public Set<Entity> getTargets() {
@@ -136,7 +135,7 @@ public class RandomSearcher {
      */
     public void setSeed(long seed) {
         this.seed = seed;
-        if (random == RandomTeleport.RANDOM) {
+        if (random == RandomTeleport.RANDOM ) {
             random = new Random(seed);
         } else {
             random.setSeed(seed);
@@ -189,8 +188,7 @@ public class RandomSearcher {
      * @param minRadius The min radius; has to be positive and less than the max radius!
      */
     public void setMinRadius(int minRadius) {
-        Validate.isTrue(minRadius >= 0 && minRadius < maxRadius,
-                "Min radius has to be positive and less than the max radius!");
+        Validate.isTrue(minRadius >= 0 && minRadius < maxRadius, "Min radius has to be positive and less than the max radius!");
         this.minRadius = minRadius;
     }
 
@@ -207,8 +205,7 @@ public class RandomSearcher {
      * @param maxRadius The max radius; has to be greater than the min radius!
      */
     public void setMaxRadius(int maxRadius) {
-        Validate
-                .isTrue(maxRadius > minRadius, "Max radius has to be greater than the min radius!");
+        Validate.isTrue(maxRadius > minRadius, "Max radius has to be greater than the min radius!");
         this.maxRadius = maxRadius;
     }
 
