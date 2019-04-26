@@ -288,7 +288,6 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
      * @param sender The sender of the command
      * @param center The center location for the searcher
      * @param args The arguments to parse
-     *
      * @return Returns the searcher that is running or null if it was stopped due to a cooldown
      * @throws IllegalArgumentException Thrown when arguments couldn't be handled properly
      */
@@ -313,18 +312,14 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
         }
 
         if (cooldown > 0 && cooldown < searcher.getCooldown()) {
-            sendMessage(searcher.getTargets(), "error.cooldown", "cooldown_text",
-                    (searcher.getCooldown() - cooldown) + "s");
+            sendMessage(searcher.getTargets(), "error.cooldown", "cooldown_text", (searcher.getCooldown() - cooldown) + "s");
             return null;
         }
-        sendMessage(searcher.getTargets(), "search", "worldname",
-                searcher.getCenter().getWorld().getName());
+        sendMessage(searcher.getTargets(), "search", "worldname", searcher.getCenter().getWorld().getName());
         searcher.search().thenApply(targetLoc -> {
             targetLoc.add(0, 1, 0);
             searcher.getTargets().forEach(e -> {
-                cooldowns.put(searcher.getId(), e.getUniqueId(),
-                        new AbstractMap.SimpleImmutableEntry<>(System.currentTimeMillis(),
-                                searcher.getCooldown()));
+                cooldowns.put(searcher.getId(), e.getUniqueId(), new AbstractMap.SimpleImmutableEntry<>(System.currentTimeMillis(), searcher.getCooldown()));
                 e.teleport(targetLoc);
                 sendMessage(e, "teleport",
                         "worldname", targetLoc.getWorld().getName(),
@@ -362,7 +357,7 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
      * @param center The center for the search
      * @return The RandomSearcher instance that is searching
      */
-    public RandomSearcher runPreset(CommandSender sender, String preset, Player target, Location center){
+    public RandomSearcher runPreset(CommandSender sender, String preset, Player target, Location center) {
         String cmd = getConfig().getString("presets." + preset) + " -p " + target.getName();
         if (cmd.startsWith("/")) {
             cmd = cmd.substring(1);
@@ -374,21 +369,17 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
     }
 
     @Override
-    public Location getRandomLocation(Player player, Location origin, int minRange, int maxRange,
-            LocationValidator... validators)
-            throws ExecutionException, InterruptedException {
+    public Location getRandomLocation(Player player, Location origin, int minRange, int maxRange, LocationValidator... validators) throws ExecutionException, InterruptedException {
         return getRandomSearcher(player, origin, minRange, maxRange, validators).search().get();
     }
 
     @Override
-    public void teleportToRandomLocation(Player player, Location origin, int minRange, int maxRange,
-            LocationValidator... validators) throws ExecutionException, InterruptedException {
+    public void teleportToRandomLocation(Player player, Location origin, int minRange, int maxRange, LocationValidator... validators) throws ExecutionException, InterruptedException {
         player.teleport(getRandomLocation(player, origin, minRange, maxRange, validators));
     }
 
     @Override
-    public RandomSearcher getRandomSearcher(Player player, Location origin, int minRange,
-            int maxRange, LocationValidator... validators) {
+    public RandomSearcher getRandomSearcher(Player player, Location origin, int minRange, int maxRange, LocationValidator... validators) {
         return new RandomSearcher(this, player, origin, minRange, maxRange, validators);
     }
 }
