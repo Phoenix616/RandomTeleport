@@ -39,21 +39,21 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 
 public class RandomSearcher {
+    private final RandomTeleport plugin;
+    private final CommandSender initiator;
+    private final UUID uniqueId = UUID.randomUUID();
 
-    private static final List<int[]> RANDOM_LIST = new ArrayList<>();
+    private ValidatorRegistry validators = new ValidatorRegistry();
 
+    private static final List<int[]> RANDOM_LIST = new ArrayList<int[]>();
     static {
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
-                RANDOM_LIST.add(new int[]{x, z});
+                RANDOM_LIST.add(new int[] {x, z});
             }
         }
     }
 
-    private final RandomTeleport plugin;
-    private final CommandSender initiator;
-    private final UUID uniqueId = UUID.randomUUID();
-    private ValidatorRegistry validators = new ValidatorRegistry();
     private Random random = RandomTeleport.RANDOM;
 
     private Set<Entity> targets = Collections.newSetFromMap(new LinkedHashMap<>());
