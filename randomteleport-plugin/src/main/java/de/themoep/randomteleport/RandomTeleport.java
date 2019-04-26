@@ -37,6 +37,15 @@ import de.themoep.randomteleport.searcher.validators.LocationValidator;
 import de.themoep.randomteleport.searcher.validators.ProtectionValidator;
 import de.themoep.randomteleport.searcher.validators.WorldborderValidator;
 import de.themoep.utils.lang.bukkit.LanguageManager;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.block.Biome;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
+
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,14 +60,6 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.block.Biome;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
 public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
 

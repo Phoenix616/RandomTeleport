@@ -22,6 +22,11 @@ import de.themoep.randomteleport.RandomTeleport;
 import de.themoep.randomteleport.ValidatorRegistry;
 import de.themoep.randomteleport.searcher.options.NotFoundException;
 import de.themoep.randomteleport.searcher.validators.LocationValidator;
+import org.apache.commons.lang.Validate;
+import org.bukkit.Location;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
+
 import io.papermc.lib.PaperLib;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,10 +38,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import org.apache.commons.lang.Validate;
-import org.bukkit.Location;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Entity;
+
 
 public class RandomSearcher {
     private final RandomTeleport plugin;
