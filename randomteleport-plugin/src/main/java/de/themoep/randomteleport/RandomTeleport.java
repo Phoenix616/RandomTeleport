@@ -44,6 +44,8 @@ import org.bukkit.block.Biome;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.AbstractMap;
@@ -116,7 +118,7 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
 
     private void initOptionParsers() {
         addOptionParser(new SimpleOptionParser(array("p", "player"), (searcher, args) -> {
-            if (args.length > 0) {
+            if (args.length > 0 && searcher.getInitiator().hasPermission("randomteleport.tpothers")) {
                 List<Player> players = new ArrayList<>();
                 for (String arg : args) {
                     for (String s : arg.split(",")) {
@@ -249,12 +251,16 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
     }
 
     public boolean sendMessage(CommandSender sender, String key, String... replacements) {
-        String message = lang.getConfig(sender).get(key, replacements);
+        String message = getMessage(sender, key, replacements);
         if (message != null && !message.isEmpty()) {
             sender.sendMessage(message);
             return true;
         }
         return false;
+    }
+
+    public String getMessage(CommandSender sender, String key, String... replacements) {
+        return lang.getConfig(sender).get(key, replacements);
     }
 
     public HookManager getHookManager() {
@@ -279,6 +285,16 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
      */
     public void addOptionParser(OptionParser parser) {
         optionParsers.add(parser);
+        if (parser instanceof SimpleOptionParser) {
+            Permission parent = getServer().getPluginManager().getPermission("randomteleport.manual.option.*");
+            for (String alias : ((SimpleOptionParser) parser).getAliases()) {
+                Permission perm = new Permission("randomteleport.manual.option." + alias, PermissionDefault.OP);
+                perm.addParent(parent, true);
+                try {
+                    getServer().getPluginManager().addPermission(perm);
+                } catch (IllegalArgumentException ignored) {} // duplicate
+            }
+        }
     }
 
     /**

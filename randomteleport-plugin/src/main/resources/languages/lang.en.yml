@@ -21,5 +21,6 @@ error:
    already-searching: "&cA search is already in progress&c!"
    no-permission:
       general: "&cYou don't have permission to do that! &o({perm})"
+      option: "&cYou don't have permission to use the option {option}! &o({perm})"
       preset: "&cYou don't have permission to use the preset &6{preset}&c! &o({perm})"
       tp-others: "&cYou don't have permission to teleport other players! &o({perm})"

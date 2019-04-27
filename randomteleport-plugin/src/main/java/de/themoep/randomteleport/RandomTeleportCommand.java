@@ -45,11 +45,11 @@ public class RandomTeleportCommand implements CommandExecutor {
                 return true;
             }
         } else if (args.length == 1) {
-            if ("--reload".equalsIgnoreCase(args[0])) {
+            if ("--reload".equalsIgnoreCase(args[0]) && sender.hasPermission("randomteleport.reload")) {
                 plugin.loadConfig();
                 plugin.sendMessage(sender, "reloaded");
                 return true;
-            } else if ("--stat".equalsIgnoreCase(args[0])) {
+            } else if ("--stat".equalsIgnoreCase(args[0]) && sender.hasPermission("randomteleport.stat")) {
                 //TODO: teleporter and searcher statistics
             } else if (sender instanceof Player) {
                 runPreset(args[0].toLowerCase(), sender, (Player) sender, ((Player) sender).getLocation());
@@ -57,8 +57,13 @@ public class RandomTeleportCommand implements CommandExecutor {
             }
         } else {
             try {
-                plugin.parseAndRun(sender, getLocation(sender), args);
-                return true;
+                if (sender.hasPermission("randomteleport.manual")){
+                    plugin.parseAndRun(sender, getLocation(sender), args);
+                    return true;
+                } else {
+                    plugin.sendMessage(sender, "error.no-permission.general", "perm", "randomteleport.manual");
+                    return true;
+                }
             } catch (IllegalArgumentException e) {
                 if (args.length == 2) {
                     Player target = plugin.getServer().getPlayer(args[1]);

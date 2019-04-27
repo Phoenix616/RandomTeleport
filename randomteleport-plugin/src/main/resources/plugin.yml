@@ -9,6 +9,7 @@ commands:
    randomteleport:
       aliases: [randomtp, rtp]
       description: RandomTeleport command.
+      permission: randomteleport.use
       usage: |
         /<command> - uses the default preset
         /<command> <preset> [<playername>] - uses a specific preset
@@ -34,6 +35,12 @@ permissions:
    randomteleport.use:
       description: Gives permission to the command
       default: op
+   randomteleport.manual:
+      description: Gives permission to manually specify parameters in the command
+      default: op
+   randomteleport.manual.option.*:
+      description: Gives permission to use certain options in the command
+      default: op
    randomteleport.tpothers:
       description: Gives permission to teleport other players
       default: op
@@ -44,14 +51,14 @@ permissions:
       description: Permission for showing the teleport statistic
       default: op
    randomteleport.reload:
-         description: Permission to use the reload command
-         default: op
+      description: Permission to use the reload command
+      default: op
    randomteleport.presets.default:
       description: Gives permission to use the default random teleport preset
       default: op
    randomteleport.presets.*:
-         description: Gives permission to use all random teleport presets
-         default: op
+      description: Gives permission to use all random teleport presets
+      default: op
    randomteleport.sign.preset.default:
       description: Gives permission to use the default preset with a rightclick on a preset sign
       default: op

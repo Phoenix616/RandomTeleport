@@ -20,6 +20,7 @@ package de.themoep.randomteleport.searcher.options;
 
 import de.themoep.randomteleport.searcher.RandomSearcher;
 import org.apache.commons.lang.Validate;
+import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -51,9 +52,28 @@ public class SimpleOptionParser implements OptionParser {
                 parts[0] = parts[0].substring(1);
             }
             if (aliases.contains(parts[0].toLowerCase())) {
+                if (!hasAccess(searcher.getInitiator())) {
+                    throw new IllegalArgumentException(searcher.getPlugin().getMessage(
+                            searcher.getInitiator(), "error.no-permission.option",
+                            "option", parts[0],
+                            "perm", "randomteleport.manual.option." + aliases.iterator().next()));
+                }
                 ret |= parser.apply(searcher, Arrays.copyOfRange(parts, 1, parts.length));
             }
         }
         return ret;
+    }
+
+    private boolean hasAccess(CommandSender initiator) {
+        for (String alias : aliases) {
+            if (initiator.hasPermission("randomteleport.manual.option." + alias)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Set<String> getAliases() {
+        return aliases;
     }
 }
