@@ -18,6 +18,8 @@ package de.themoep.randomteleport.searcher;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import com.google.common.collect.Multimap;
+import com.google.common.collect.MultimapBuilder;
 import de.themoep.randomteleport.RandomTeleport;
 import de.themoep.randomteleport.ValidatorRegistry;
 import de.themoep.randomteleport.searcher.options.NotFoundException;
@@ -31,6 +33,7 @@ import org.bukkit.entity.Entity;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,6 +73,7 @@ public class RandomSearcher {
     private Map<String, String> options = new LinkedHashMap<>();
 
     private int checks = 0;
+    private Multimap<Integer, Integer> checked = MultimapBuilder.hashKeys().hashSetValues().build();
 
     private CompletableFuture<Location> future = null;
 
@@ -256,13 +260,19 @@ public class RandomSearcher {
     /**
      * Search for a valid location
      * @return A CompletableFuture for when the search task is complete
+     * @throws IllegalStateException when the searcher is already running
      */
     public CompletableFuture<Location> search() {
+        if (plugin.getRunningSearchers().containsKey(uniqueId)) {
+            throw new IllegalStateException("Searcher " + uniqueId + " is already running!");
+        }
         plugin.getRunningSearchers().put(uniqueId, this);
         if (targets.isEmpty() && initiator instanceof Entity) {
             targets.add((Entity) initiator);
         }
         future = new CompletableFuture<>();
+        checks = 0;
+        checked.clear();
         plugin.getServer().getScheduler().runTask(plugin, () -> checkRandom(future));
         future.whenComplete((l, e) -> plugin.getRunningSearchers().remove(uniqueId));
         return future;
@@ -278,12 +288,26 @@ public class RandomSearcher {
         }
         Location randomLoc = center.clone();
         randomLoc.setY(0);
+        int minChunk = minRadius >> 4;
+        int maxChunk = maxRadius >> 4;
+        int randChunkX;
+        int randChunkZ;
         do {
-            randomLoc.setX(center.getBlockX() + (random.nextBoolean() ? 1 : -1) * (random.nextInt(maxRadius + 1)));
-            randomLoc.setZ(center.getBlockZ() + (random.nextBoolean() ? 1 : -1) * (random.nextInt(maxRadius + 1)));
-        } while (!inRadius(randomLoc));
-        randomLoc.setX((randomLoc.getBlockX() >> 4) * 16);
-        randomLoc.setZ((randomLoc.getBlockZ() >> 4) * 16);
+            randChunkX = (random.nextBoolean() ? 1 : -1) * random.nextInt(maxChunk + 1);
+            randChunkZ = (random.nextBoolean() ? 1 : -1) * random.nextInt(maxChunk + 1);
+            if (checked.containsEntry(randChunkX, randChunkZ)) {
+                checks++;
+                if (checks >= maxTries) {
+                    future.completeExceptionally(new NotFoundException("location"));
+                    return;
+                }
+                continue;
+            }
+            checked.put(randChunkX, randChunkZ);
+        } while (!inRadius(randChunkX, randChunkZ, minChunk, maxChunk));
+
+        randomLoc.setX((center.getBlockX() >> 4 + randChunkX) * 16);
+        randomLoc.setZ((center.getBlockZ() >> 4 + randChunkZ) * 16);
         PaperLib.getChunkAtAsync(randomLoc, generatedOnly).thenApply(c -> {
             checks++;
             int indexOffset = random.nextInt(RANDOM_LIST.size());
@@ -322,6 +346,10 @@ public class RandomSearcher {
     private boolean inRadius(Location location) {
         int diffX = Math.abs(location.getBlockX() - center.getBlockX());
         int diffZ = Math.abs(location.getBlockZ() - center.getBlockZ());
+        return inRadius(diffX, diffZ, minRadius, maxRadius);
+    }
+
+    private boolean inRadius(int diffX, int diffZ, int minRadius, int maxRadius) {
         return diffX >= minRadius && diffX <= maxRadius && diffZ <= maxRadius
                 || diffZ >= minRadius && diffZ <= maxRadius && diffX <= maxRadius;
     }
