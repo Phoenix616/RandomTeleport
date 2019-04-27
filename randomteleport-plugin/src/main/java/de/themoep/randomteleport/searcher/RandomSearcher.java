@@ -280,17 +280,15 @@ public class RandomSearcher {
         } while (!inRange(randomLoc.getBlockX(), center.getBlockX()));
         do {
             randomLoc.setZ(center.getBlockZ() + (random.nextBoolean() ? 1 : -1) * random.nextInt(maxRadius));
-        } while (!inRange(randomLoc.getBlockZ(), center.getBlockX()));
+        } while (!inRange(randomLoc.getBlockZ(), center.getBlockZ()));
         randomLoc.setX((randomLoc.getBlockX() >> 4) * 16);
         randomLoc.setZ((randomLoc.getBlockZ() >> 4) * 16);
         PaperLib.getChunkAtAsync(randomLoc, generatedOnly).thenApply(c -> {
             checks++;
-            int startIndex = random.nextInt(RANDOM_LIST.size());
+            int indexOffset = random.nextInt(RANDOM_LIST.size());
             Location foundLoc = null;
-            for (int index = startIndex; index != startIndex - 1; index++) {
-                if (index >= RANDOM_LIST.size()) {
-                    index = 0;
-                }
+            for (int i = 0; i < RANDOM_LIST.size(); i++) {
+                int index = (i + indexOffset) % RANDOM_LIST.size();
                 boolean validated = true;
                 Location loc = randomLoc.clone().add(RANDOM_LIST.get(index)[0], 0, RANDOM_LIST.get(index)[1]);
 
