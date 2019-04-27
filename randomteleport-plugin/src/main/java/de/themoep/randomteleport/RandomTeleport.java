@@ -348,8 +348,14 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
             return true;
         }).exceptionally(ex -> {
             sendMessage(sender, "error.location");
-            sender.sendMessage(ex.getMessage());
-            searcher.getTargets().forEach(e -> sendMessage(e, "error.location"));
+            if (!(ex instanceof NotFoundException)) {
+                getLogger().log(Level.SEVERE, "Error while trying to find a location!", ex);
+            }
+            searcher.getTargets().forEach(e -> {
+                if (e != sender) {
+                    sendMessage(e, "error.location");
+                }
+            });
             return true;
         });
         return searcher;
