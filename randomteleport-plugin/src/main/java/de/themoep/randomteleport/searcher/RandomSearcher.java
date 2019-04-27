@@ -279,11 +279,9 @@ public class RandomSearcher {
         Location randomLoc = center.clone();
         randomLoc.setY(0);
         do {
-            randomLoc.setX(center.getBlockX() + (random.nextBoolean() ? 1 : -1) * random.nextInt(maxRadius));
-        } while (!inRange(randomLoc.getBlockX(), center.getBlockX()));
-        do {
-            randomLoc.setZ(center.getBlockZ() + (random.nextBoolean() ? 1 : -1) * random.nextInt(maxRadius));
-        } while (!inRange(randomLoc.getBlockZ(), center.getBlockZ()));
+            randomLoc.setX(center.getBlockX() + (random.nextBoolean() ? 1 : -1) * (random.nextInt(maxRadius + 1)));
+            randomLoc.setZ(center.getBlockZ() + (random.nextBoolean() ? 1 : -1) * (random.nextInt(maxRadius + 1)));
+        } while (!inRadius(randomLoc));
         randomLoc.setX((randomLoc.getBlockX() >> 4) * 16);
         randomLoc.setZ((randomLoc.getBlockZ() >> 4) * 16);
         PaperLib.getChunkAtAsync(randomLoc, generatedOnly).thenApply(c -> {
@@ -322,13 +320,10 @@ public class RandomSearcher {
     }
 
     private boolean inRadius(Location location) {
-        return inRange(location.getBlockX(), center.getBlockX())
-                || inRange(location.getBlockZ(), center.getBlockZ()) ;
-    }
-
-    private boolean inRange(int coord, int check) {
-        int diff = Math.abs(check - coord);
-        return diff >= minRadius && diff < maxRadius;
+        int diffX = Math.abs(location.getBlockX() - center.getBlockX());
+        int diffZ = Math.abs(location.getBlockZ() - center.getBlockZ());
+        return diffX >= minRadius && diffX <= maxRadius && diffZ <= maxRadius
+                || diffZ >= minRadius && diffZ <= maxRadius && diffX <= maxRadius;
     }
 
     public RandomTeleport getPlugin() {
