@@ -259,6 +259,9 @@ public class RandomSearcher {
      */
     public CompletableFuture<Location> search() {
         plugin.getRunningSearchers().put(uniqueId, this);
+        if (targets.isEmpty() && initiator instanceof Entity) {
+            targets.add((Entity) initiator);
+        }
         future = new CompletableFuture<>();
         plugin.getServer().getScheduler().runTask(plugin, () -> checkRandom(future));
         future.whenComplete((l, e) -> plugin.getRunningSearchers().remove(uniqueId));
