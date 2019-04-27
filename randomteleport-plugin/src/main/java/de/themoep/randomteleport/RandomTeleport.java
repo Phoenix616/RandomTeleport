@@ -317,7 +317,6 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
         }
         sendMessage(searcher.getTargets(), "search", "worldname", searcher.getCenter().getWorld().getName());
         searcher.search().thenApply(targetLoc -> {
-            targetLoc.add(0, 1, 0);
             searcher.getTargets().forEach(e -> {
                 cooldowns.put(searcher.getId(), e.getUniqueId(), new AbstractMap.SimpleImmutableEntry<>(System.currentTimeMillis(), searcher.getCooldown()));
                 e.teleport(targetLoc);

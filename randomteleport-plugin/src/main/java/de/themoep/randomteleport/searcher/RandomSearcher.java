@@ -311,7 +311,8 @@ public class RandomSearcher {
             }
 
             if (foundLoc != null) {
-                future.complete(foundLoc);
+                // all checks are for the top block, put we want a location above that so add 1 to y
+                future.complete(foundLoc.add(0, 1, 0));
                 return true;
             }
             checkRandom(future);
