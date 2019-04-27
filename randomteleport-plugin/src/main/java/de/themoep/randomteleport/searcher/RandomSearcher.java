@@ -33,7 +33,6 @@ import org.bukkit.entity.Entity;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,10 +49,11 @@ public class RandomSearcher {
     private ValidatorRegistry validators = new ValidatorRegistry();
 
     private static final List<int[]> RANDOM_LIST = new ArrayList<int[]>();
+
     static {
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
-                RANDOM_LIST.add(new int[] {x, z});
+                RANDOM_LIST.add(new int[]{x, z});
             }
         }
     }
@@ -132,7 +132,7 @@ public class RandomSearcher {
      */
     public void setSeed(long seed) {
         this.seed = seed;
-        if (random == RandomTeleport.RANDOM ) {
+        if (random == RandomTeleport.RANDOM) {
             random = new Random(seed);
         } else {
             random.setSeed(seed);
@@ -243,7 +243,7 @@ public class RandomSearcher {
 
     /**
      * Get the cooldown that a player has to wait before using a searcher with similar settings again
-     * @return  The cooldown in seconds
+     * @return The cooldown in seconds
      */
     public int getCooldown() {
         return cooldown;
@@ -295,19 +295,15 @@ public class RandomSearcher {
         do {
             randChunkX = (random.nextBoolean() ? 1 : -1) * random.nextInt(maxChunk + 1);
             randChunkZ = (random.nextBoolean() ? 1 : -1) * random.nextInt(maxChunk + 1);
-            if (checked.containsEntry(randChunkX, randChunkZ)) {
-                checks++;
-                if (checks >= maxTries) {
-                    future.completeExceptionally(new NotFoundException("location"));
-                    return;
-                }
-                continue;
+            checks++;
+            if (checks >= maxTries) {
+                future.completeExceptionally(new NotFoundException("location"));
+                return;
             }
-            checked.put(randChunkX, randChunkZ);
-        } while (!inRadius(randChunkX, randChunkZ, minChunk, maxChunk));
+        } while (!checked.put(randChunkX, randChunkZ) || !inRadius(randChunkX, randChunkZ, minChunk, maxChunk));
 
-        randomLoc.setX((center.getBlockX() >> 4 + randChunkX) * 16);
-        randomLoc.setZ((center.getBlockZ() >> 4 + randChunkZ) * 16);
+        randomLoc.setX(((center.getBlockX() >> 4) + randChunkX) * 16);
+        randomLoc.setZ(((center.getBlockZ() >> 4) + randChunkZ) * 16);
         PaperLib.getChunkAtAsync(randomLoc, generatedOnly).thenApply(c -> {
             checks++;
             int indexOffset = random.nextInt(RANDOM_LIST.size());
