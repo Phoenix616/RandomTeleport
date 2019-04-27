@@ -65,7 +65,7 @@ public class RandomSearcher {
     private int minRadius = 0;
     private int maxRadius = Integer.MAX_VALUE;
     private boolean generatedOnly = false;
-    private int maxChecks = 100;
+    private int maxTries = 100;
     private int cooldown;
     private Map<String, String> options = new LinkedHashMap<>();
 
@@ -220,12 +220,12 @@ public class RandomSearcher {
         this.generatedOnly = generatedOnly;
     }
 
-    public int getMaxChecks() {
-        return maxChecks;
+    public int getMaxTries() {
+        return maxTries;
     }
 
-    public void setMaxChecks(int maxChecks) {
-        this.maxChecks = maxChecks;
+    public void setMaxTries(int maxTries) {
+        this.maxTries = maxTries;
     }
 
     /**
@@ -266,7 +266,7 @@ public class RandomSearcher {
     }
 
     private void checkRandom(CompletableFuture<Location> future) {
-        if (checks >= maxChecks) {
+        if (checks >= maxTries) {
             future.completeExceptionally(new NotFoundException("location"));
             return;
         }
@@ -359,7 +359,7 @@ public class RandomSearcher {
                 ", minRadius=" + minRadius +
                 ", maxRadius=" + maxRadius +
                 ", generatedOnly=" + generatedOnly +
-                ", maxChecks=" + maxChecks +
+                ", maxTries=" + maxTries +
                 ", cooldown=" + cooldown +
                 '}';
     }
