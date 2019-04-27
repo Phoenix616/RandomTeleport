@@ -49,7 +49,7 @@ public interface RandomTeleportAPI {
      * @param validators additional LocationValidators to customize validity check of a location
      * @return a CompletableFuture<Boolean> true if teleport was successful else false
      */
-    CompletableFuture<Boolean> teleportToRandomLocation(Player player, Location center, int minRange, int maxRange, LocationValidator... validators) throws ExecutionException, InterruptedException;
+    CompletableFuture<Boolean> teleportToRandomLocation(Player player, Location center, int minRange, int maxRange, LocationValidator... validators);
 
     /**
      * Creates a RandomSearcher instance with the passed parameters
@@ -60,8 +60,6 @@ public interface RandomTeleportAPI {
      * @param maxRange the maximum distance a found location has to the center location
      * @param validators additional LocationValidators to customize validity check of a location
      * @return a randomSearcher instance
-     * @throws ExecutionException see {@link CompletableFuture#get()}
-     * @throws InterruptedException see {@link CompletableFuture#get()}
      */
-    RandomSearcher getRandomSearcher(Player player, Location center, int minRange, int maxRange, LocationValidator... validators) throws ExecutionException, InterruptedException;
+    RandomSearcher getRandomSearcher(Player player, Location center, int minRange, int maxRange, LocationValidator... validators);
 }
