@@ -168,12 +168,12 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
         }));
         addOptionParser(new SimpleOptionParser(array("f", "force"), (searcher, args) -> {
             if (args.length > 0) {
-                if ("regions".equalsIgnoreCase(args[1])) {
+                if ("regions".equalsIgnoreCase(args[0])) {
                     searcher.getValidators().remove("protection");
-                } else if ("blocks".equalsIgnoreCase(args[1])) {
+                } else if ("blocks".equalsIgnoreCase(args[0])) {
                     searcher.getValidators().add(new BlockValidator(false, unsaveBlocks));
                 } else {
-                    throw new NotFoundException(args[1]);
+                    throw new NotFoundException(args[0]);
                 }
             } else {
                 searcher.getValidators().remove("protection");
