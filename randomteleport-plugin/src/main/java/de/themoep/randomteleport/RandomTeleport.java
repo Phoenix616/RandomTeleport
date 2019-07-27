@@ -195,9 +195,11 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
             }
             return false;
         }));
-        addOptionParser(new SimpleOptionParser(array("g", "generated", "l", "loaded"), (searcher, args) -> {
-            // loaded is removed as we load chunks async which should no longer lead to performance issues
-            // now it just works like the new "generated" option where it only checks generated chunks
+        addOptionParser(new SimpleOptionParser(array("l", "loaded"), (searcher, args) -> {
+            searcher.searchInLoadedOnly(true);
+            return true;
+        }));
+        addOptionParser(new SimpleOptionParser(array("g", "generated"), (searcher, args) -> {
             searcher.searchInGeneratedOnly(true);
             return true;
         }));

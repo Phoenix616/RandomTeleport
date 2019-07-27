@@ -26,6 +26,7 @@ import de.themoep.randomteleport.searcher.options.NotFoundException;
 import de.themoep.randomteleport.searcher.validators.LocationValidator;
 import io.papermc.lib.PaperLib;
 import org.apache.commons.lang.Validate;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -67,6 +68,7 @@ public class RandomSearcher {
     private Location center;
     private int minRadius = 0;
     private int maxRadius = Integer.MAX_VALUE;
+    private boolean loadedOnly = false;
     private boolean generatedOnly = false;
     private int maxTries = 100;
     private int cooldown;
@@ -215,6 +217,16 @@ public class RandomSearcher {
     }
 
     /**
+     * By default it will search for coordinates in any chunk, even unloaded ones prompting the server to load new
+     * chunks which might result in some performance impact if the server doesn't support async loading. This disables
+     * that and only searches in already loaded chunks. (But might fail more often)
+     * @param loadedOnly Whether or not to search in loaded chunks only
+     */
+    public void searchInLoadedOnly(boolean loadedOnly) {
+        this.loadedOnly = loadedOnly;
+    }
+
+    /**
      * By default it will search for coordinates in any chunk, even ungenerated ones prompting the world to get
      * generated at the point which might result in some performance impact. This disables that and only searches
      * in already generated chunks.
@@ -292,9 +304,24 @@ public class RandomSearcher {
         int maxChunk = maxRadius >> 4;
         int randChunkX;
         int randChunkZ;
+        Chunk[] loadedChunks = new Chunk[0];
+        if (loadedOnly) {
+            loadedChunks = randomLoc.getWorld().getLoadedChunks();
+            if (loadedChunks.length == 0) {
+                future.completeExceptionally(new NotFoundException("loaded chunk"));
+                return;
+            }
+        }
+
         do {
-            randChunkX = (random.nextBoolean() ? 1 : -1) * random.nextInt(maxChunk + 1);
-            randChunkZ = (random.nextBoolean() ? 1 : -1) * random.nextInt(maxChunk + 1);
+            if (loadedOnly) {
+                Chunk chunk = loadedChunks[random.nextInt(loadedChunks.length)];
+                randChunkX = chunk.getX();
+                randChunkZ = chunk.getZ();
+            } else {
+                randChunkX = (random.nextBoolean() ? 1 : -1) * random.nextInt(maxChunk + 1);
+                randChunkZ = (random.nextBoolean() ? 1 : -1) * random.nextInt(maxChunk + 1);
+            }
             checks++;
             if (checks >= maxTries) {
                 future.completeExceptionally(new NotFoundException("location"));
@@ -378,6 +405,7 @@ public class RandomSearcher {
                 ", center=" + center +
                 ", minRadius=" + minRadius +
                 ", maxRadius=" + maxRadius +
+                ", loadedOnly=" + loadedOnly +
                 ", generatedOnly=" + generatedOnly +
                 ", maxTries=" + maxTries +
                 ", cooldown=" + cooldown +
