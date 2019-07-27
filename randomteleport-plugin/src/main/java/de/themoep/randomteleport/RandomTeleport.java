@@ -387,6 +387,9 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
      */
     public RandomSearcher runPreset(CommandSender sender, String preset, Player target, Location center) {
         String cmd = getConfig().getString("presets." + preset) + " -p " + target.getName();
+        if (!cmd.contains("-id")) {
+            cmd += " -id " + preset;
+        }
         if (cmd.startsWith("/")) {
             cmd = cmd.substring(1);
         }
