@@ -314,6 +314,11 @@ public class RandomSearcher {
         }
 
         do {
+            checks++;
+            if (checks >= maxTries) {
+                future.completeExceptionally(new NotFoundException("location"));
+                return;
+            }
             if (loadedOnly) {
                 Chunk chunk = loadedChunks[random.nextInt(loadedChunks.length)];
                 randChunkX = chunk.getX();
@@ -321,11 +326,6 @@ public class RandomSearcher {
             } else {
                 randChunkX = (random.nextBoolean() ? 1 : -1) * random.nextInt(maxChunk + 1);
                 randChunkZ = (random.nextBoolean() ? 1 : -1) * random.nextInt(maxChunk + 1);
-            }
-            checks++;
-            if (checks >= maxTries) {
-                future.completeExceptionally(new NotFoundException("location"));
-                return;
             }
         } while (!checked.put(randChunkX, randChunkZ) || !inRadius(randChunkX, randChunkZ, minChunk, maxChunk));
 
