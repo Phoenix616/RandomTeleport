@@ -330,7 +330,7 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
             Map.Entry<Long, Integer> lastUse = cooldowns.get(searcher.getId(), target.getUniqueId());
             if (lastUse != null) {
                 int targetCooldown = (int) ((System.currentTimeMillis() - lastUse.getKey()) / 1000);
-                if (targetCooldown > cooldown) {
+                if (targetCooldown > cooldown && !target.hasPermission("randomteleport.cooldownexempt")) {
                     cooldown = targetCooldown;
                 }
             }
