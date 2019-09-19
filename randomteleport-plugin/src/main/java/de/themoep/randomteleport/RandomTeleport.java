@@ -41,6 +41,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
+import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -346,7 +347,8 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
                 cooldowns.put(searcher.getId(), e.getUniqueId(), new AbstractMap.SimpleImmutableEntry<>(System.currentTimeMillis(), searcher.getCooldown()));
                 if (e instanceof Player) {
                     Location belowLoc = targetLoc.clone().subtract(0, 1, 0);
-                    ((Player) e).sendBlockChange(belowLoc, belowLoc.getBlock().getBlockData());
+                    Block belowBlock = belowLoc.getBlock();
+                    ((Player) e).sendBlockChange(belowLoc, belowBlock.getType(), belowBlock.getData());
                 }
                 e.teleport(targetLoc);
                 sendMessage(e, "teleport",
