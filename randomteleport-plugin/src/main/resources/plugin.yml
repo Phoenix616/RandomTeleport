@@ -22,6 +22,8 @@ commands:
         > -b,-biome <biomename> [<biome 2> ...] - only teleport to this biome (multiple allowed, Bukkit biome names!)
         > -x,-xPos <x value> - x axis of the center point, if not set the player's x axis is used
         > -z,-zPos <z value> - z axis of the center point, if not set the player's z axis is used
+        > -minY <y value> - minimum y value that the random location should have (default: 0)
+        > -maxY <y value> - maximum y value that the random location should have (default: world height, half in nether)
         > -l,-loaded - only search loaded chunks for possible locations (might fail more often)
         > -g,-generated - only search generated chunks for possible locations
         > -c, -cooldown <seconds> - cooldown in seconds after which the player can use this teleporter again

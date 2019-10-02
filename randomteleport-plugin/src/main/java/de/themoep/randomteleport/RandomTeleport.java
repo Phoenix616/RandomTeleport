@@ -149,6 +149,20 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
             }
             return false;
         }));
+        addOptionParser(new SimpleOptionParser(array("miny"), (searcher, args) -> {
+            if (args.length > 0) {
+                searcher.setMinY(Integer.parseInt(args[0]));
+                return true;
+            }
+            return false;
+        }));
+        addOptionParser(new SimpleOptionParser(array("maxy"), (searcher, args) -> {
+            if (args.length > 0) {
+                searcher.setMaxY(Integer.parseInt(args[0]));
+                return true;
+            }
+            return false;
+        }));
         addOptionParser(new SimpleOptionParser(array("w", "world"), (searcher, args) -> {
             if (args.length > 0) {
                 World world = getServer().getWorld(args[0]);

@@ -28,6 +28,7 @@ import io.papermc.lib.PaperLib;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 
@@ -68,6 +69,8 @@ public class RandomSearcher {
     private Location center;
     private int minRadius = 0;
     private int maxRadius = Integer.MAX_VALUE;
+    private int minY = 0;
+    private int maxY;
     private boolean loadedOnly = false;
     private boolean generatedOnly = false;
     private int maxTries = 100;
@@ -85,6 +88,11 @@ public class RandomSearcher {
         setCenter(center);
         setMinRadius(minRadius);
         setMaxRadius(maxRadius);
+        if (center.getWorld().getEnvironment() == World.Environment.NETHER) {
+            maxY = 127;
+        } else {
+            maxY = center.getWorld().getMaxHeight();
+        }
         this.validators.getRaw().putAll(plugin.getLocationValidators().getRaw());
         Arrays.asList(validators).forEach(this.validators::add);
     }
@@ -214,6 +222,40 @@ public class RandomSearcher {
     public void setMaxRadius(int maxRadius) {
         Validate.isTrue(maxRadius > minRadius, "Max radius has to be greater than the min radius!");
         this.maxRadius = maxRadius;
+    }
+
+    /**
+     * Get the minimum Y
+     * @return The minimum Y, always positive and less than the max Y!
+     */
+    public int getMinY() {
+        return minY;
+    }
+
+    /**
+     * Set the minimum search Y
+     * @param minY The min Y; has to be positive and less than the max Y!
+     */
+    public void setMinY(int minY) {
+        Validate.isTrue(minY >= 0 && minY < maxY, "Min Y has to be positive and less than the max Y!");
+        this.minY = minY;
+    }
+
+    /**
+     * Get the maximum Y
+     * @return The maximum Y, always greater than the minimum Y
+     */
+    public int getMaxY() {
+        return maxY;
+    }
+
+    /**
+     * Set the maximum search Y
+     * @param maxY The max Y; has to be greater than the min Y!
+     */
+    public void setMaxY(int maxY) {
+        Validate.isTrue(maxY > minY, "Max Y has to be greater than the min Y!");
+        this.maxY = maxY;
     }
 
     /**
