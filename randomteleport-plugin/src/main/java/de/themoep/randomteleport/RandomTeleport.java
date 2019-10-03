@@ -364,6 +364,9 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
                     Block belowBlock = belowLoc.getBlock();
                     ((Player) e).sendBlockChange(belowLoc, belowBlock.getType(), belowBlock.getData());
                 }
+                targetLoc.setX(targetLoc.getBlockX() + 0.5);
+                targetLoc.setY(targetLoc.getY() + 0.1);
+                targetLoc.setZ(targetLoc.getBlockZ() + 0.5);
                 e.teleport(targetLoc);
                 sendMessage(e, "teleport",
                         "worldname", targetLoc.getWorld().getName(),
