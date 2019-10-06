@@ -56,7 +56,7 @@ public class HookManager implements Listener, ProtectionHook, WorldborderHook {
 
     private void registerHook(Plugin plugin) {
         String path = getClass().getPackage().getName() + ".plugin." + plugin.getName();
-        String version = plugin.getDescription().getVersion();
+        String version = plugin.getDescription().getVersion().replace('.', '_').replace('-', '_');
         Class<?> hookClass = null;
         do {
             try {
@@ -65,8 +65,8 @@ public class HookManager implements Listener, ProtectionHook, WorldborderHook {
                     hookClass = null;
                 }
             } catch (ClassNotFoundException ignored) {}
-            if (version.contains(".")) {
-                version = version.substring(0, version.lastIndexOf('.'));
+            if (version.contains("_")) {
+                version = version.substring(0, version.lastIndexOf('_'));
             } else {
                 try {
                     hookClass = Class.forName(path + "Hook");
