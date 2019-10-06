@@ -17,6 +17,7 @@
     <modules>
         <module>worldguard-6</module>
         <module>worldguard-7</module>
+        <module>griefprevention</module>
         <module>worldborder</module>
     </modules>
 
