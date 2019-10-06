@@ -19,6 +19,8 @@
         <module>worldguard-7</module>
         <module>griefprevention</module>
         <module>redprotect</module>
+        <module>factions</module>
+        <module>factions-uuid</module>
         <module>worldborder</module>
     </modules>
 
