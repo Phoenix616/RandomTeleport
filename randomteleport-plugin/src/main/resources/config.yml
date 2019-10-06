@@ -70,7 +70,7 @@ sign-variables:
 # Don't use the -p parameter, this will get added automatically with the senders name/the specified playername
 presets:
   # Triggered when you use /rtp without any additional paramters
-  default: "100 1000 -f"
+  default: "100 1000"
   # add more to use /rtp <rtpname>, player needs "randomteleport.presets.<rtpname>"
   #   <rtpname>: "/rtp 1 2"
   test: "10 200 -f"
