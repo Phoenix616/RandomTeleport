@@ -362,7 +362,7 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
                 if (e instanceof Player) {
                     Location belowLoc = targetLoc.clone().subtract(0, 1, 0);
                     Block belowBlock = belowLoc.getBlock();
-                    ((Player) e).sendBlockChange(belowLoc, belowBlock.getType(), belowBlock.getData());
+                    ((Player) e).sendBlockChange(belowLoc, belowBlock.getBlockData());
                 }
                 targetLoc.setX(targetLoc.getBlockX() + 0.5);
                 targetLoc.setY(targetLoc.getY() + 0.1);

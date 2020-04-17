@@ -47,9 +47,11 @@ public class SignListener implements Listener {
                 plugin.sendMessage(event.getPlayer(), "sign.no-permission.create", "perm", "randomteleport.sign.create");
             } else {
                 String preset = event.getLine(2);
-                plugin.sendMessage(event.getPlayer(), "sign.created", "preset", preset);
-                if (plugin.getConfig().getString("presets." + preset.toLowerCase()) == null) {
-                    plugin.sendMessage(event.getPlayer(), "error.preset-doesnt-exist", "preset", preset);
+                if (preset != null) {
+                    plugin.sendMessage(event.getPlayer(), "sign.created", "preset", preset);
+                    if (plugin.getConfig().getString("presets." + preset.toLowerCase()) == null) {
+                        plugin.sendMessage(event.getPlayer(), "error.preset-doesnt-exist", "preset", preset);
+                    }
                 }
             }
         }
@@ -72,7 +74,8 @@ public class SignListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onSignClick(PlayerInteractEvent event) {
-        if (event.getHand() == EquipmentSlot.HAND && event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType().name().contains("SIGN")) {
+        if (event.getHand() == EquipmentSlot.HAND && event.getAction() == Action.RIGHT_CLICK_BLOCK
+                && event.getClickedBlock() != null && event.getClickedBlock().getType().name().contains("SIGN")) {
             Sign sign = (Sign) event.getClickedBlock().getState();
             if (plugin.matchesSignVariable(sign.getLine(1))) {
                 String preset = sign.getLine(2).toLowerCase();
