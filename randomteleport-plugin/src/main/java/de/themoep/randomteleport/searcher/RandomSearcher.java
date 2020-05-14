@@ -369,7 +369,7 @@ public class RandomSearcher {
                 randChunkX = (random.nextBoolean() ? 1 : -1) * random.nextInt(maxChunk + 1);
                 randChunkZ = (random.nextBoolean() ? 1 : -1) * random.nextInt(maxChunk + 1);
             }
-        } while (!checked.put(randChunkX, randChunkZ) || !inRadius(randChunkX, randChunkZ, minChunk, maxChunk));
+        } while (!checked.put(randChunkX, randChunkZ) || !inRadius(Math.abs(randChunkX), Math.abs(randChunkZ), minChunk, maxChunk));
 
         randomLoc.setX(((center.getBlockX() >> 4) + randChunkX) * 16);
         randomLoc.setZ(((center.getBlockZ() >> 4) + randChunkZ) * 16);
