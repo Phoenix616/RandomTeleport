@@ -375,6 +375,11 @@ public class RandomSearcher {
         randomLoc.setZ(((center.getBlockZ() >> 4) + randChunkZ) * 16);
         PaperLib.getChunkAtAsync(randomLoc, generatedOnly).thenApply(c -> {
             checks++;
+            if (c == null) {
+                // Chunk not generated, test another one
+                checkRandom(future);
+                return false;
+            }
             int indexOffset = random.nextInt(RANDOM_LIST.size());
             Location foundLoc = null;
             for (int i = 0; i < RANDOM_LIST.size(); i++) {
