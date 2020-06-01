@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 public class SimpleOptionParser implements OptionParser {
 
     private Set<String> aliases;
+    private final int argsLength;
     private final BiFunction<RandomSearcher, String[], Boolean> parser;
 
     public SimpleOptionParser(String option, BiFunction<RandomSearcher, String[], Boolean> parser) {
@@ -37,28 +38,37 @@ public class SimpleOptionParser implements OptionParser {
     }
 
     public SimpleOptionParser(String[] optionAliases, BiFunction<RandomSearcher, String[], Boolean> parser) {
+        this(optionAliases, -1, parser);
+    }
+
+    public SimpleOptionParser(String[] optionAliases, int argsLength, BiFunction<RandomSearcher, String[], Boolean> parser) {
         Validate.notEmpty(optionAliases);
         this.aliases = Arrays.stream(optionAliases).map(String::toLowerCase).collect(Collectors.toSet());
+        this.argsLength = argsLength;
         this.parser = parser;
     }
 
     @Override
     public boolean parse(RandomSearcher searcher, String[] args) {
         boolean ret = false;
-        String[] optionParts = String.join(" ", args).split(" -");
-        for (String optionPart : optionParts) {
-            String[] parts = optionPart.split(" ");
-            while (parts[0].startsWith("-")) {
-                parts[0] = parts[0].substring(1);
-            }
-            if (aliases.contains(parts[0].toLowerCase())) {
-                if (!hasAccess(searcher.getInitiator())) {
-                    throw new IllegalArgumentException(searcher.getPlugin().getMessage(
-                            searcher.getInitiator(), "error.no-permission.option",
-                            "option", parts[0],
-                            "perm", "randomteleport.manual.option." + aliases.iterator().next()));
+
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].startsWith("-")) {
+                String option = args[i].toLowerCase().substring(1);
+                if (option.startsWith("-")) {
+                    option = args[i].substring(1);
                 }
-                ret |= parser.apply(searcher, Arrays.copyOfRange(parts, 1, parts.length));
+                if (aliases.contains(option)) {
+                    if (!hasAccess(searcher.getInitiator())) {
+                        throw new IllegalArgumentException(searcher.getPlugin().getMessage(
+                                searcher.getInitiator(), "error.no-permission.option",
+                                "option", option,
+                                "perm", "randomteleport.manual.option." + aliases.iterator().next()));
+                    }
+                    if (argsLength < 0 || i + argsLength < args.length) {
+                        ret |= parser.apply(searcher, Arrays.copyOfRange(args, i + 1, argsLength < 0 ? args.length : i + 1 + argsLength));
+                    }
+                }
             }
         }
         return ret;
