@@ -50,8 +50,6 @@ public class SimpleOptionParser implements OptionParser {
 
     @Override
     public boolean parse(RandomSearcher searcher, String[] args) {
-        boolean ret = false;
-
         for (int i = 0; i < args.length; i++) {
             if (args[i].startsWith("-")) {
                 String option = args[i].toLowerCase().substring(1);
@@ -65,13 +63,23 @@ public class SimpleOptionParser implements OptionParser {
                                 "option", option,
                                 "perm", "randomteleport.manual.option." + aliases.iterator().next()));
                     }
-                    if (argsLength < 0 || i + argsLength < args.length) {
-                        ret |= parser.apply(searcher, Arrays.copyOfRange(args, i + 1, argsLength < 0 ? args.length : i + 1 + argsLength));
+                    i++;
+                    int argLength = argsLength > 0 ? argsLength : 0;
+                    for (int j = i + argLength; j < args.length; j++) {
+                        if (!args[j].startsWith("-")) {
+                            argLength++;
+                        } else {
+                            break;
+                        }
                     }
+                    if (i + argLength < args.length) {
+                        return parser.apply(searcher, Arrays.copyOfRange(args, i,  i + argLength));
+                    }
+                    break;
                 }
             }
         }
-        return ret;
+        return false;
     }
 
     private boolean hasAccess(CommandSender initiator) {
