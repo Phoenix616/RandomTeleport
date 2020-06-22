@@ -2,6 +2,7 @@
 lang: en
 # Some debug information
 debug: true
+# Delay in ticks between checking chunks when searching
 
 # Blocks to teleport on in normal mode
 save-blocks:

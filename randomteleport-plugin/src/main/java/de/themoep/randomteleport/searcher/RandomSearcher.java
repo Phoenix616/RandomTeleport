@@ -69,6 +69,7 @@ public class RandomSearcher {
     private Location center;
     private int minRadius = 0;
     private int maxRadius = Integer.MAX_VALUE;
+    private int checkDelay = 1;
     private int minY = 0;
     private int maxY;
     private boolean loadedOnly = false;
@@ -77,6 +78,7 @@ public class RandomSearcher {
     private int cooldown;
     private Map<String, String> options = new LinkedHashMap<>();
 
+    private long lastCheck;
     private int checks = 0;
     private Multimap<Integer, Integer> checked = MultimapBuilder.hashKeys().hashSetValues().build();
 
@@ -187,6 +189,7 @@ public class RandomSearcher {
      */
     public void setCenter(Location center) {
         Validate.notNull(center, "Center cannot be null!");
+        Validate.notNull(center.getWorld(), "Center world cannot be null!");
         this.center = center;
     }
 
@@ -222,6 +225,22 @@ public class RandomSearcher {
     public void setMaxRadius(int maxRadius) {
         Validate.isTrue(maxRadius > minRadius, "Max radius has to be greater than the min radius!");
         this.maxRadius = maxRadius;
+    }
+
+    /**
+     * Get the delay in ticks between checking chunks when searching
+     * @return The delay in ticks
+     */
+    public int getCheckDelay() {
+        return checkDelay;
+    }
+
+    /**
+     * Set the delay in ticks between checking chunks when searching
+     * @param checkDelay The delay in ticks
+     */
+    public void setCheckDelay(int checkDelay) {
+        this.checkDelay = checkDelay;
     }
 
     /**
@@ -340,6 +359,7 @@ public class RandomSearcher {
         if (future.isCancelled() || future.isDone() || future.isCompletedExceptionally()) {
             return;
         }
+        lastCheck = center.getWorld().getTime();
         Location randomLoc = center.clone();
         randomLoc.setY(0);
         int minChunk = minRadius >> 4;
@@ -408,7 +428,12 @@ public class RandomSearcher {
                 future.complete(foundLoc.add(0, 1, 0));
                 return true;
             }
-            checkRandom(future);
+            long diff = center.getWorld().getTime() - lastCheck;
+            if (diff < checkDelay) {
+                plugin.getServer().getScheduler().runTaskLater(plugin, () -> checkRandom(future), checkDelay - diff);
+            } else {
+                checkRandom(future);
+            }
             return false;
         }).exceptionally(future::completeExceptionally);
     }
