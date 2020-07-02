@@ -72,7 +72,7 @@ public class SimpleOptionParser implements OptionParser {
                             break;
                         }
                     }
-                    if (i + argLength < args.length) {
+                    if (i + argLength <= args.length) {
                         return parser.apply(searcher, Arrays.copyOfRange(args, i,  i + argLength));
                     }
                     break;
