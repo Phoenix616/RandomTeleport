@@ -389,11 +389,13 @@ public class RandomSearcher {
                 randChunkX = (random.nextBoolean() ? 1 : -1) * random.nextInt(maxChunk + 1);
                 randChunkZ = (random.nextBoolean() ? 1 : -1) * random.nextInt(maxChunk + 1);
             }
-        } while (!checked.put(randChunkX, randChunkZ) || !inRadius(Math.abs(randChunkX), Math.abs(randChunkZ), minChunk, maxChunk));
+        } while (!checked.put(randChunkX, randChunkZ)
+                || !inRadius(Math.abs(randChunkX), Math.abs(randChunkZ), minChunk, maxChunk)
+                || (generatedOnly && !PaperLib.isChunkGenerated(randomLoc.getWorld(), randChunkX, randChunkZ)));
 
         randomLoc.setX(((center.getBlockX() >> 4) + randChunkX) * 16);
         randomLoc.setZ(((center.getBlockZ() >> 4) + randChunkZ) * 16);
-        PaperLib.getChunkAtAsync(randomLoc, generatedOnly).thenApply(c -> {
+        PaperLib.getChunkAtAsync(randomLoc).thenApply(c -> {
             checks++;
             if (c == null) {
                 // Chunk not generated, test another one
