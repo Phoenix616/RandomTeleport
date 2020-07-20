@@ -37,6 +37,7 @@ import de.themoep.randomteleport.searcher.validators.LocationValidator;
 import de.themoep.randomteleport.searcher.validators.ProtectionValidator;
 import de.themoep.randomteleport.searcher.validators.WorldborderValidator;
 import de.themoep.utils.lang.bukkit.LanguageManager;
+import io.papermc.lib.PaperLib;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -374,24 +375,34 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
                 targetLoc.setX(targetLoc.getBlockX() + 0.5);
                 targetLoc.setY(targetLoc.getY() + 0.1);
                 targetLoc.setZ(targetLoc.getBlockZ() + 0.5);
-                e.teleport(targetLoc);
-                sendMessage(e, "teleport",
-                        "worldname", targetLoc.getWorld().getName(),
-                        "x", String.valueOf(targetLoc.getBlockX()),
-                        "y", String.valueOf(targetLoc.getBlockY()),
-                        "z", String.valueOf(targetLoc.getBlockZ())
-                );
-                if (searcher.getOptions().containsKey("spawnpoint") && e instanceof Player) {
-                    if (((Player) e).getBedSpawnLocation() == null || "force".equalsIgnoreCase(searcher.getOptions().get("spawnpoint"))){
-                        ((Player) e).setBedSpawnLocation(targetLoc, true);
-                        sendMessage(e, "setspawnpoint",
+                PaperLib.teleportAsync(e, targetLoc).thenAccept(success -> {
+                    if (success) {
+                        sendMessage(e, "teleport",
+                                "worldname", targetLoc.getWorld().getName(),
+                                "x", String.valueOf(targetLoc.getBlockX()),
+                                "y", String.valueOf(targetLoc.getBlockY()),
+                                "z", String.valueOf(targetLoc.getBlockZ())
+                        );
+                        if (searcher.getOptions().containsKey("spawnpoint") && e instanceof Player) {
+                            if (((Player) e).getBedSpawnLocation() == null || "force".equalsIgnoreCase(searcher.getOptions().get("spawnpoint"))) {
+                                ((Player) e).setBedSpawnLocation(targetLoc, true);
+                                sendMessage(e, "setspawnpoint",
+                                        "worldname", targetLoc.getWorld().getName(),
+                                        "x", String.valueOf(targetLoc.getBlockX()),
+                                        "y", String.valueOf(targetLoc.getBlockY()),
+                                        "z", String.valueOf(targetLoc.getBlockZ())
+                                );
+                            }
+                        }
+                    } else {
+                        sendMessage(e, "error.teleport",
                                 "worldname", targetLoc.getWorld().getName(),
                                 "x", String.valueOf(targetLoc.getBlockX()),
                                 "y", String.valueOf(targetLoc.getBlockY()),
                                 "z", String.valueOf(targetLoc.getBlockZ())
                         );
                     }
-                }
+                });
             });
             return true;
         }).exceptionally(ex -> {

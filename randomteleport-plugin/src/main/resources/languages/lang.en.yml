@@ -11,6 +11,7 @@ sign:
       use: "&cYou don't have permission to use the preset &6{preset}&c! &o({perm})"
 error:
    location: "&4Error: &cRandomTeleport could not find a safe location!"
+   teleport: "&4Error: &cRandomTeleport could not teleport you to X: {x} Y: {y} Z: {z}!"
    cooldown: "&cYou have to wait {cooldown_text} before using this RandomTeleport again!"
    parse-error: "&cError while parsing option &f{option}&c with value &f{value}&c: {error}"
    not-found: "&cCould not find &f{what}&c!"
