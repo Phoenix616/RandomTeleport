@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: "#moep IRC channel on irc.spi.gt"
+    url: "https://kiwiirc.com/client/irc.spi.gt/#moep"
+    about: My public chat channel to discuss any of my projects
+  - name: SpigotMC Discussion Thread
+    url: https://www.spigotmc.org/threads/fubs-random-teleport.29162/
+    about: Ask questions and discuss the resource publicly
+  - name: SpigotMC PM
+    url: https://www.spigotmc.org/conversations/add?to=Phoenix616&title=RandomTeleport%20Question
+    about: Ask me questions privately
