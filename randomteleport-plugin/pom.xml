@@ -66,6 +66,10 @@
                             <shadedPattern>de.themoep.randomteleport.libs.paperlib</shadedPattern>
                         </relocation>
                         <relocation>
+                            <pattern>de.themoep.minedown</pattern>
+                            <shadedPattern>de.themoep.randomteleport.libs.minedown</shadedPattern>
+                        </relocation>
+                        <relocation>
                             <pattern>de.themoep.utils.lang</pattern>
                             <shadedPattern>de.themoep.randomteleport.libs.lang</shadedPattern>
                         </relocation>

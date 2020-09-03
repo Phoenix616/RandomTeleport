@@ -58,7 +58,7 @@ public class SimpleOptionParser implements OptionParser {
                 }
                 if (aliases.contains(option)) {
                     if (!hasAccess(searcher.getInitiator())) {
-                        throw new IllegalArgumentException(searcher.getPlugin().getMessage(
+                        throw new IllegalArgumentException(searcher.getPlugin().getTextMessage(
                                 searcher.getInitiator(), "error.no-permission.option",
                                 "option", option,
                                 "perm", "randomteleport.manual.option." + aliases.iterator().next()));

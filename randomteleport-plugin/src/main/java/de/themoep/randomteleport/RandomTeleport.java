@@ -20,6 +20,7 @@ package de.themoep.randomteleport;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import de.themoep.minedown.MineDown;
 import de.themoep.randomteleport.api.RandomTeleportAPI;
 import de.themoep.randomteleport.hook.HookManager;
 import de.themoep.randomteleport.listeners.SignListener;
@@ -38,6 +39,8 @@ import de.themoep.randomteleport.searcher.validators.ProtectionValidator;
 import de.themoep.randomteleport.searcher.validators.WorldborderValidator;
 import de.themoep.utils.lang.bukkit.LanguageManager;
 import io.papermc.lib.PaperLib;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -276,16 +279,24 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
     }
 
     public boolean sendMessage(CommandSender sender, String key, String... replacements) {
-        String message = getMessage(sender, key, replacements);
-        if (message != null && !message.isEmpty()) {
-            sender.sendMessage(message);
+        BaseComponent[] message = getComponentMessage(sender, key, replacements);
+        if (message != null && message.length != 0) {
+            sender.spigot().sendMessage(message);
             return true;
         }
         return false;
     }
 
-    public String getMessage(CommandSender sender, String key, String... replacements) {
-        return lang.getConfig(sender).get(key, replacements);
+    public BaseComponent[] getComponentMessage(CommandSender sender, String key, String... replacements) {
+        return MineDown.parse(getLang(sender, key), replacements);
+    }
+
+    public String getTextMessage(CommandSender sender, String key, String... replacements) {
+        return TextComponent.toLegacyText(getComponentMessage(sender, key, replacements));
+    }
+
+    private String getLang(CommandSender sender, String key) {
+        return lang.getConfig(sender).get(key);
     }
 
     public HookManager getHookManager() {
