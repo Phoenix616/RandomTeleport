@@ -117,8 +117,6 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
                 .toArray(Material[]::new);
         signVariables = getConfig().getStringList("sign-variables").stream().map(String::toLowerCase).collect(Collectors.toSet());
         lang = new LanguageManager(this, getConfig().getString("lang"));
-        lang.setPlaceholderPrefix("{");
-        lang.setPlaceholderSuffix("}");
     }
 
     private void initOptionParsers() {
@@ -288,7 +286,11 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
     }
 
     public BaseComponent[] getComponentMessage(CommandSender sender, String key, String... replacements) {
-        return MineDown.parse(getLang(sender, key), replacements);
+        return new MineDown(getLang(sender, key))
+                .placeholderPrefix("{")
+                .placeholderSuffix("}")
+                .replace(replacements)
+                .toComponent();
     }
 
     public String getTextMessage(CommandSender sender, String key, String... replacements) {
