@@ -377,7 +377,6 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
         sendMessage(searcher.getTargets(), "search", "worldname", searcher.getCenter().getWorld().getName());
         searcher.search().thenApply(targetLoc -> {
             searcher.getTargets().forEach(e -> {
-                cooldowns.put(searcher.getId(), e.getUniqueId(), new AbstractMap.SimpleImmutableEntry<>(System.currentTimeMillis(), searcher.getCooldown()));
                 if (e instanceof Player) {
                     Location belowLoc = targetLoc.clone().subtract(0, 1, 0);
                     Block belowBlock = belowLoc.getBlock();
@@ -388,6 +387,7 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
                 targetLoc.setZ(targetLoc.getBlockZ() + 0.5);
                 PaperLib.teleportAsync(e, targetLoc).thenAccept(success -> {
                     if (success) {
+                        cooldowns.put(searcher.getId(), e.getUniqueId(), new AbstractMap.SimpleImmutableEntry<>(System.currentTimeMillis(), searcher.getCooldown()));
                         sendMessage(e, "teleport",
                                 "worldname", targetLoc.getWorld().getName(),
                                 "x", String.valueOf(targetLoc.getBlockX()),
