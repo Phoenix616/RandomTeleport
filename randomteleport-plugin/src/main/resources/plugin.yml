@@ -5,6 +5,7 @@ api-version: 1.13
 description: ${project.description}
 author: Phoenix616
 website: https://github.com/Phoenix616/RandomTeleport/
+softdepend: [WorldGuard, Factions, GriefPrevention, RedProtect, WorldBorder]
 commands:
    randomteleport:
       aliases: [randomtp, rtp]
