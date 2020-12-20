@@ -42,14 +42,5 @@ public interface WorldborderHook extends PluginHook {
      * @param location The location to check
      * @return True if it is inside (or there is no border), false if not
      */
-    default boolean isInsideBorder(Location location) {
-        Location center = getCenter(location.getWorld());
-        if (center != null) {
-            double radius = getBorderRadius(location.getWorld());
-            if (radius > 0) {
-                return center.distanceSquared(location) <= radius * radius;
-            }
-        }
-        return true;
-    }
+    boolean isInsideBorder(Location location);
 }
