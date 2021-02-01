@@ -1,4 +1,5 @@
 name: RandomTeleport
+provides: [FUBSRandomTeleport]
 main: de.themoep.randomteleport.RandomTeleport
 version: '${minecraft.plugin.version}'
 api-version: 1.13
