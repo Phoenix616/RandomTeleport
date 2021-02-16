@@ -79,8 +79,8 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
     private ValidatorRegistry locationValidators = new ValidatorRegistry();
     private List<OptionParser> optionParsers = new ArrayList<>();
 
-    private Material[] saveBlocks;
-    private Material[] unsaveBlocks;
+    private Material[] safeBlocks;
+    private Material[] unsafeBlocks;
     private Set<String> signVariables;
 
     public void onEnable() {
@@ -95,7 +95,13 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
     public void loadConfig() {
         saveDefaultConfig();
         reloadConfig();
-        saveBlocks = getConfig().getStringList("save-blocks").stream()
+        List<String> safeBlocksList;
+        if (getConfig().contains("save-blocks")) {
+            safeBlocksList = getConfig().getStringList("save-blocks");
+        } else {
+            safeBlocksList = getConfig().getStringList("safe-blocks");
+        }
+        safeBlocks = safeBlocksList.stream()
                 .map(s -> {
                     Material mat = Material.matchMaterial(s);
                     if (mat == null) {
@@ -105,7 +111,13 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
                 })
                 .filter(Objects::nonNull)
                 .toArray(Material[]::new);
-        unsaveBlocks = getConfig().getStringList("unsave-blocks").stream()
+        List<String> unsafeBlocksList;
+        if (getConfig().contains("unsave-blocks")) {
+            unsafeBlocksList = getConfig().getStringList("unsave-blocks");
+        } else {
+            unsafeBlocksList = getConfig().getStringList("unsafe-blocks");
+        }
+        unsafeBlocks = unsafeBlocksList.stream()
                 .map(s -> {
                     Material mat = Material.matchMaterial(s);
                     if (mat == null) {
@@ -188,13 +200,13 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
                 if ("regions".equalsIgnoreCase(args[0])) {
                     searcher.getValidators().remove("protection");
                 } else if ("blocks".equalsIgnoreCase(args[0])) {
-                    searcher.getValidators().add(new BlockValidator(false, unsaveBlocks));
+                    searcher.getValidators().add(new BlockValidator(false, unsafeBlocks));
                 } else {
                     throw new NotFoundException(args[0]);
                 }
             } else {
                 searcher.getValidators().remove("protection");
-                searcher.getValidators().add(new BlockValidator(false, unsaveBlocks));
+                searcher.getValidators().add(new BlockValidator(false, unsafeBlocks));
             }
             return true;
         }));
@@ -248,7 +260,7 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
         locationValidators.add(new WorldborderValidator());
         locationValidators.add(new HeightValidator());
         locationValidators.add(new ProtectionValidator());
-        locationValidators.add(new BlockValidator(saveBlocks));
+        locationValidators.add(new BlockValidator(safeBlocks));
     }
 
     /**

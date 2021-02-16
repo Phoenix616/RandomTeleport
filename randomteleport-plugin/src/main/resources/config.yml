@@ -5,7 +5,7 @@ debug: true
 # Delay in ticks between checking chunks when searching
 
 # Blocks to teleport on in normal mode
-save-blocks:
+safe-blocks:
 - sand
 - sandstone
 - gravel
@@ -21,8 +21,8 @@ save-blocks:
 - end_stone
 - netherrack
 
-# Blocks unsave when in "--force blocks" mode
-unsave-blocks:
+# Blocks unsafe when in "--force blocks" mode
+unsafe-blocks:
 - air
 - water
 - lava
