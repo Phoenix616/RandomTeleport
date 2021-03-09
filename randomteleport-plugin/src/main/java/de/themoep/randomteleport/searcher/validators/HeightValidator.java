@@ -46,6 +46,10 @@ public class HeightValidator extends LocationValidator {
             }
         }
         location.setY(block.getY());
-        return !block.getRelative(BlockFace.UP).getType().isSolid() && !block.getRelative(BlockFace.UP, 2).getType().isSolid();
+        return isSafe(block.getRelative(BlockFace.UP)) && isSafe(block.getRelative(BlockFace.UP, 2));
+    }
+
+    private static boolean isSafe(Block block) {
+        return block.isPassable() && !block.isLiquid();
     }
 }
