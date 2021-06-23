@@ -36,6 +36,7 @@ commands:
         > -sp,spawnpoint [force] - set the respawn point of the player to the location he teleported to (force overrides existing spawnpoint)
         /<command> --stat - shows a statistic of the teleports since the last restart
         /<command> --reload - reloads the config
+        /<command> --info - shows the version
 permissions:
    randomteleport.use:
       description: Gives permission to the command
