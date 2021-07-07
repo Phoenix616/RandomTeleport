@@ -1,5 +1,4 @@
 reloaded: "&eReloaded the config. Some settings might require a server restart!"
-info: "&eRandomTeleport version {version}."
 search: "&7RandomTeleport searches for a safe place in world {worldname}. . ."
 teleport: "&7RandomTeleport teleported you to X: {x} Y: {y} Z: {z}!"
 setspawnpoint: "&7Your Respawnpoint has been set to your current location!"
