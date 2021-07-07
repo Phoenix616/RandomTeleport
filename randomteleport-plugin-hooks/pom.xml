@@ -23,6 +23,7 @@
         <module>factions</module>
         <module>factions-uuid</module>
         <module>worldborder</module>
+        <module>chunkyborder</module>
     </modules>
 
     <dependencies>
