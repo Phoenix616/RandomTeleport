@@ -18,10 +18,12 @@
         <module>worldguard-6</module>
         <module>worldguard-7</module>
         <module>griefprevention</module>
+        <module>griefdefender</module>
         <module>redprotect</module>
         <module>factions</module>
         <module>factions-uuid</module>
         <module>worldborder</module>
+        <module>chunkyborder</module>
     </modules>
 
     <dependencies>

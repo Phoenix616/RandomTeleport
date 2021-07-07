@@ -57,7 +57,7 @@ public class RandomTeleportCommand implements CommandExecutor {
             }
         } else {
             try {
-                if (sender.hasPermission("randomteleport.manual")){
+                if (sender.hasPermission("randomteleport.manual")) {
                     plugin.parseAndRun(sender, getLocation(sender), args);
                     return true;
                 } else {

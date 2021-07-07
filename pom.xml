@@ -40,7 +40,7 @@
         </repository>
         <repository>
             <id>paper-repo</id>
-            <url>https://papermc.io/repo/content/groups/public</url>
+            <url>https://papermc.io/repo/repository/maven-public/</url>
         </repository>
         <repository>
             <id>minebench-repo</id>
@@ -58,7 +58,7 @@
         <dependency>
             <groupId>io.papermc</groupId>
             <artifactId>paperlib</artifactId>
-            <version>1.0.2</version>
+            <version>1.0.6</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
