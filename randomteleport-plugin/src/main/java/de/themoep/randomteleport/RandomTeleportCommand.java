@@ -53,7 +53,7 @@ public class RandomTeleportCommand implements CommandExecutor {
                 //TODO: teleporter and searcher statistics
             } else if ("--info ".equalsIgnoreCase(args[0]) && sender.hasPermission("randomteleport.info")) {
                 plugin.sendMessage(sender, "info",plugin.getDescription().getVersion());
-
+                return true;
             } else if (sender instanceof Player) {
                 runPreset(args[0].toLowerCase(), sender, (Player) sender, ((Player) sender).getLocation());
                 return true;
