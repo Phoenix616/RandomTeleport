@@ -48,9 +48,9 @@ public class RandomSearcher {
     private final CommandSender initiator;
     private final UUID uniqueId = UUID.randomUUID();
 
-    private ValidatorRegistry validators = new ValidatorRegistry();
+    private final ValidatorRegistry validators = new ValidatorRegistry();
 
-    private static final List<int[]> RANDOM_LIST = new ArrayList<int[]>();
+    private static final List<int[]> RANDOM_LIST = new ArrayList<>();
 
     static {
         for (int x = 0; x < 16; x++) {
@@ -70,7 +70,7 @@ public class RandomSearcher {
     private int minRadius = 0;
     private int maxRadius = Integer.MAX_VALUE;
     private int checkDelay = 1;
-    private int minY = 0;
+    private int minY;
     private int maxY;
     private boolean loadedOnly = false;
     private boolean generatedOnly = false;
@@ -80,7 +80,7 @@ public class RandomSearcher {
 
     private long lastCheck;
     private int checks = 0;
-    private Multimap<Integer, Integer> checked = MultimapBuilder.hashKeys().hashSetValues().build();
+    private final Multimap<Integer, Integer> checked = MultimapBuilder.hashKeys().hashSetValues().build();
 
     private CompletableFuture<Location> future = null;
 
@@ -90,8 +90,9 @@ public class RandomSearcher {
         setCenter(center);
         setMinRadius(minRadius);
         setMaxRadius(maxRadius);
+        minY = center.getWorld().getMinHeight();
         if (center.getWorld().getEnvironment() == World.Environment.NETHER) {
-            maxY = 127;
+            maxY = 126;
         } else {
             maxY = center.getWorld().getMaxHeight();
         }
@@ -256,7 +257,7 @@ public class RandomSearcher {
      * @param minY The min Y; has to be positive and less than the max Y!
      */
     public void setMinY(int minY) {
-        Validate.isTrue(minY >= 0 && minY < maxY, "Min Y has to be positive and less than the max Y!");
+        Validate.isTrue(minY >= center.getWorld().getMinHeight() && minY < maxY, "Min Y has to be at least the world's minimum height and less than the max Y!");
         this.minY = minY;
     }
 
@@ -273,7 +274,7 @@ public class RandomSearcher {
      * @param maxY The max Y; has to be greater than the min Y!
      */
     public void setMaxY(int maxY) {
-        Validate.isTrue(maxY > minY, "Max Y has to be greater than the min Y!");
+        Validate.isTrue(maxY <= center.getWorld().getMaxHeight() && maxY > minY, "Max Y has to be greater than the min Y and at most the world's max height!");
         this.maxY = maxY;
     }
 
@@ -361,7 +362,7 @@ public class RandomSearcher {
         }
         lastCheck = center.getWorld().getTime();
         Location randomLoc = center.clone();
-        randomLoc.setY(0);
+        randomLoc.setY(center.getWorld().getMinHeight());
         int minChunk = minRadius >> 4;
         int maxChunk = maxRadius >> 4;
         int randChunkX;
