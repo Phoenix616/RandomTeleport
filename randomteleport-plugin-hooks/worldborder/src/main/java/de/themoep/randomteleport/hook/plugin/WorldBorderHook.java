@@ -47,7 +47,7 @@ public class WorldBorderHook implements WorldborderHook {
     @Override
     public boolean isInsideBorder(Location location) {
         BorderData data = plugin.getWorldBorder(location.getWorld().getName());
-        return data.insideBorder(location);
+        return data == null || data.insideBorder(location);
     }
 
     @Override
