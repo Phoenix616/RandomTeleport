@@ -21,7 +21,7 @@ safe-blocks:
 - end_stone
 - netherrack
 
-# Blocks unsafe when in "--force blocks" mode
+# Blocks not to teleport on or into
 unsafe-blocks:
 - air
 - water
@@ -96,6 +96,7 @@ unsafe-blocks:
 - dark_oak_door
 - end_rod
 - end_gateway
+- powder_snow
 
 sign-variables:
 - "[RTP]"

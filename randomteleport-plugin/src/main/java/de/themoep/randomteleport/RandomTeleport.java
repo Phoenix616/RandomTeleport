@@ -258,7 +258,7 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
 
     private void initValidators() {
         locationValidators.add(new WorldborderValidator());
-        locationValidators.add(new HeightValidator());
+        locationValidators.add(new HeightValidator(unsafeBlocks));
         locationValidators.add(new ProtectionValidator());
         locationValidators.add(new BlockValidator(safeBlocks));
     }

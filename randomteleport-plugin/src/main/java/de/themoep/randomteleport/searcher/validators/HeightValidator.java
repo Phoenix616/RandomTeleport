@@ -20,13 +20,21 @@ package de.themoep.randomteleport.searcher.validators;
 
 import de.themoep.randomteleport.searcher.RandomSearcher;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
+import java.util.Collections;
+import java.util.EnumSet;
+
 public class HeightValidator extends LocationValidator {
 
-    public HeightValidator() {
+    private final EnumSet<Material> unsafeBlocks;
+
+    public HeightValidator(Material[] unsafeBlocks) {
         super("height");
+        this.unsafeBlocks = EnumSet.noneOf(Material.class);
+        Collections.addAll(this.unsafeBlocks, unsafeBlocks);
     }
 
     @Override
@@ -49,7 +57,7 @@ public class HeightValidator extends LocationValidator {
         return isSafe(block.getRelative(BlockFace.UP)) && isSafe(block.getRelative(BlockFace.UP, 2));
     }
 
-    private static boolean isSafe(Block block) {
-        return block.isPassable() && !block.isLiquid();
+    private boolean isSafe(Block block) {
+        return block.isPassable() && !block.isLiquid() && !unsafeBlocks.contains(block.getType());
     }
 }
