@@ -12,15 +12,15 @@
     <artifactId>griefdefender</artifactId>
     <repositories>
         <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
+            <id>gdapi</id>
+            <url>https://repo.glaremasters.me/repository/bloodshot</url>
         </repository>
     </repositories>
     <dependencies>
         <dependency>
-            <groupId>com.github.bloodmc</groupId>
-            <artifactId>GriefDefenderAPI</artifactId>
-            <version>-dd5aa2224c-1</version>
+            <groupId>com.griefdefender</groupId>
+            <artifactId>api</artifactId>
+            <version>2.1.0-20220122.032038-5</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.bukkit</groupId>
