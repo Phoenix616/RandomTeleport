@@ -4,6 +4,9 @@ lang: en
 debug: true
 # Delay in ticks between checking chunks when searching
 
+# Should we search for a preset named like the world the player is in when using /rtp without parameters?
+use-player-world-as-preset: false
+
 # Blocks to teleport on in normal mode
 safe-blocks:
 - sand
