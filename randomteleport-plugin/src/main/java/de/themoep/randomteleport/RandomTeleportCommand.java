@@ -41,7 +41,14 @@ public class RandomTeleportCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
             if (sender instanceof Player) {
-                runPreset("default", sender, (Player) sender, ((Player) sender).getLocation());
+                Player player = (Player) sender;
+                String preset = "default";
+                if (plugin.getConfig().getBoolean("use-player-world-as-preset", false)) {
+                    String worldName = player.getWorld().getName().toLowerCase();
+                    if (presetExistsInConfig(worldName))
+                        preset = worldName;
+                }
+                runPreset(preset, sender, player, player.getLocation());
                 return true;
             }
         } else if (args.length == 1) {
@@ -88,7 +95,7 @@ public class RandomTeleportCommand implements CommandExecutor {
             );
         } else if (sender != target && !sender.hasPermission("randomteleport.tpothers")) {
             plugin.sendMessage(sender, "error.no-permission.tp-others", "perm", "randomteleport.tpothers");
-        } else if (plugin.getConfig().getString("presets." + preset) == null) {
+        } else if (!presetExistsInConfig(preset)) {
             plugin.sendMessage(sender, "error.preset-doesnt-exist", "preset", preset);
         } else {
             if (sender == target) {
@@ -107,6 +114,10 @@ public class RandomTeleportCommand implements CommandExecutor {
                 plugin.getLogger().log(Level.SEVERE, "Error while parsing preset " + preset, e);
             }
         }
+    }
+
+    private boolean presetExistsInConfig(String preset) {
+        return plugin.getConfig().getString("presets." + preset) != null;
     }
 
     private static Location getLocation(CommandSender sender) {
