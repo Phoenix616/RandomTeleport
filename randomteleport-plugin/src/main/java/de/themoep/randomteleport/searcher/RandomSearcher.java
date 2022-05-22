@@ -90,7 +90,7 @@ public class RandomSearcher {
         setCenter(center);
         setMinRadius(minRadius);
         setMaxRadius(maxRadius);
-        minY = center.getWorld().getMinHeight();
+        minY = plugin.getMinHeight(center.getWorld());
         if (center.getWorld().getEnvironment() == World.Environment.NETHER) {
             maxY = 126;
         } else {
@@ -257,7 +257,8 @@ public class RandomSearcher {
      * @param minY The min Y; has to be positive and less than the max Y!
      */
     public void setMinY(int minY) {
-        Validate.isTrue(minY >= center.getWorld().getMinHeight() && minY < maxY, "Min Y has to be at least the world's minimum height and less than the max Y!");
+        Validate.isTrue(minY >= plugin.getMinHeight(center.getWorld()), "Min Y has to be at least the world's minimum height!");
+        Validate.isTrue(minY < maxY, "Min Y has to be less than the max Y!");
         this.minY = minY;
     }
 
@@ -362,7 +363,7 @@ public class RandomSearcher {
         }
         lastCheck = center.getWorld().getTime();
         Location randomLoc = center.clone();
-        randomLoc.setY(center.getWorld().getMinHeight());
+        randomLoc.setY(plugin.getMinHeight(center.getWorld()));
         int minChunk = minRadius >> 4;
         int maxChunk = maxRadius >> 4;
         int randChunkX;

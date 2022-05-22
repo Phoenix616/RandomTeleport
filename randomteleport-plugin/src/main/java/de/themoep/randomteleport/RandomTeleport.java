@@ -83,6 +83,8 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
     private Material[] unsafeBlocks;
     private Set<String> signVariables;
 
+    private boolean hasMinHeight = true;
+
     public void onEnable() {
         hookManager = new HookManager(this);
         loadConfig();
@@ -480,5 +482,22 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
     @Override
     public RandomSearcher getRandomSearcher(Player player, Location origin, int minRange, int maxRange, LocationValidator... validators) {
         return new RandomSearcher(this, player, origin, minRange, maxRange, validators);
+    }
+
+    /**
+     * Utility method to get the min height of a world as old versions didn't have support for this.
+     * @param world The world
+     * @return The min height or 0 if querying that isn't supported
+     */
+    public int getMinHeight(World world) {
+        if (hasMinHeight) {
+            try {
+                return world.getMinHeight();
+            } catch (NoSuchMethodError ignored) {
+                // getMinHeight is only available starting in 1.16.5
+            }
+            hasMinHeight = false;
+        }
+        return 0;
     }
 }
