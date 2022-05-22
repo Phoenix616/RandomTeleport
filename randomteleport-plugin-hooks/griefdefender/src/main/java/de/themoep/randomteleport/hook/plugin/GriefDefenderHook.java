@@ -1,6 +1,7 @@
 package de.themoep.randomteleport.hook.plugin;
 
 import com.griefdefender.api.GriefDefender;
+import com.griefdefender.api.claim.ClaimManager;
 import com.griefdefender.api.claim.ClaimTypes;
 import de.themoep.randomteleport.hook.ProtectionHook;
 import org.bukkit.Bukkit;
@@ -23,13 +24,22 @@ public class GriefDefenderHook implements ProtectionHook {
 
     @Override
     public boolean canBuild(Player player, Location location) {
-        return GriefDefender.getCore().getClaimManager(location.getWorld().getUID()).getClaimAt(location.getBlockX(), location.getBlockY(), location.getBlockZ()).getType() == ClaimTypes.WILDERNESS;
+        return canBuild(location.getWorld(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
 
     @Override
     public boolean canBuild(Player player, World world, int chunkX, int chunkZ) {
-        if(GriefDefender.getCore().isEnabled(world.getUID())) {
-            return GriefDefender.getCore().getClaimManager(world.getUID()).getClaimAt(chunkX,0,chunkZ).isTrusted(player.getUniqueId());
+        return canBuild(world, chunkX * 16, world.getSeaLevel(), chunkZ * 16);
+    }
+
+    private boolean canBuild(World world, int x, int y, int z) {
+        if (GriefDefender.getCore().isEnabled(world.getUID())) {
+            ClaimManager claimManager = GriefDefender.getCore().getClaimManager(world.getUID());
+            if (claimManager == null) {
+                return true;
+            } else {
+                return claimManager.getClaimAt(x, y, z).getType() == ClaimTypes.WILDERNESS;
+            }
         }
         return true;
     }
