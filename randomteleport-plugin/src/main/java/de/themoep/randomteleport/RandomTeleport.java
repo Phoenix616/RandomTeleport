@@ -387,7 +387,7 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
         }
 
         if (cooldown > 0 && cooldown < searcher.getCooldown()) {
-            sendMessage(searcher.getTargets(), "error.cooldown", "cooldown_text", (searcher.getCooldown() - cooldown) + "s");
+            sendMessage(searcher.getTargets(), "error.cooldown", "cooldown_text", (searcher.getCooldown() - cooldown));
             return null;
         }
         sendMessage(searcher.getTargets(), "search", "worldname", searcher.getCenter().getWorld().getName());
