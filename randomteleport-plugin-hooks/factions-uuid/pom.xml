@@ -15,7 +15,7 @@
     <repositories>
         <repository>
             <id>factions-repo</id>
-            <url>http://ci.ender.zone/plugin/repository/everything/</url>
+            <url>https://ci.ender.zone/plugin/repository/everything/</url>
         </repository>
     </repositories>
 
