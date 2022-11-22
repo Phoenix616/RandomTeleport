@@ -25,12 +25,7 @@ import de.themoep.randomteleport.api.RandomTeleportAPI;
 import de.themoep.randomteleport.hook.HookManager;
 import de.themoep.randomteleport.listeners.SignListener;
 import de.themoep.randomteleport.searcher.RandomSearcher;
-import de.themoep.randomteleport.searcher.options.AdditionalOptionParser;
-import de.themoep.randomteleport.searcher.options.NotFoundException;
-import de.themoep.randomteleport.searcher.options.OptionParser;
-import de.themoep.randomteleport.searcher.options.PlayerNotFoundException;
-import de.themoep.randomteleport.searcher.options.SimpleOptionParser;
-import de.themoep.randomteleport.searcher.options.WorldNotFoundException;
+import de.themoep.randomteleport.searcher.options.*;
 import de.themoep.randomteleport.searcher.validators.BiomeValidator;
 import de.themoep.randomteleport.searcher.validators.BlockValidator;
 import de.themoep.randomteleport.searcher.validators.HeightValidator;
@@ -134,6 +129,7 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
     }
 
     private void initOptionParsers() {
+        addOptionParser(new BooleanOptionParser("debug", (searcher) -> searcher.setDebug(true)));
         addOptionParser(new SimpleOptionParser(array("p", "player"), (searcher, args) -> {
             if (args.length > 0 && searcher.getInitiator().hasPermission("randomteleport.tpothers")) {
                 List<Player> players = new ArrayList<>();
@@ -185,7 +181,7 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
                 if (world == null) {
                     throw new WorldNotFoundException(args[0]);
                 }
-                searcher.getCenter().setWorld(world);
+                searcher.setWorld(world);
                 return true;
             }
             return false;
@@ -401,7 +397,11 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
                 targetLoc.setX(targetLoc.getBlockX() + 0.5);
                 targetLoc.setY(targetLoc.getY() + 0.1);
                 targetLoc.setZ(targetLoc.getBlockZ() + 0.5);
-                PaperLib.teleportAsync(e, targetLoc).thenAccept(success -> {
+                if (searcher.isDebug()) {
+                    getLogger().info("[DEBUG] Search " + searcher.getId() + " triggered by " + searcher.getInitiator().getName()
+                            + " will try to teleport " + e.getType() + " " + e.getName() + "/" + e.getUniqueId() + " to " + targetLoc);
+                }
+                PaperLib.teleportAsync(e, targetLoc).whenComplete((success, ex) -> {
                     if (success) {
                         cooldowns.put(searcher.getId(), e.getUniqueId(), new AbstractMap.SimpleImmutableEntry<>(System.currentTimeMillis(), searcher.getCooldown()));
                         sendMessage(e, "teleport",
@@ -428,6 +428,9 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
                                 "y", String.valueOf(targetLoc.getBlockY()),
                                 "z", String.valueOf(targetLoc.getBlockZ())
                         );
+                    }
+                    if (ex != null && searcher.isDebug()) {
+                        getLogger().log(Level.SEVERE, "Error while trying to teleport to location!", ex);
                     }
                 });
             });

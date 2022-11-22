@@ -64,13 +64,16 @@ public class RandomSearcher {
 
     private Set<Entity> targets = Collections.newSetFromMap(new LinkedHashMap<>());
 
+    private boolean debug = false;
     private String id = null;
     private long seed = -1;
     private Location center;
     private int minRadius = 0;
     private int maxRadius = Integer.MAX_VALUE;
     private int checkDelay = 1;
+    private boolean minYWasProvided = false;
     private int minY;
+    private boolean maxYWasProvided = false;
     private int maxY;
     private boolean loadedOnly = false;
     private boolean generatedOnly = false;
@@ -118,6 +121,22 @@ public class RandomSearcher {
      */
     public UUID getUniqueId() {
         return uniqueId;
+    }
+
+    /**
+     * Enable debugging messages for this searcher
+     * @param debug Whether to print debug messages
+     */
+    public void setDebug(boolean debug) {
+        this.debug = debug;
+    }
+
+    /**
+     * Get if debugging is enabled for this searcher
+     * @return Whether to print debug messages
+     */
+    public boolean isDebug() {
+        return debug;
     }
 
     /**
@@ -245,6 +264,33 @@ public class RandomSearcher {
     }
 
     /**
+     * Get the world this searcher will search in
+     * @return The world
+     */
+    public World getWorld() {
+        return center.getWorld();
+    }
+
+    /**
+     * Set the world this searcher will search in
+     * @param world The world
+     */
+    public void setWorld(World world) {
+        center.setWorld(world);
+        if (!minYWasProvided) {
+            minY = plugin.getMinHeight(world);
+        }
+
+        if (!maxYWasProvided) {
+            if (world.getEnvironment() == World.Environment.NETHER) {
+                maxY = 126;
+            } else {
+                maxY = world.getMaxHeight();
+            }
+        }
+    }
+
+    /**
      * Get the minimum Y
      * @return The minimum Y, always positive and less than the max Y!
      */
@@ -260,6 +306,7 @@ public class RandomSearcher {
         Validate.isTrue(minY >= plugin.getMinHeight(center.getWorld()), "Min Y has to be at least the world's minimum height!");
         Validate.isTrue(minY < maxY, "Min Y has to be less than the max Y!");
         this.minY = minY;
+        minYWasProvided = true;
     }
 
     /**
@@ -277,6 +324,7 @@ public class RandomSearcher {
     public void setMaxY(int maxY) {
         Validate.isTrue(maxY <= center.getWorld().getMaxHeight() && maxY > minY, "Max Y has to be greater than the min Y and at most the world's max height!");
         this.maxY = maxY;
+        maxYWasProvided = true;
     }
 
     /**
@@ -348,6 +396,9 @@ public class RandomSearcher {
         future = new CompletableFuture<>();
         checks = 0;
         checked.clear();
+        if (debug) {
+            plugin.getLogger().info("[DEBUG] " + uniqueId + " " + this + " started searching...");
+        }
         plugin.getServer().getScheduler().runTask(plugin, () -> checkRandom(future));
         future.whenComplete((l, e) -> plugin.getRunningSearchers().remove(uniqueId));
         return future;

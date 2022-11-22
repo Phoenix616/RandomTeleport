@@ -39,6 +39,7 @@ Option                          | Description
 `-t,-tries <amount>`            | the amount of times the plugin should try to find a random location before giving up  
 `-sp,spawnpoint [force]`        | set the respawn point of the player to the location he teleported to (force overrides existing spawnpoint)  
 `-checkdelay <ticks>`           | the amount of ticks to wait between each chunk check
+`-debug`                        | print some more debugging information in the log
 
 ## Permissions
 
