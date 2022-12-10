@@ -102,7 +102,7 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
                 .map(s -> {
                     Material mat = Material.matchMaterial(s);
                     if (mat == null) {
-                        getLogger().log(Level.WARNING, "Error in save-blocks config! No material found with name " + s);
+                        getLogger().log(Level.WARNING, "Error in safe blocks config! No material found with name " + s);
                     }
                     return mat;
                 })
@@ -118,7 +118,13 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
                 .map(s -> {
                     Material mat = Material.matchMaterial(s);
                     if (mat == null) {
-                        getLogger().log(Level.WARNING, "Error in unsave-blocks config! No material found with name " + s);
+                        getLogger().log(Level.WARNING, "Error in unsafe blocks config! No material found with name " + s);
+                    }
+                    // Air was in the default for a while now but will cause issues. Don't allow that.
+                    if (mat == Material.AIR) {
+                        getLogger().log(Level.WARNING, "Your list of unsafe blocks contained 'air'!" +
+                                " This will cause issues and has not been loaded. Remove it from your config to remove this warning!");
+                        return null;
                     }
                     return mat;
                 })

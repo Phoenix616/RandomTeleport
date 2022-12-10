@@ -26,7 +26,6 @@ safe-blocks:
 
 # Blocks not to teleport on or into
 unsafe-blocks:
-- air
 - water
 - lava
 - oak_sapling
