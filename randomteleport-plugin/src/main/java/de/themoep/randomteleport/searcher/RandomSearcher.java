@@ -455,41 +455,46 @@ public class RandomSearcher {
                 checkRandom(future);
                 return false;
             }
-            int indexOffset = random.nextInt(RANDOM_LIST.size());
-            Location foundLoc = null;
-            for (int i = 0; i < RANDOM_LIST.size(); i++) {
-                int index = (i + indexOffset) % RANDOM_LIST.size();
-                boolean validated = true;
-                Location loc = randomLoc.clone().add(RANDOM_LIST.get(index)[0], 0, RANDOM_LIST.get(index)[1]);
+            c.addPluginChunkTicket(plugin);
+            try {
+                int indexOffset = random.nextInt(RANDOM_LIST.size());
+                Location foundLoc = null;
+                for (int i = 0; i < RANDOM_LIST.size(); i++) {
+                    int index = (i + indexOffset) % RANDOM_LIST.size();
+                    boolean validated = true;
+                    Location loc = randomLoc.clone().add(RANDOM_LIST.get(index)[0], 0, RANDOM_LIST.get(index)[1]);
 
-                if (!inRadius(loc)) {
-                    continue;
-                }
+                    if (!inRadius(loc)) {
+                        continue;
+                    }
 
-                for (LocationValidator validator : getValidators().getAll()) {
-                    if (!validator.validate(this, loc)) {
-                        validated = false;
+                    for (LocationValidator validator : getValidators().getAll()) {
+                        if (!validator.validate(this, loc)) {
+                            validated = false;
+                            break;
+                        }
+                    }
+                    if (validated) {
+                        foundLoc = loc;
                         break;
                     }
                 }
-                if (validated) {
-                    foundLoc = loc;
-                    break;
-                }
-            }
 
-            if (foundLoc != null) {
-                // all checks are for the top block, put we want a location above that so add 1 to y
-                future.complete(foundLoc.add(0, 1, 0));
-                return true;
+                if (foundLoc != null) {
+                    // all checks are for the top block, put we want a location above that so add 1 to y
+                    future.complete(foundLoc.add(0, 1, 0));
+                    return true;
+                }
+                long diff = center.getWorld().getTime() - lastCheck;
+                if (diff < checkDelay) {
+                    plugin.getServer().getScheduler().runTaskLater(plugin, () -> checkRandom(future), checkDelay - diff);
+                } else {
+                    checkRandom(future);
+                }
+                return false;
+            } finally {
+                c.removePluginChunkTicket(plugin);
             }
-            long diff = center.getWorld().getTime() - lastCheck;
-            if (diff < checkDelay) {
-                plugin.getServer().getScheduler().runTaskLater(plugin, () -> checkRandom(future), checkDelay - diff);
-            } else {
-                checkRandom(future);
-            }
-            return false;
         }).exceptionally(future::completeExceptionally);
     }
 
