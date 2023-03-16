@@ -183,9 +183,11 @@ public class RandomTeleport extends JavaPlugin implements RandomTeleportAPI {
         }));
         addOptionParser(new SimpleOptionParser(array("w", "world"), (searcher, args) -> {
             if (args.length > 0) {
-                World world = getServer().getWorld(args[0]);
+                String[] worldNames = args[0].split(",");
+                String worldName = worldNames[searcher.getRandom().nextInt(worldNames.length)];
+                World world = getServer().getWorld(worldName);
                 if (world == null) {
-                    throw new WorldNotFoundException(args[0]);
+                    throw new WorldNotFoundException(worldName);
                 }
                 searcher.setWorld(world);
                 return true;

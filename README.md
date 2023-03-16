@@ -24,7 +24,7 @@ Usage                                       | Description
 Option                          | Description
 --------------------------------|-------------------------------------------
 `-p,-player <playername>`       | teleports other players 
-`-w,-world <worldname>`         | teleports the player in a specific world  
+`-w,-world <world1,world2,...>` | teleports the player in a specific or random world   
 `-b,-biome <biomename...>`      | only teleport to this biome (multiple allowed, Bukkit biome names!)  
 `-x,-xPos <x value>`            | x axis of the center point, if not set the player's x axis is used  
 `-z,-zPos <z value>`            | z axis of the center point, if not set the player's z axis is used  
