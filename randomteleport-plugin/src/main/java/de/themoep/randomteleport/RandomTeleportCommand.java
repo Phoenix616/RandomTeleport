@@ -78,7 +78,8 @@ public class RandomTeleportCommand implements CommandExecutor {
                         plugin.sendMessage(sender, "error.player-not-found", "what", args[1]);
                         return true;
                     }
-                    runPreset(args[0].toLowerCase(), sender, target, target.getLocation());
+                    String[] presets = args[0].split(",");
+                    runPreset(presets[RandomTeleport.RANDOM.nextInt(presets.length)].toLowerCase(), sender, target, target.getLocation());
                     return true;
                 }
                 sender.sendMessage(e.getMessage());
