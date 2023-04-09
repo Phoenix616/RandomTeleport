@@ -25,19 +25,19 @@ public class ChunkyBorderHook implements WorldborderHook {
     @Override
     public Location getCenter(World world) {
         BorderData borderData = chunkyBorder.getBorders().get(world.getName());
-        return new Location(world, borderData.getCenterX(),0D,borderData.getCenterZ());
+        return borderData != null ? new Location(world, borderData.getCenterX(),0D,borderData.getCenterZ()) : null;
     }
 
     @Override
     public double getBorderRadius(World world) {
         BorderData borderData = chunkyBorder.getBorders().get(world.getName());
-        return borderData.getRadiusX();
+        return borderData != null ? borderData.getRadiusX() : -1;
     }
 
     @Override
     public boolean isInsideBorder(Location location) {
         BorderData borderData = chunkyBorder.getBorders().get(location.getWorld().getName());
-        return borderData.getBorder().isBounding(location.getBlockX(),location.getBlockZ());
+        return borderData == null || borderData.getBorder().isBounding(location.getBlockX(),location.getBlockZ());
     }
 
     @Override
